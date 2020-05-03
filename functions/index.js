@@ -6,11 +6,38 @@ const bot = new WebClient(functions.config().slack.token);
 const { PubSub } = require('@google-cloud/pubsub');
 const pubsubClient = new PubSub();
 
+const crypto = require('crypto');
+const tsscmp = require('tsscmp');
+
+function legitSlackRequest(req) {
+  // Your signing secret
+  const slackSigningSecret = functions.config().slack.signing_secret;
+
+  // Grab the signature and timestamp from the headers
+  const requestSignature = req.headers['x-slack-signature'];
+  const requestTimestamp = req.headers['x-slack-request-timestamp'];
+
+  // Create the HMAC
+  const hmac = crypto.createHmac('sha256', slackSigningSecret);
+
+  // Update it with the Slack Request
+  const [version, hash] = requestSignature.split('=');
+  const base = `${version}:${requestTimestamp}:${JSON.stringify(req.body)}`;
+  hmac.update(base);
+
+  // Returns true if it matches
+  return tsscmp(hash, hmac.digest('hex'));
+}
 
 exports.slack = functions.https.onRequest(async (req,res) => {
 
-    // We need to verify the request here. this is a security problem
-    // verifySlackSignature(req); // See snippet above for implementation
+
+    const legit = legitSlackRequest(req);
+
+    if (!legit) { 
+        res.status(403).send('Slack signature mismatch.');
+        return;
+    }
 
     const data = JSON.stringify(req.body);
     const dataBuffer = Buffer.from(data);
