@@ -9,6 +9,8 @@ const pubsubClient = new PubSub();
 const crypto = require('crypto');
 const tsscmp = require('tsscmp');
 
+// Taken from Jeff Delaney in fireship.io
+// Validates that the request is a legit request from slack
 function legitSlackRequest(req) {
   // Your signing secret
   const slackSigningSecret = functions.config().slack.signing_secret;
@@ -31,26 +33,32 @@ function legitSlackRequest(req) {
 
 exports.slack = functions.https.onRequest(async (req,res) => {
 
-
+    //Checks if the request is a legit slack request
     const legit = legitSlackRequest(req);
-
     if (!legit) { 
         res.status(403).send('Slack signature mismatch.');
         return;
     }
 
-    const data = JSON.stringify(req.body);
-    const dataBuffer = Buffer.from(data);
+    const { event } = req.body; 
+    
+    const { type } = event; 
+    //Check if the event is a message
+    if (type === "message"){  
+        const { channel_type } = event;
+        // If it's a direct message   
+        if(channel_type === "im"){
 
-    await pubsubClient
-            .topic('personal-message').publish(dataBuffer);
+            //Send the data to the pubsub client. Since we need to respond to events in a short time,
+            // pubsub runs the processing somewhere else and we can return
+            const data = JSON.stringify(event);
+            const dataBuffer = Buffer.from(data);
+        
+            await pubsubClient
+                    .topic('personal-message').publish(dataBuffer);
+        }
+    }
 
-    // // Send a Message
-    // await bot.chat.postMessage({
-
-    //     channel: "#general",
-    //     text: req.body.event.text //`Uh someone just slid in my dms. What a creep`
-    // });
     res.sendStatus(200);
 
 
@@ -59,17 +67,9 @@ exports.personalMesage = functions.pubsub
   .topic('personal-message')
   .onPublish(async (message, context) => {
 
-    const { event } = message.json; 
+    const { user, channel , text} = message.json;
 
-    const { user, channel , text} = event;
-
-
-
-    // Get the full Slack profile
     const userResult = await bot.users.profile.get({ user });
-    // const { email, display_name } = userResult.profile;
-
-    const print = JSON.stringify(userResult.profile.real_name);
     // Send a Message
     const chatMessage = await bot.chat.postMessage({
         channel: '#general',
