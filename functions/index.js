@@ -1,11 +1,8 @@
 const functions = require('firebase-functions');
-
 const { WebClient }= require('@slack/web-api');
 const bot = new WebClient(functions.config().slack.token);
-
 const { PubSub } = require('@google-cloud/pubsub');
 const pubsubClient = new PubSub();
-
 const crypto = require('crypto');
 const tsscmp = require('tsscmp');
 
@@ -60,9 +57,8 @@ exports.slack = functions.https.onRequest(async (req,res) => {
     }
 
     res.sendStatus(200);
-
-
 });
+
 exports.personalMesage = functions.pubsub
   .topic('personal-message')
   .onPublish(async (message, context) => {
