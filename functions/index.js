@@ -31,8 +31,10 @@ app.command('/pairup', async ({ command, ack, say }) => {
     pairUp();
 
 });
+
 app.message(async ({ message, context }) => {
     try{
+        schedule();
         // console.log(message)
         if(message.channel_type === 'im'){
             app.client.chat.postMessage({
@@ -49,6 +51,28 @@ app.message(async ({ message, context }) => {
 });
 exports.slack = functions.https.onRequest(expressReceiver.app);
 
+async function schedule() {
+    try {
+        // This works, but it cant be recurring. 
+        // const result = await app.client.chat.scheduleMessage({
+        //     // The token you used to initialize your app is stored in the `context` object
+        //     token: token,
+        //     channel: '#general',
+        //     post_at: 1588966200, //12:30
+        //     text: 'Scheduling a message at 12:30'
+        // });
+        app.client.reminders.add({
+            token: token,
+            text: "Scheduling a message everyday at 3:45pm", 
+            time: "every weekday at 3:45 pm", // tested with /remind command
+            //channel: "#general"
+        })
+
+    }
+    catch(error) {
+        console.error(error);
+    }
+}
 
 async function pairUp(){
     try{
