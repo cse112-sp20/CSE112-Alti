@@ -30,6 +30,13 @@ function legitSlackRequest(req) {
 
 exports.slack = functions.https.onRequest(async (req,res) => {
 
+
+    // Request from Slack
+    const { challenge }  = req.body;
+    if(challenge){    // Response from You
+        res.send({ challenge })
+        return;
+    }
     //Checks if the request is a legit slack request
     const legit = legitSlackRequest(req);
     if (!legit) { 
