@@ -47,6 +47,197 @@ app.message(async ({ message, context }) => {
     }
 
 });
+
+// Handle the occurence when a user opens the app home tab
+app.event("app_home_opened", async ({ payload, context }) => {
+  //generate a reference to the user id 
+  const userId = payload.user;
+  try {
+    // Call the views.publish method using the built-in WebClient
+    const result = await app.client.views.publish({
+      // The token you used to initialize your app is stored in the `context` object
+      token: context.botToken,
+      user_id: userId,
+      view: {
+        // Home tabs must be enabled in your app configuration page under "App Home"
+        "type": "home",
+        "blocks": [
+			{
+				"type": "section",
+				"text": {
+					"type": "plain_text",
+					"emoji": true,
+					"text": `*Hey ${  userId  }, pick a warmup for your buddy!*`
+				}
+			},
+			{
+				"type": "divider"
+			},
+			{
+				"type": "section",
+				"text": {
+					"type": "mrkdwn",
+					"text": "*Buddy Name*\nTuesday, January 21 9:30 AM\n"
+				}
+			},
+			{
+				"type": "divider"
+			},
+			{
+				"type": "section",
+				"text": {
+					"type": "mrkdwn",
+					"text": "*Pick a content type:*"
+				}
+			},
+			{
+				"type": "section",
+				"text": {
+					"type": "mrkdwn",
+					"text": "*Code Speed Typing Test*"
+				},
+				"accessory": {
+					"type": "button",
+					"text": {
+						"type": "plain_text",
+						"emoji": true,
+						"text": "Choose"
+					},
+					"value": "select_test"
+				}
+			},
+			{
+				"type": "section",
+				"text": {
+					"type": "mrkdwn",
+					"text": "*Tech Article*"
+				},
+				"accessory": {
+					"type": "button",
+					"text": {
+						"type": "plain_text",
+						"emoji": true,
+						"text": "Choose"
+					},
+					"value": "select_article"
+				}
+			},
+			{
+				"type": "section",
+				"text": {
+					"type": "mrkdwn",
+					"text": "*Easy Online Puzzle*"
+				},
+				"accessory": {
+					"type": "button",
+					"text": {
+						"type": "plain_text",
+						"emoji": true,
+						"text": "Choose"
+					},
+					"value": "select_puzzle"
+				}
+			},
+			{
+				"type": "section",
+				"text": {
+					"type": "mrkdwn",
+					"text": "*Motivational Quote*"
+				},
+				"accessory": {
+					"type": "button",
+					"text": {
+						"type": "plain_text",
+						"emoji": true,
+						"text": "Choose"
+					},
+					"value": "select_quote"
+				}
+			},
+			 {
+				"type": "section",
+				"text": {
+					"type": "mrkdwn",
+					"text": "*Custom Message*"
+				},
+				"accessory": {
+					"action_id": "select_custom", 
+					"type": "button",
+					"text": {
+						"type": "plain_text",
+						"emoji": true,
+						"text": "Choose"
+					},
+					"value": "select_custom"
+				}
+			}
+		]
+      }
+    });
+
+    console.log(result);
+  }
+  catch (error) {
+    console.error(error);
+  }
+});
+//submission responser handler
+app.action('ml_input', async ({ body, context, ack }) => {
+  response_action: 'clear'
+});
+
+//selection respose handler
+app.action('select_custom', async ({ body, context, ack }) => {
+  ack();  
+  try {
+    const result = await app.client.views.open({
+      token: context.botToken,
+      trigger_id: body.trigger_id,
+      view: {
+		"type": "modal",
+		"title": {
+			"type": "plain_text",
+			"text": "Message your buddy!",
+			"emoji": true
+		},
+		"submit": {
+			"type": "plain_text",
+			"text": "Submit",
+			"emoji": true
+		},
+		"close": {
+			"type": "plain_text",
+			"text": "Cancel",
+			"emoji": true
+		},
+		"blocks": [
+			{
+				"type": "input",
+				"element": {
+					"type": "plain_text_input",
+					"action_id": "ml_input",
+					"multiline": true,
+					"placeholder": {
+						"type": "plain_text",
+						"text": "Type it here!"
+					}
+				},
+				"label": {
+					"type": "plain_text",
+					"text": "Warmup"
+				}
+			}
+		]
+	}
+    });
+    
+  } catch(e) {
+    console.log(e);
+    app.error(e);
+  }
+});
+
+
 exports.slack = functions.https.onRequest(expressReceiver.app);
 
 
