@@ -45,30 +45,19 @@ exports.slack = functions.https.onRequest(async (req,res) => {
         const { channel_type } = event;
         // If it's a direct message   
         if(channel_type === "im"){
-
-            //Send the data to the pubsub client. Since we need to respond to events in a short time,
-            // pubsub runs the processing somewhere else and we can return
-            const data = JSON.stringify(event);
-            const dataBuffer = Buffer.from(data);
-        
-            await pubsubClient
-                    .topic('personal-message').publish(dataBuffer);
+            personalMessage(event);
         }
     }
 
     res.sendStatus(200);
 });
 
-exports.personalMesage = functions.pubsub
-  .topic('personal-message')
-  .onPublish(async (message, context) => {
+async function personalMessage (data) {
 
-    const { user, channel , text} = message.json;
-
-    const userResult = await bot.users.profile.get({ user });
+    const { user, channel , text} = data;
     // Send a Message
-    const chatMessage = await bot.chat.postMessage({
+    bot.chat.postMessage({
         channel: '#general',
-        text: `${userResult.profile.first_name} just DMd me. What a creep! Other people should also know that "${text}"`
+        text: `Someone just DMd me. What a creep! Other people should also know that "${text}"`
     });
-});
+};
