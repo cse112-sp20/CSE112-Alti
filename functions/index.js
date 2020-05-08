@@ -1,70 +1,42 @@
 const functions = require('firebase-functions');
-const { WebClient }= require('@slack/web-api');
-const bot = new WebClient(functions.config().slack.token);
-const { PubSub } = require('@google-cloud/pubsub');
-const pubsubClient = new PubSub();
-const crypto = require('crypto');
-const tsscmp = require('tsscmp');
+const { App, ExpressReceiver } = require('@slack/bolt');
+const admin = require('firebase-admin');
 
-// Taken from Jeff Delaney in fireship.io
-// Validates that the request is a legit request from slack
-function legitSlackRequest(req) {
-  // Your signing secret
-  const slackSigningSecret = functions.config().slack.signing_secret;
+admin.initializeApp();
 
-  // Grab the signature and timestamp from the headers
-  const requestSignature = req.headers['x-slack-signature'];
-  const requestTimestamp = req.headers['x-slack-request-timestamp'];
-
-  // Create the HMAC
-  const hmac = crypto.createHmac('sha256', slackSigningSecret);
-
-  // Update it with the Slack Request
-  const [version, hash] = requestSignature.split('=');
-  const base = `${version}:${requestTimestamp}:${JSON.stringify(req.body)}`;
-  hmac.update(base);
-
-  // Returns true if it matches
-  return tsscmp(hash, hmac.digest('hex'));
-}
-
-exports.slack = functions.https.onRequest(async (req,res) => {
-
-
-    // Request from Slack
-    const { challenge }  = req.body;
-    if(challenge){    // Response from You
-        res.send({ challenge })
-        return;
-    }
-    //Checks if the request is a legit slack request
-    const legit = legitSlackRequest(req);
-    if (!legit) { 
-        res.status(403).send('Slack signature mismatch.');
-        return;
-    }
-
-    const { event } = req.body; 
-    
-    const { type } = event; 
-    //Check if the event is a message
-    if (type === "message"){  
-        const { channel_type } = event;
-        // If it's a direct message   
-        if(channel_type === "im"){
-            personalMessage(event);
-        }
-    }
-
-    res.sendStatus(200);
+const expressReceiver = new ExpressReceiver({
+    signingSecret: functions.config().slack.signing_secret,
+    endpoints: '/events'
 });
 
-async function personalMessage (data) {
+const app = new App({
+    receiver: expressReceiver,
+    token: functions.config().slack.token
+});
 
-    const { user, channel , text} = data;
-    // Send a Message
-    bot.chat.postMessage({
-        channel: '#general',
-        text: `Someone just DMd me. What a creep! Other people should also know that "${text}"`
-    });
-}
+// Global error handler
+app.error(console.log);
+
+// Handle `/echo` command invocations
+app.command('/pairup', async ({ command, ack, say }) => {
+    // Acknowledge command request
+    ack();
+    say(`You said "${command.text}"`);
+});
+app.message(async ({ message, context }) => {
+    try{
+        // console.log(message)
+        if(message.channel_type === 'im'){
+            app.client.chat.postMessage({
+                token: context.botToken,
+                channel: '#general',
+                text: `<@${message.user}> just DMd me. What a creep! Other people should also know that "${message.text}"`
+            });
+        }
+    }
+    catch(error){
+        console.error(error);
+    }
+
+});
+exports.slack = functions.https.onRequest(expressReceiver.app);
