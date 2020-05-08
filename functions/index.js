@@ -60,4 +60,4 @@ async function personalMessage (data) {
         channel: '#general',
         text: `Someone just DMd me. What a creep! Other people should also know that "${text}"`
     });
-};
+}
