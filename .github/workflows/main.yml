@@ -16,10 +16,12 @@ jobs:
     - name: Install Dependencys Top 
       working-directory: ./
       run: npm install
-    - name: Install Firebase
-      run: npm install firebase-tools
-    - name: firebase init
-      run: firebase init
-    - name: Deploy to Firebase
-      working-directory: ./
-      run: firebase deploy --token ${{ secrets.FIREBASE_TOKEN }}
+#     - name: Install Firebase
+#       run: npm install firebase-tools
+#     - name: firebase init
+#       run: firebase init
+    - uses: w9jds/firebase-action@master
+      with:
+        args: deploy --only hosting
+      env:
+        FIREBASE_TOKEN: ${{ secrets.FIREBASE_TOKEN }}
