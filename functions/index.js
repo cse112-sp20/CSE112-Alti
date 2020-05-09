@@ -7,7 +7,6 @@ const config = functions.config();
 const signingSecret = config.slack.signing_secret;
 const token = config.slack.token;
 const bot_token = config.slack.bot_token;
-const bot_id = config.slack.bot_id;
 
 
 admin.initializeApp();
@@ -15,12 +14,11 @@ admin.initializeApp();
 const expressReceiver = new ExpressReceiver({
     signingSecret: signingSecret,
     endpoints: '/events',
-    botId: bot_id
 });
 
 const app = new App({
     receiver: expressReceiver,
-    token: token
+    token: bot_token
 });
 
 // Global error handler
@@ -38,7 +36,7 @@ app.command('/pairup', async ({ command, ack, say }) => {
 
 app.message(async ({ message, context }) => {
     try{
-        schedule();
+        // schedule(); //doesnt work for now
         // console.log(message)
         if(message.channel_type === 'im'){
             app.client.chat.postMessage({
@@ -55,6 +53,7 @@ app.message(async ({ message, context }) => {
 });
 exports.slack = functions.https.onRequest(expressReceiver.app);
 
+//fixing
 async function schedule() {
     try {
         // This works, but it cant be recurring. 
@@ -80,7 +79,7 @@ async function schedule() {
 async function pairUp(){
     try{
         const {members} = await app.client.users.list({
-            token:token
+            token:bot_token
         });
    
         // Get the human users among all users
@@ -105,7 +104,7 @@ async function pairUp(){
             // console.log(pair);
             
             var responsePromise = app.client.conversations.open({
-                token: token,
+                token: bot_token,
                 return_im: false,
                 users: ids[i]+','+ids[(ids.length/2) + i]
             })
@@ -129,7 +128,7 @@ async function handlePairingResponse(response){
     //     channel: response.channel.id
     // });
     return app.client.chat.postMessage({
-        token: token,
+        token: bot_token,
         channel: response.channel.id,
         text: "You ppl just got paired!"
     });
