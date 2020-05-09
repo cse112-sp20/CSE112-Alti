@@ -6,12 +6,16 @@ const shuffle = require('shuffle-array');
 const config = functions.config();
 const signingSecret = config.slack.signing_secret;
 const token = config.slack.token;
+const bot_token = config.slack.bot_token;
+const bot_id = config.slack.bot_id;
+
 
 admin.initializeApp();
 
 const expressReceiver = new ExpressReceiver({
     signingSecret: signingSecret,
-    endpoints: '/events'
+    endpoints: '/events',
+    botId: bot_id
 });
 
 const app = new App({
@@ -38,9 +42,9 @@ app.message(async ({ message, context }) => {
         // console.log(message)
         if(message.channel_type === 'im'){
             app.client.chat.postMessage({
-                token: token,
+                token: bot_token,
                 channel: '#general',
-                text: `<@${message.user}> just DMd me. What a creep! Other people should also know that "${message.text}"`
+                text: `<@${message.user}> just DMd me. What a creep?! Other people should also know that "${message.text}"`
             });
         }
     }
@@ -61,13 +65,12 @@ async function schedule() {
         //     post_at: 1588966200, //12:30
         //     text: 'Scheduling a message at 12:30'
         // });
-        app.client.reminders.add({
+        const result = await app.client.reminders.add({
             token: token,
             text: "Scheduling a message everyday at 3:45pm", 
-            time: "every weekday at 3:45 pm", // tested with /remind command
+            time: "5:10 pm", // tested with /remind command
             //channel: "#general"
-        })
-
+        });
     }
     catch(error) {
         console.error(error);
