@@ -1,0 +1,25 @@
+name: Build and Deploy
+on:
+  push:
+    branches:
+    - master
+jobs:
+  main:
+    name: Build and Deploy
+    runs-on: ubuntu-latest
+    steps:
+    - name: Check out code
+      uses: actions/checkout@master
+    - name: Install Dependencys Bottom 
+      working-directory: ./functions
+      run: npm install
+    - name: Install Dependencys Top 
+      working-directory: ./
+      run: npm install
+    - name: Install Firebase
+      run: npm install firebase-tools
+    - name: firebase init
+      run: firebase init
+    - name: Deploy to Firebase
+      working-directory: ./
+      run: firebase deploy --token ${{ secrets.FIREBASE_TOKEN }}
