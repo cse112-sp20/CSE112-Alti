@@ -1,33 +1,48 @@
-
 const shuffle = require('shuffle-array');
 
-exports.pairUp = async function pairUp(app, token){
+exports.pairUp = async function pairUp(app, token, channelName){
     try{
-        const {members} = await app.client.users.list({
-            token:token
+        
+        const channelId = getChannelIdByName(app, token, channelName)
+
+        const members = channelId.then( id => {
+            return app.client.conversations.members({
+                    token:token,
+                    channel:id
+            });
         });
-   
-        // Get the human users among all users
-        const users = Array.from(members);
-        const humans = users.filter( user => {
-            //SlackBot is includeded now for testing purposes, need to filter that out too.
-            return !user.is_bot && user.id!=='USLACKBOT';
+        const usersInfo = await members.then( members => {
+            
+            const ids = members.members;
+            return ids.map(id => {
+                return app.client.users.info({
+                    token:token,
+                    user:id
+                });
+            })
+        });
+        const ids = await Promise.all(usersInfo).then( usersInfo => {
+            const users = usersInfo.map( info => info.user);
+            const humans = users.filter( user => {
+                //SlackBot is also excluded. Filters non-humans
+                return !user.is_bot && user.id!=='USLACKBOT';
+            });
+
+            if(humans.length <= 1){
+                console.error("Could not pair since there is less than 2 people in the workspace");
+                return undefined;
+            }
+            var ids = humans.map( human => {
+                return human.id;
+            });
+            // // Randomize the order of people
+            shuffle(ids);
+            return ids
         });
 
-        if(humans.length <= 1){
-            console.log("Could not pair since there is less than 2 people in the workspace");
-            return;
-        }
-        var ids = humans.map( human => human.id );
-
-        // Randomize the order of people
-        shuffle(ids);
 
         for (i = 0; i < ids.length/2; i++) {
-            
-            // var pair = new Array(ids[i], ids[i]);
-            // console.log(pair);
-            
+
             var responsePromise = app.client.conversations.open({
                 token: token,
                 return_im: false,
@@ -43,6 +58,8 @@ exports.pairUp = async function pairUp(app, token){
         console.error(error);
     }
 }
+
+
 async function handlePairingResponse(response, app, token){
 
     if(!response.ok){
@@ -59,4 +76,29 @@ async function handlePairingResponse(response, app, token){
     });
 }
 
-// export{ pairUp };
+
+async function getChannelIdByName(app, token, channelName){
+    const conversations = app.client.conversations.list({
+        token:token
+    });
+    const channelId = conversations.then( conversations => {
+        const filteredChannels = conversations.channels.filter( channel => {
+            if(channel.name === channelName){
+                return true;
+            }
+            else return false;
+        })
+
+        if (filteredChannels.length === 0){
+            console.error("Target channel not found");
+            return undefined;
+        }
+        if (filteredChannels.length > 1){
+            console.error("Multiple channels found");
+            return undefined;
+        }
+
+        return filteredChannels[0].id;
+    });
+    return channelId;
+}
