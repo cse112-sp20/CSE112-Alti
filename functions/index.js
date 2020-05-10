@@ -1,16 +1,15 @@
-const { App, ExpressReceiver } = require('@slack/bolt');
-
 const functions = require('firebase-functions');
+const { App, ExpressReceiver } = require('@slack/bolt');
+const admin = require('firebase-admin');
+
 const config = functions.config();
 const signingSecret = config.slack.signing_secret;
-const user_token = config.slack.token;
+const token = config.slack.token;
 const pairUp = require('./pairUp');
 const bot_token = config.slack.bot_token;
 
-const admin = require('firebase-admin');
 
-admin.initializeApp(functions.config().firebase);
-let db = admin.firestore();
+admin.initializeApp();
 
 const expressReceiver = new ExpressReceiver({
     signingSecret: signingSecret,
@@ -55,9 +54,49 @@ app.message(async ({ message, context }) => {
 exports.slack = functions.https.onRequest(expressReceiver.app);
 
 //fixing
+
+
+async function getChannelId()
+{
+  try{
+      const {channels} = await app.client.conversations.list({
+          token:token
+      });
+      var i;
+      for (i = 0; i < channels.length; i++)
+      {
+        //put which channel you want to get id from
+        if (channels[i]['name'] === 'general')
+        {
+          id = channels[i]['id'];
+          //console.log(id);
+        }
+      }
+      usersFromChannelId(id);
+    }
+    catch(error) {
+        console.error(error);
+    }
+}
+
+async function usersFromChannelId(id)
+{
+  try{
+      const {members} = await app.client.conversations.members({
+          token:token,
+          channel:id
+
+      });
+    console.log(members)
+    }
+    catch(error) {
+        console.error(error);
+    }
+}
+
 async function schedule() {
     try {
-        // This works, but it cant be recurring. 
+        // This works, but it cant be recurring.
         // const result = await app.client.chat.scheduleMessage({
         //     // The token you used to initialize your app is stored in the `context` object
         //     token: token,
@@ -66,8 +105,8 @@ async function schedule() {
         //     text: 'Scheduling a message at 12:30'
         // });
         const result = await app.client.reminders.add({
-            token: user_token,
-            text: "Scheduling a message everyday at 3:45pm", 
+            token: token,
+            text: "Scheduling a message everyday at 3:45pm",
             time: "5:10 pm", // tested with /remind command
             //channel: "#general"
         });
@@ -77,18 +116,29 @@ async function schedule() {
     }
 }
 
-app.command('/firestore', async ({ command, ack, say }) => {
-    // Acknowledge command request
 
-    ack();
-    let docRef = db.collection('Workspaces').doc('T0132EDC3M4').get().then((doc) => {
-            if (!(doc && doc.exists)) {
-                return console.log({ error: 'Unable to find the document' });
-            }
-            return say(String(doc.data().users));
-        }).catch((err) => {
-            return console.log('Error getting documents', err);
-        });
-    say(`Trying to firebase`);
 
-});
+// const Firestore = require('@google-cloud/firestore');
+// const PROJECTID = 'altitest-5f53d';
+// const COLLECTION_NAME = 'Workspaces';
+// const firestore = new Firestore({
+//   projectId: PROJECTID,
+//   timestampsInSnapshots: true,
+// });
+
+
+// Firestore access example:
+
+// firestore.collection(COLLECTION_NAME)
+// .doc('T0132EDC3M4')
+// .get()
+// .then(doc => {
+//   if (!(doc && doc.exists)) {
+//     console.log({ error: 'Unable to find the document' });
+//   }
+//   const data = doc.data();
+//   console.log(data);
+// }).catch(err => {
+//   console.error(err);
+//   console.log({ error: 'Unable to retrieve the document' });
+// });
