@@ -61,38 +61,8 @@ app.message(async ({ message, context }) => {
 });
 exports.slack = functions.https.onRequest(expressReceiver.app);
 
-<<<<<<< HEAD
-=======
-//fixing
-
-
-async function schedule() {
-    try {
-        // This works, but it cant be recurring.
-        // const result = await app.client.chat.scheduleMessage({
-        //     // The token you used to initialize your app is stored in the `context` object
-        //     token: token,
-        //     channel: '#general',
-        //     post_at: 1588966200, //12:30
-        //     text: 'Scheduling a message at 12:30'
-        // });
-        const result = await app.client.reminders.add({
-            token: user_token,
-            text: "Scheduling a message everyday at 3:45pm",
-            time: "5:10 pm", // tested with /remind command
-            //channel: "#general"
-        });
-    }
-    catch(error) {
-        console.error(error);
-    }
-}
->>>>>>> 65c77067f9535966af50379191b773cabdb87736
-
-
 app.command('/firestore', async ({ command, ack, say }) => {	
     // Acknowledge command request	
-
 
     ack();	
     let docRef = db.collection('Workspaces').doc('T0132EDC3M4').get().then((doc) => {	
