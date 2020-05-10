@@ -6,6 +6,7 @@ const config = functions.config();
 const signingSecret = config.slack.signing_secret;
 const token = config.slack.token;
 const pairUp = require('./pairUp');
+const schedule = require('./schedule');
 const bot_token = config.slack.bot_token;
 
 
@@ -34,10 +35,16 @@ app.command('/pairup', async ({ command, ack, say }) => {
 
 });
 
+app.command('/warmup', async({command, ack, say}) => {
+
+    ack();
+    say(`Trying to schedule a warmup at 9am`);
+    schedule.warmup(app, token); 
+    //schedule.show(app, token); //doesnt work yet. Check the code. 
+});
+
 app.message(async ({ message, context }) => {
     try{
-        // schedule(); //doesnt work for now
-        // console.log(message)
         if(message.channel_type === 'im'){
             app.client.chat.postMessage({
                 token: bot_token,
@@ -53,28 +60,6 @@ app.message(async ({ message, context }) => {
 });
 exports.slack = functions.https.onRequest(expressReceiver.app);
 
-//fixing
-async function schedule() {
-    try {
-        // This works, but it cant be recurring. 
-        // const result = await app.client.chat.scheduleMessage({
-        //     // The token you used to initialize your app is stored in the `context` object
-        //     token: token,
-        //     channel: '#general',
-        //     post_at: 1588966200, //12:30
-        //     text: 'Scheduling a message at 12:30'
-        // });
-        const result = await app.client.reminders.add({
-            token: token,
-            text: "Scheduling a message everyday at 3:45pm", 
-            time: "5:10 pm", // tested with /remind command
-            //channel: "#general"
-        });
-    }
-    catch(error) {
-        console.error(error);
-    }
-}
 
 
 
