@@ -3,10 +3,17 @@ const firestoreFuncs = require('./firestore');
 
 exports.pairUp = async function pairUp(app, token, channelName){
     try{
+        // TODO: Take this out of this function and pass it in as a parameter ideally
+        const workspaceInfo = await app.client.team.info({
+            token: token
+        })
         
         const channelId = getChannelIdByName(app, token, channelName)
+        var pairingChannelIdVal;
+        // const workspaceInfo = await workspaceInfoPromise.then(result => result.data);
 
         const members = channelId.then( id => {
+            pairingChannelIdVal = id;
             return app.client.conversations.members({
                     token:token,
                     channel:id
@@ -22,6 +29,7 @@ exports.pairUp = async function pairUp(app, token, channelName){
                 });
             })
         });
+        // Get all the necessary user ids
         const ids = await Promise.all(usersInfo).then( usersInfo => {
             const users = usersInfo.map( info => info.user);
             const humans = users.filter( user => {
@@ -36,30 +44,32 @@ exports.pairUp = async function pairUp(app, token, channelName){
             var ids = humans.map( human => {
                 return human.id;
             });
-            // // Randomize the order of people
+            // Randomize the order of people
             shuffle(ids);
             return ids
         });
 
-
+        //Pairing people up randomly and saving the response containing the paired channel information
+        conversationInfos = []
         for (i = 0; i < ids.length/2; i++) {
-
             var responsePromise = app.client.conversations.open({
                 token: token,
                 return_im: false,
                 users: ids[i]+','+ids[(ids.length/2) + i]
             })
-            responsePromise.then(async response => {
-                handlePairingResponse(response, app, token);
-                // TODO need to get workspace somehow
-                var workspacePromise = await app.client.team.info({
-                    token: token
-                })
-
-                firestoreFuncs.storeNewPairings(workspacePromise.team.id, await channelId, response.channel.id);
-            })
-            .catch(console.error);
+            conversationInfos.push(responsePromise);
+            
         }
+        // Going through the paired channels and post messages to them.
+        // also store the pairing info on the firebase
+        Promise.all(conversationInfos).then(async responses => {
+            return Promise.resolve(responses.map(response => {
+                return handlePairingResponse(response, app, token, workspaceInfo, pairingChannelIdVal);
+            }));
+
+        })
+        .catch(console.error);       
+
 
     }
     catch(error){
@@ -67,21 +77,17 @@ exports.pairUp = async function pairUp(app, token, channelName){
     }
 }
 
-
-async function handlePairingResponse(response, app, token){
-
+// Handles pairing response by posting a message to the pairing channel and storing pairing information on firestore
+async function handlePairingResponse(response, app, token, workspaceInfo, pairingChannelIdVal){
     if(!response.ok){
         return console.error(response.error);
     }
-    // app.client.conversations.join({
-    //     token: token,
-    //     channel: response.channel.id
-    // });
-    return app.client.chat.postMessage({
+    app.client.chat.postMessage({
         token: token,
         channel: response.channel.id,
         text: "You ppl just got paired!"
     });
+    return firestoreFuncs.storeNewPairings(workspaceInfo.team.id, pairingChannelIdVal, response.channel.id);
 }
 
 
