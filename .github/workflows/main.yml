@@ -13,8 +13,8 @@ jobs:
     - name: Install Dependencys Bottom 
       working-directory: ./functions
       run: npm install
-    - name: Run Tests
-      run: npm test
+#    - name: Run Tests
+#      run: npm test
 #     - name: Install Dependencys Top 
 #       working-directory: ./
 #       run: npm install
