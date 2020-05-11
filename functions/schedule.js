@@ -9,53 +9,39 @@ exports.warmup = async function warmup(app, token) {
         //invoke sayStuff every 2 second
         //let timerId = setInterval(sayStuff, 2000, app, token, hour);
 
-<<<<<<< HEAD
-<<<<<<< HEAD
-        var now = new Date(),
-        start,
-        wait;
-
-        if (now.getHours() < hour) {
-            start = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 8, 0, 0, 0);
-        } else {
-            start = new Date(now.getFullYear(), now.getMonth(), now.getDate() + 1, 8, 0, 0, 0);
-        }
-
-        wait = start.getTime() - now.getTime();
-
-        if(wait <= 0) { //If missed 8am before going into the setTimeout
-            console.log('Oops, missed the hour');
-            every8am(yourcode); //Retry
-        } else {
-            setTimeout(function () { //Wait 8am
-                setInterval(function () {
-                    yourcode();
-                }, 86400000); //Every day
-            },wait);
-        }
-=======
-        //var d = new Date();
-
-        let timerId = setInterval(sayStuff, 60000, app, token, hour);
->>>>>>> 39e13bda147a81ef48f0974f8d71162fd9e661f1
-=======
         // Guide set timeout event to certain time, then set interval function every 24 hours.
         // Need to timeout until 9:00 am, it runs sayStuff once, sayStuff will run dummy function
         // finalReminder which is going to run indefnitely every day at 9 am afterwards.
 
         // Need to figure out how to timeout until 9am. 
         var d = new Date();
-        var current = d.getTime();
+        var c = new Date();
 
-        // Currently timing out for just 2 seconds
-        let timerId = setTimeout(sayStuff, 2000, app, token, hour);
->>>>>>> efed2d9f7fd757ee8d0bc0415dd19dabdb24b400
+        var currentHour = d.getHours();
+
+        if( currentHour < 9 )
+        {
+            c.setHours(9);
+            c.setMinutes(0);
+            c.setSeconds(0);
+        }
+        else
+        {
+            c.setDate(d.getDate()+1);
+            c.setHours(9);
+            c.setMinutes(0);
+            c.setSeconds(0);
+        }
+
+        var timeoutDuration = (c.getTime() - d.getTime());
+
+        // Timing out until the next 9:00 am time
+        let timerId = setTimeout(sayStuff, timeoutDuration, app, token, hour);
 
     } catch(error) {
         console.error(error);
     }
 }
-
 
 async function sayStuff(app, token, hour) {
     var d = new Date();
@@ -70,8 +56,8 @@ async function sayStuff(app, token, hour) {
         });
     }
 
-    // Change time val to 86400000 for recurring 24 hours
-    var time = setInterval(finalReminder, 10000, app, token, hour);
+    // Change time val to 86400000 for recurring 24 hours, test with 2,3 sec
+    var time = setInterval(finalReminder, 86400000, app, token, hour);
 
 }
 
