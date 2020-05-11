@@ -7,7 +7,13 @@ const config = functions.config();
 const signingSecret = config.slack.signing_secret;
 const token = config.slack.token;
 
-admin.initializeApp();
+var serviceAccount = require("serviceKey.json");
+
+admin.initializeApp({
+  credential: admin.credential.cert(serviceAccount),
+  databaseURL: "https://altitest-5f53d.firebaseio.com"
+});
+
 
 const expressReceiver = new ExpressReceiver({
     signingSecret: signingSecret,
@@ -84,6 +90,7 @@ na
 */
 app.action('request_custom_send', async ({ ack, body, context }) => {
     await ack();
+	console.log(body.channel.id);
     try {
       const result = await app.client.views.open({
         token: context.botToken,
@@ -99,7 +106,7 @@ app.action('request_custom_send', async ({ ack, body, context }) => {
 			blocks: [
 			  {
 				type: 'input',
-				block_id: body.channel_id,
+				block_id: body.channel.id,
 				label: {
 				  type: 'plain_text',
 				  text: 'Enter your custom message here below.'
@@ -154,9 +161,9 @@ app.view('custom_msg_view', async ({ ack, body, view, context }) => {
 	  }
   }
   const teamID = body['team']['id'];
-  const userId = body['user']['id'];
-  console.log(userId + " in " + channelID + " sent the following: " + msgToSend+ "in team:"+ teamID);
-  //SAVE TO DB
+  const userID = body['user']['id'];
+  console.log(userID + " in " + channelID + " sent the following: " + msgToSend+ "in team:"+ teamID);
+  writeToDB(teamID, userID, channelID,msgToSend,true);
 });
   
 exports.slack = functions.https.onRequest(expressReceiver.app);
@@ -360,7 +367,28 @@ async function handlePairingResponse(response){
         text: "You ppl just got paired!"
     });
 }
-
+async function writeToDB(teamId, userID, channelID,msgToSend,isWarmup) {
+	if (isWarmup === true) {
+		admin.firestore().collection("workspaces").doc(teamId+"/activeChannels/"+channelID+"/teammatePairings/"+userID).set({
+			warmupMessage: msgToSend
+		}).then(function() {
+		console.log("Document successfully written!");
+		})
+		.catch(function(error) {
+			console.error("Error writing document: ", error);
+		});
+	}
+	else {
+		admin.firestore().collection("workspaces").doc(teamId+"/activeChannels/"+channelID+"/teammatePairings/"+userID).set({
+			cooldownMessage: msgToSend
+		}).then(function() {
+		console.log("Document successfully written!");
+		})
+		.catch(function(error) {
+			console.error("Error writing document: ", error);
+		});	
+	}
+}
 
 // const Firestore = require('@google-cloud/firestore');
 // const PROJECTID = 'altitest-5f53d';
