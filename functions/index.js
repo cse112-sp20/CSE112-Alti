@@ -153,9 +153,9 @@ app.view('custom_msg_view', async ({ ack, body, view, context }) => {
 		channelID=key;
 	  }
   }
-  //const teamID = team['id'];
+  const teamID = body['team']['id'];
   const userId = body['user']['id'];
-  //console.log(userId + " in " + channelID + " sent the following: " + msgToSend+ "in team:"+ teamID);
+  console.log(userId + " in " + channelID + " sent the following: " + msgToSend+ "in team:"+ teamID);
   //SAVE TO DB
 });
   
