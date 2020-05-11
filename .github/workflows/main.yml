@@ -5,8 +5,10 @@ on:
     - master
 jobs:
   main:
+
     name: Build and Deploy
     runs-on: ubuntu-latest
+
     steps:
     - name: Check out code
       uses: actions/checkout@master
