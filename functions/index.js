@@ -53,6 +53,13 @@ app.message(async ({ message, context }) => {
     }
 
 });
+
+
+//submission responser handler
+app.event('send_input', async ({ body, context, ack }) => {
+	 ack();
+});
+
 // Handle '/setupWarmup` command invocations
 app.command('/setupwarmup', async ({ command, ack, say }) => {
     // Acknowledge command request
@@ -60,12 +67,6 @@ app.command('/setupwarmup', async ({ command, ack, say }) => {
 	//send Warmup prompts to the channel that this command was called from
     sendSelectChoice(command.channel_id);
 });
-
-//submission responser handler
-app.event('send_input', async ({ body, context, ack }) => {
-	 ack();
-});
-
 /*
 generic_button Action Listener
 Descr: Listens for a slack provided action id matching 'generic_button'
@@ -79,7 +80,7 @@ app.action('generic_button', async ({ action, ack, context }) => {
 });
 
 /*
-select_user Action Listener
+request_custom_send Action Listener
 Descr: Listens for a slack provided action id matching 
 'request_custom_send' and opens a model for sending a custom message
 in the user's from where the action originated from window with a 
@@ -145,14 +146,13 @@ app.view('custom_msg_view', async ({ ack, body, view, context }) => {
 	  //clear the modal off the users screen
 	 "response_action": "clear"
   });
-
-  // Do whatever you want with the input data - here we're saving it to a DB then sending the user a verifcation of their submission
-
-  // grab the value of the input as 
+  // get a  reference to the view object's values
   const valuesObject = view['state']['values']
   let msgToSend = ''
   let counter = 0;
   let channelID = "";
+  //obtain the first key in the values object and use it to grab the user input 
+  //as well as the channel the user wants to send the input to
   for (key in valuesObject) {
 	  if (counter == 0) {
 		msgToSend += valuesObject[key]['input_text']['value'];
@@ -160,9 +160,13 @@ app.view('custom_msg_view', async ({ ack, body, view, context }) => {
 		channelID=key;
 	  }
   }
+  //gets teamID from the action which functions as workspace id
   const teamID = body['team']['id'];
+  //gets the userID from the action
   const userID = body['user']['id'];
+  //console.log used for local testing
   console.log(userID + " in " + channelID + " sent the following: " + msgToSend+ "in team:"+ teamID);
+  //writes the data collected to the firebase
   writeToDB(teamID, userID, channelID,msgToSend,true);
 });
   
@@ -367,6 +371,25 @@ async function handlePairingResponse(response){
         text: "You ppl just got paired!"
     });
 }
+
+
+/*
+writeToDB
+Descr: Takes in a target strings representing the location in the db
+to store warmup and cooldown prompts for later use.
+
+TODO: implement functionality for prompr types other than custom messages
+
+args:
+teamId (string)- an id of the target workspace. 
+userID (string)- an id of the user sending the prompt. 
+channelID (string)- an id of the target channel. 
+msgToSend (string)- message to store in the db. 
+isWarmup (bool)- deterimines to store data as a warmup or cooldown. 
+
+return:
+na
+*/
 async function writeToDB(teamId, userID, channelID,msgToSend,isWarmup) {
 	if (isWarmup === true) {
 		admin.firestore().collection("workspaces").doc(teamId+"/activeChannels/"+channelID+"/teammatePairings/"+userID).set({
