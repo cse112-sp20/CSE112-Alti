@@ -13,13 +13,11 @@ jobs:
     - name: Install Dependencys Bottom 
       working-directory: ./functions
       run: npm install
-    - name: Install Dependencys Top 
-      working-directory: ./
-      run: npm install
-#     - name: Install Firebase
-#       run: npm install firebase-tools
-#     - name: firebase init
-#       run: firebase init
+    - name: Run Tests
+      run: npm test
+#     - name: Install Dependencys Top 
+#       working-directory: ./
+#       run: npm install
     - uses: w9jds/firebase-action@master
       with:
         args: deploy --only functions
