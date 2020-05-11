@@ -35,7 +35,7 @@ exports.warmup = async function warmup(app, token) {
 
         var timeoutDuration = (c.getTime() - d.getTime());
 
-        // Currently timing out for just 2 seconds
+        // Timing out until the next 9:00 am time
         let timerId = setTimeout(sayStuff, timeoutDuration, app, token, hour);
 
     } catch(error) {
@@ -56,8 +56,8 @@ async function sayStuff(app, token, hour) {
         });
     }
 
-    // Change time val to 86400000 for recurring 24 hours
-    var time = setInterval(finalReminder, 10000, app, token, hour);
+    // Change time val to 86400000 for recurring 24 hours, test with 2,3 sec
+    var time = setInterval(finalReminder, 86400000, app, token, hour);
 
 }
 
