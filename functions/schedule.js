@@ -2,15 +2,25 @@
 
 exports.warmup = async function warmup(app, token) {
     try {
+        // 86400000ms = 24 hours
+        let hour = 9;
 
-        const result = await app.client.reminders.add({
-            token: token,
-            text: "Scheduling a warmup at 9 am", 
-            time: "every weekday at 9 am", // tested with /remind command
-        });
+        //invoke sayStuff every 2 second
+        let timerId = setInterval(sayStuff, 2000, app, token, hour);
+
     } catch(error) {
         console.error(error);
     }
+}
+
+async function sayStuff(app, token, hour) {
+    var d = new Date();
+
+    app.client.chat.postMessage({
+        token: token,
+        channel: '#general',
+        text:  d.toString()
+    });
 }
 
 //doesnt show anything for some reason

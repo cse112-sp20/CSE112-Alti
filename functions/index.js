@@ -40,9 +40,10 @@ app.command('/warmup', async({command, ack, say}) => {
 
     ack();
     say(`Trying to schedule a warmup at 9am`);
-    schedule.warmup(app, token); 
+    schedule.warmup(app, bot_token); 
     //schedule.show(app, token); //doesnt work yet. Check the code. 
 });
+
 
 app.message(async ({ message, context }) => {
     try{
