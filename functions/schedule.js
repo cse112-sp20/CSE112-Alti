@@ -38,22 +38,13 @@ exports.warmup = async function warmup(app, token, hour, minute) {
 async function sayStuff(app, token, reminder) {
     var now = new Date();
     let errorRange = 60000; // within 1 minute
-    
+
+    // Just a check, but if working properly this if case is useless
     app.client.chat.postMessage({
         token: token,
         channel: '#general',
-        text:  (reminder.getTime()-now.getTime()).toString()
+        text:  "This is your first Reminder"
     });
-
-    // Just a check, but if working properly this if case is useless
-    if(reminder.getTime() - now.getTime() < errorRange)
-    {
-        app.client.chat.postMessage({
-            token: token,
-            channel: '#general',
-            text:  "This is your first Reminder"
-        });
-    }
 
     // Change time val to 86400000 for recurring 24 hours, tested with 2,3 sec
     var time = setInterval(finalReminder, 3000, app, token, reminder);
