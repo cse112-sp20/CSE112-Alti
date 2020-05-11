@@ -25,12 +25,12 @@ app.error(console.log);
 // Handle `/echo` command invocations
 app.command('/pairup', async ({ command, ack, say }) => {
     // Acknowledge command request
-
     ack();
     say(`Trying to pair up.`);
     pairUp();
-
 });
+
+
 app.message(async ({ message, context }) => {
     try{
         // console.log(message)
@@ -47,27 +47,84 @@ app.message(async ({ message, context }) => {
     }
 
 });
+// Handle '/setupWarmup` command invocations
+app.command('/setupwarmup', async ({ command, ack, say }) => {
+    // Acknowledge command request
+    ack();
+	//send Warmup prompts to the channel that this command was called from
+    sendSelectChoice(command.channel_id);
+});
 
-// Handle the occurence when a user opens the app home tab
-app.event("app_home_opened", async ({ payload, context }) => {
-  //generate a reference to the user id 
-  const userId = payload.user;
+//submission responser handler
+app.event('send_input', async ({ body, context, ack }) => {
+	 ack();
+});
+
+//selection respose handler
+app.action('select_custom', async ({ body, context, ack }) => {
+  ack();  
   try {
-    // Call the views.publish method using the built-in WebClient
-    const result = await app.client.views.publish({
-      // The token you used to initialize your app is stored in the `context` object
+    const result = await app.client.views.open({
       token: context.botToken,
-      user_id: userId,
+      trigger_id: body.trigger_id,
       view: {
-        // Home tabs must be enabled in your app configuration page under "App Home"
-        "type": "home",
-        "blocks": [
+		"type": "modal",
+		"title": {
+			"type": "plain_text",
+			"text": "Message your buddy!",
+			"emoji": true
+		},
+		"submit": {
+			"type": "plain_text",
+			"text": "Submit",
+			"emoji": true
+		},
+		"close": {
+			"type": "plain_text",
+			"text": "Cancel",
+			"emoji": true
+		},
+		"blocks": [
+			{
+				"type": "input",
+				"element": {
+					"type": "plain_text_input",
+					"action_id": "send_input",
+					"multiline": true,
+					"placeholder": {
+						"type": "plain_text",
+						"text": "Type it here!"
+					}
+				},
+				"label": {
+					"type": "plain_text",
+					"text": "Warmup"
+				}
+			}
+		]
+	}
+    });
+    
+  } catch(e) {
+    console.log(e);
+    app.error(e);
+  }
+});
+
+
+exports.slack = functions.https.onRequest(expressReceiver.app);
+
+
+//sends warmup selection choice
+async function sendSelectChoice(targChannelID){
+	const notificationString = "Send a warmup to your buddy!"
+	const warmupSelect = [
 			{
 				"type": "section",
 				"text": {
 					"type": "plain_text",
 					"emoji": true,
-					"text": `*Hey ${  userId  }, pick a warmup for your buddy!*`
+					"text": "Hey there, pick a warmup for your buddy!"
 				}
 			},
 			{
@@ -171,76 +228,23 @@ app.event("app_home_opened", async ({ payload, context }) => {
 					"value": "select_custom"
 				}
 			}
-		]
-      }
-    });
-
-    console.log(result);
-  }
-  catch (error) {
-    console.error(error);
-  }
-});
-//submission responser handler
-app.action('ml_input', async ({ body, context, ack }) => {
-  response_action: 'clear'
-});
-
-//selection respose handler
-app.action('select_custom', async ({ body, context, ack }) => {
-  ack();  
-  try {
-    const result = await app.client.views.open({
-      token: context.botToken,
-      trigger_id: body.trigger_id,
-      view: {
-		"type": "modal",
-		"title": {
-			"type": "plain_text",
-			"text": "Message your buddy!",
-			"emoji": true
-		},
-		"submit": {
-			"type": "plain_text",
-			"text": "Submit",
-			"emoji": true
-		},
-		"close": {
-			"type": "plain_text",
-			"text": "Cancel",
-			"emoji": true
-		},
-		"blocks": [
-			{
-				"type": "input",
-				"element": {
-					"type": "plain_text_input",
-					"action_id": "ml_input",
-					"multiline": true,
-					"placeholder": {
-						"type": "plain_text",
-						"text": "Type it here!"
-					}
-				},
-				"label": {
-					"type": "plain_text",
-					"text": "Warmup"
-				}
-			}
-		]
+		];
+		
+	//try function logic
+	try {
+		const result = await app.client.chat.postMessage({
+		  // The token you used to initialize your app is stored in the `context` object
+		  token: token,
+		  channel: targChannelID,
+		  text: notificationString,
+		  blocks: warmupSelect
+		});
 	}
-    });
-    
-  } catch(e) {
-    console.log(e);
-    app.error(e);
-  }
-});
-
-
-exports.slack = functions.https.onRequest(expressReceiver.app);
-
-
+	//catch any errors
+	catch(error) {
+		console.log(error);
+	}
+}
 async function pairUp(){
     try{
         const {members} = await app.client.users.list({
@@ -298,6 +302,7 @@ async function handlePairingResponse(response){
         text: "You ppl just got paired!"
     });
 }
+
 
 // const Firestore = require('@google-cloud/firestore');
 // const PROJECTID = 'altitest-5f53d';
