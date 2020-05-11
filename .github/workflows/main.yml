@@ -3,21 +3,27 @@ on:
   push:
     branches:
     - master
+  pull_request:
+    branches:
+      - master
 jobs:
   main:
+
     name: Build and Deploy
     runs-on: ubuntu-latest
+
     steps:
     - name: Check out code
       uses: actions/checkout@master
-    - name: Install Dependencys Bottom 
+    - name: Install Dependencys 
       working-directory: ./functions
       run: npm install
-#    - name: Run Tests
-#      run: npm test
-#     - name: Install Dependencys Top 
-#       working-directory: ./
-#       run: npm install
+    - name: Run Linter
+      working-directory: ./functions
+      run: npm run lint
+    - name: Run Tests
+      working-directory: ./functions
+      run: npm test
     - uses: w9jds/firebase-action@master
       with:
         args: deploy --only functions
