@@ -24,7 +24,7 @@ exports.warmup = async function warmup(app, token) {
         //     post_at: 1589187600
         // });
 
-        
+
         // 86400000ms = 24 hours
         let hour = 9;
 
@@ -43,13 +43,16 @@ exports.warmup = async function warmup(app, token) {
 async function sayStuff(app, token, hour) {
     var d = new Date();
 
-    if( d.getHours() == 9 )
+    var count = 0;
+    if( d.getHours() == 9 && count == 0 )
     {
         app.client.chat.postMessage({
             token: token,
             channel: '#general',
             text:  "This is your 9:00 am Reminder"
         });
+
+        count++;
     }
 }
 
