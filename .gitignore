@@ -1,3 +1,7 @@
 node_modules
 functions/.runtimeconfig.json
 .runtimeconfig.json
+firebase-debug.log
+firestore-debug.log
+pubsub-debug.log
+AltiTest-234ac26149af.json

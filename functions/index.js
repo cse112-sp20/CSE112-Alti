@@ -5,9 +5,9 @@ const admin = require('firebase-admin');
 const config = functions.config();
 const signingSecret = config.slack.signing_secret;
 const user_token = config.slack.user_token;
-//const pairUp = require('./pairUp');
-//const schedule = require('./schedule');
-const onBoard = require('./onBoard.js');
+
+const pairUp = require('./pairUp');
+const schedule = require('./schedule');
 const bot_token = config.slack.bot_token;
 
 
@@ -60,7 +60,9 @@ app.message(async ({ message, context }) => {
         console.error(error);
     }
 
+
 });
+exports.slack = functions.https.onRequest(expressReceiver.app);
 
 app.command('/firestore', async ({ command, ack, say }) => {	
     // Acknowledge command request	
@@ -78,5 +80,3 @@ app.command('/firestore', async ({ command, ack, say }) => {
 
 
 }); 
-
-exports.slack = functions.https.onRequest(expressReceiver.app);
