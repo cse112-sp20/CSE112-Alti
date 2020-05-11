@@ -15,10 +15,28 @@ exports.warmup = async function warmup(app, token) {
 
         // Need to figure out how to timeout until 9am. 
         var d = new Date();
-        var current = d.getTime();
+        var c = new Date();
+
+        var currentHour = d.getHours();
+
+        if( currentHour < 9 )
+        {
+            c.setHours(9);
+            c.setMinutes(0);
+            c.setSeconds(0);
+        }
+        else
+        {
+            c.setDate(d.getDate()+1);
+            c.setHours(9);
+            c.setMinutes(0);
+            c.setSeconds(0);
+        }
+
+        var timeoutDuration = (c.getTime() - d.getTime());
 
         // Currently timing out for just 2 seconds
-        let timerId = setTimeout(sayStuff, 2000, app, token, hour);
+        let timerId = setTimeout(sayStuff, timeoutDuration, app, token, hour);
 
     } catch(error) {
         console.error(error);
