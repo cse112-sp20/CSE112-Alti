@@ -10,12 +10,15 @@ jobs:
     steps:
     - name: Check out code
       uses: actions/checkout@master
-    - name: Install Dependencys Bottom 
+    - name: Install Dependencys 
       working-directory: ./functions
       run: npm install
     - name: Run Tests
       working-directory: ./functions
       run: npm test
+    - name: Run Linter
+      working-directory: ./functions
+      run: npm lint
     - uses: w9jds/firebase-action@master
       with:
         args: deploy --only functions
