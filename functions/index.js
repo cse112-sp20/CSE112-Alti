@@ -40,8 +40,10 @@ app.command('/warmup', async({command, ack, say}) => {
 
     ack();
     say(`Trying to schedule a warmup`);
-    schedule.warmup(app, bot_token); 
-    //schedule.show(app, token); //doesnt work yet. Check the code. 
+
+    let hour = parseInt(command.text.split(" ")[0])
+    let minute = parseInt(command.text.split(" ")[1])
+    schedule.warmup(app, bot_token, hour , minute); 
 });
 
 

@@ -1,23 +1,16 @@
 //working
 
-exports.warmup = async function warmup(app, token) {
+exports.warmup = async function warmup(app, token, hour, minute) {
     try {
-
-        // 86400000ms = 24 hours
-        let hour = 12;
-        let minute = 5;
-
-        //invoke sayStuff every 2 second
-        //let timerId = setInterval(sayStuff, 2000, app, token, hour);
 
         // Guide set timeout event to certain time, then set interval function every 24 hours.
         // Need to timeout until 9:00 am, it runs sayStuff once, sayStuff will run dummy function
         // finalReminder which is going to run indefnitely every day at 9 am afterwards.
 
-        // Need to figure out how to timeout until 9am. 
         var now = new Date();
         var reminder = new Date();
 
+        // set reminder
         reminder.setHours(hour);
         reminder.setMinutes(minute);
         reminder.setSeconds(0);
@@ -63,8 +56,7 @@ async function sayStuff(app, token, reminder) {
     }
 
     // Change time val to 86400000 for recurring 24 hours, tested with 2,3 sec
-    var time = setInterval(finalReminder, 2000, app, token, reminder);
-
+    var time = setInterval(finalReminder, 3000, app, token, reminder);
 }
 
 async function finalReminder(app, token, reminder) {
