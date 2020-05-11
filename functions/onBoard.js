@@ -1,5 +1,8 @@
+/* TODO 
+Send calls to database updating what the current pairing channel is */
 
-exports.onBoard = async function createOnBoardingChannel(app, token) {
+
+exports.onBoard = async function createOnBoardingChannel(app, token, channelName) {
     try {
 
         var channels = await app.client.conversations.list({
@@ -18,12 +21,10 @@ exports.onBoard = async function createOnBoardingChannel(app, token) {
 
         console.log("Channels: " + channels);
 
-        
+        if (!channels.includes(channelName)) {
+            console.log("No channel called " + channelName);
 
-        if (!channels.includes("alti-pairing")) {
-            console.log("No channel called alti-pairing");
-
-            var usersDict = await findUsers(app, token);
+            var usersDict = await findUsersWorkSpace(app, token);
     
             console.log("Users:");
             console.log(usersDict);
@@ -37,7 +38,7 @@ exports.onBoard = async function createOnBoardingChannel(app, token) {
             // create channel
             var conversationObj = await app.client.conversations.create({
                 token: token,
-                name: "alti-pairing"
+                name: channelName
                 //user_ids: userString
             }).catch((error) => {
                 console.log(error);
@@ -51,9 +52,18 @@ exports.onBoard = async function createOnBoardingChannel(app, token) {
             }).catch((error) => {
                 console.log(error);
             });
+
+            // send welcome message
+            app.client.chat.postMessage({
+                token: token,
+                channel: '#'+channelName,
+                text: `Hey I've just been added to this channel! Everyone here will participate in quick 
+                        and fun warm up and cool down activities :)
+                        (To opt out, just leave the channel.)`
+            });
         }
         else {
-            console.log("Channel alti-pairing already exists");
+            console.log("Channel " + channelName + " already exists");
         }
 
     }
@@ -63,7 +73,35 @@ exports.onBoard = async function createOnBoardingChannel(app, token) {
     }
 }
 
-async function findUsers(app, token) {
+exports.onBoardExisting = async function boardExistingChannel(app, token, channelId) {
+    try {
+        var usersDict = await findUsersChannel(app, token, channelId);
+        console.log("Users:");
+        console.log(usersDict);
+        var userString = '';
+        Object.keys(usersDict).forEach((u) => {
+            userString += u + ',';
+        });
+        userString = userString.substring(0, userString.length - 1);
+        console.log(userString);
+
+        // send welcome message
+        app.client.chat.postMessage({
+            token: token,
+            channel: channelId,
+            text: `Hey I've just been added to this channel! Everyone here will participate in quick 
+                    and fun warm up and cool down activities :)
+                    (To opt out, just leave the channel.)`
+            
+        });
+    }
+    catch (error) {
+        console.log(error);
+    }
+
+}
+
+async function findUsersWorkSpace(app, token) {
     // find users in server
     var userMembers = await app.client.users.list({
         token: token
@@ -81,4 +119,27 @@ async function findUsers(app, token) {
         }
     });
     return usersDict;
+}
+
+
+async function findUsersChannel(app, token, channelId) {
+    var users = await app.client.conversations.members({
+        token: token,
+        channel: channelId
+    }).then((obj) => {
+        return obj.members;
+    }).catch((error) => {
+        console.log(error);
+    });
+
+    var usersDict = {};
+
+    users.forEach((u) => {
+        if (u.is_bot === false && u.name !== "slackbot") {
+            var id = u.id;
+            usersDict[id] = u.name;
+        }
+    });
+    return usersDict;
+
 }
