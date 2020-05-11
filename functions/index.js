@@ -60,64 +60,124 @@ app.event('send_input', async ({ body, context, ack }) => {
 	 ack();
 });
 
-//selection respose handler
-app.action('select_custom', async ({ body, context, ack }) => {
-  ack();  
-  try {
-    const result = await app.client.views.open({
-      token: context.botToken,
-      trigger_id: body.trigger_id,
-      view: {
-		"type": "modal",
-		"title": {
-			"type": "plain_text",
-			"text": "Message your buddy!",
-			"emoji": true
-		},
-		"submit": {
-			"type": "plain_text",
-			"text": "Submit",
-			"emoji": true
-		},
-		"close": {
-			"type": "plain_text",
-			"text": "Cancel",
-			"emoji": true
-		},
-		"blocks": [
-			{
-				"type": "input",
-				"element": {
-					"type": "plain_text_input",
-					"action_id": "send_input",
-					"multiline": true,
-					"placeholder": {
-						"type": "plain_text",
-						"text": "Type it here!"
-					}
-				},
-				"label": {
-					"type": "plain_text",
-					"text": "Warmup"
-				}
-			}
-		]
-	}
-    });
-    
-  } catch(e) {
-    console.log(e);
-    app.error(e);
-  }
+/*
+generic_button Action Listener
+Descr: Listens for a slack provided action id matching 'generic_button'
+and  acknowedlges it
+
+return:
+na
+*/
+app.action('generic_button', async ({ action, ack, context }) => {
+     ack();
 });
 
+/*
+select_user Action Listener
+Descr: Listens for a slack provided action id matching 
+'request_custom_send' and opens a model for sending a custom message
+in the user's from where the action originated from window with a 
+model for sending a custom message
 
+return:
+na
+*/
+app.action('request_custom_send', async ({ ack, body, context }) => {
+    await ack();
+    try {
+      const result = await app.client.views.open({
+        token: context.botToken,
+		trigger_id: body.trigger_id,
+        view: {
+			type: 'modal',
+			// View identifier
+			callback_id: 'custom_msg_view',
+			title: {
+			  type: 'plain_text',
+			  text: 'Custom Message Warmup'
+			},
+			blocks: [
+			  {
+				type: 'input',
+				block_id: body.channel_id,
+				label: {
+				  type: 'plain_text',
+				  text: 'Enter your custom message here below.'
+				},
+				element: {
+				  type: 'plain_text_input',
+				  action_id: 'input_text',
+				  multiline: true
+				}
+			  }
+			],
+			submit: {
+			  type: 'plain_text',
+			  text: 'Submit'
+			}
+		  }
+      });
+    }
+    catch (error) {
+      console.error(error);
+    }
+  });
+ 
+/*
+custom_msg_view view Listener
+Descr: Listens for a slack provided view id matching 
+'custom_msg_view' and stores a custom message submitted in this view
+within firebase. 
+
+return:
+na
+*/
+app.view('custom_msg_view', async ({ ack, body, view, context }) => {
+  // Acknowledge the custom_msg_view event
+  ack({
+	  //clear the modal off the users screen
+	 "response_action": "clear"
+  });
+
+  // Do whatever you want with the input data - here we're saving it to a DB then sending the user a verifcation of their submission
+
+  // grab the value of the input as 
+  const valuesObject = view['state']['values']
+  let msgToSend = ''
+  let counter = 0;
+  let channelID = "";
+  for (key in valuesObject) {
+	  if (counter == 0) {
+		msgToSend += valuesObject[key]['input_text']['value'];
+		counter++;
+		channelID=key;
+	  }
+  }
+  //const teamID = team['id'];
+  const userId = body['user']['id'];
+  //console.log(userId + " in " + channelID + " sent the following: " + msgToSend+ "in team:"+ teamID);
+  //SAVE TO DB
+});
+  
 exports.slack = functions.https.onRequest(expressReceiver.app);
 
 
-//sends warmup selection choice
+/*
+sendSelectChoice
+Descr: Takes in a target channel id (a channel id that represents
+a channel containeing two paired users and the alti bot) and sends
+a string of blocks that act as a warmup selection user interface to
+the channel.
+
+args:
+targChannelID (string)- an id of the target channel. 
+
+return:
+na
+*/
 async function sendSelectChoice(targChannelID){
 	const notificationString = "Send a warmup to your buddy!"
+	//warmup selection message json
 	const warmupSelect = [
 			{
 				"type": "section",
@@ -125,16 +185,6 @@ async function sendSelectChoice(targChannelID){
 					"type": "plain_text",
 					"emoji": true,
 					"text": "Hey there, pick a warmup for your buddy!"
-				}
-			},
-			{
-				"type": "divider"
-			},
-			{
-				"type": "section",
-				"text": {
-					"type": "mrkdwn",
-					"text": "*Buddy Name*\nTuesday, January 21 9:30 AM\n"
 				}
 			},
 			{
@@ -154,6 +204,7 @@ async function sendSelectChoice(targChannelID){
 					"text": "*Code Speed Typing Test*"
 				},
 				"accessory": {
+					"action_id": "generic_button",
 					"type": "button",
 					"text": {
 						"type": "plain_text",
@@ -170,6 +221,7 @@ async function sendSelectChoice(targChannelID){
 					"text": "*Tech Article*"
 				},
 				"accessory": {
+					"action_id": "generic_button",
 					"type": "button",
 					"text": {
 						"type": "plain_text",
@@ -186,6 +238,7 @@ async function sendSelectChoice(targChannelID){
 					"text": "*Easy Online Puzzle*"
 				},
 				"accessory": {
+					"action_id": "generic_button",
 					"type": "button",
 					"text": {
 						"type": "plain_text",
@@ -202,6 +255,7 @@ async function sendSelectChoice(targChannelID){
 					"text": "*Motivational Quote*"
 				},
 				"accessory": {
+					"action_id": "generic_button", 
 					"type": "button",
 					"text": {
 						"type": "plain_text",
@@ -218,7 +272,7 @@ async function sendSelectChoice(targChannelID){
 					"text": "*Custom Message*"
 				},
 				"accessory": {
-					"action_id": "select_custom", 
+					"action_id": "request_custom_send", 
 					"type": "button",
 					"text": {
 						"type": "plain_text",
@@ -229,9 +283,9 @@ async function sendSelectChoice(targChannelID){
 				}
 			}
 		];
-		
 	//try function logic
 	try {
+		//make a call to the web api to post message in targ channel
 		const result = await app.client.chat.postMessage({
 		  // The token you used to initialize your app is stored in the `context` object
 		  token: token,
@@ -245,6 +299,10 @@ async function sendSelectChoice(targChannelID){
 		console.log(error);
 	}
 }
+
+
+
+
 async function pairUp(){
     try{
         const {members} = await app.client.users.list({
