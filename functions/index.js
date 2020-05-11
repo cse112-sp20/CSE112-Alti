@@ -1,70 +1,82 @@
 const functions = require('firebase-functions');
-const { WebClient }= require('@slack/web-api');
-const bot = new WebClient(functions.config().slack.token);
-const { PubSub } = require('@google-cloud/pubsub');
-const pubsubClient = new PubSub();
-const crypto = require('crypto');
-const tsscmp = require('tsscmp');
+const { App, ExpressReceiver } = require('@slack/bolt');
+const admin = require('firebase-admin');
 
-// Taken from Jeff Delaney in fireship.io
-// Validates that the request is a legit request from slack
-function legitSlackRequest(req) {
-  // Your signing secret
-  const slackSigningSecret = functions.config().slack.signing_secret;
-
-  // Grab the signature and timestamp from the headers
-  const requestSignature = req.headers['x-slack-signature'];
-  const requestTimestamp = req.headers['x-slack-request-timestamp'];
-
-  // Create the HMAC
-  const hmac = crypto.createHmac('sha256', slackSigningSecret);
-
-  // Update it with the Slack Request
-  const [version, hash] = requestSignature.split('=');
-  const base = `${version}:${requestTimestamp}:${JSON.stringify(req.body)}`;
-  hmac.update(base);
-
-  // Returns true if it matches
-  return tsscmp(hash, hmac.digest('hex'));
-}
-
-exports.slack = functions.https.onRequest(async (req,res) => {
+const config = functions.config();
+const signingSecret = config.slack.signing_secret;
+const user_token = config.slack.user_token;
+//const pairUp = require('./pairUp');
+//const schedule = require('./schedule');
+const onBoard = require('./onBoard.js');
+const bot_token = config.slack.bot_token;
 
 
-    // Request from Slack
-    const { challenge }  = req.body;
-    if(challenge){    // Response from You
-        res.send({ challenge })
-        return;
-    }
-    //Checks if the request is a legit slack request
-    const legit = legitSlackRequest(req);
-    if (!legit) { 
-        res.status(403).send('Slack signature mismatch.');
-        return;
-    }
+admin.initializeApp(functions.config().firebase);
+let db = admin.firestore();
 
-    const { event } = req.body; 
-    
-    const { type } = event; 
-    //Check if the event is a message
-    if (type === "message"){  
-        const { channel_type } = event;
-        // If it's a direct message   
-        if(channel_type === "im"){
-            personalMessage(event);
-        }
-    }
-
-    res.sendStatus(200);
+const expressReceiver = new ExpressReceiver({
+    signingSecret: signingSecret,
+    endpoints: '/events',
 });
 
-async function personalMessage (data) {
+const app = new App({
+    receiver: expressReceiver,
+    token: bot_token
+});
 
-    const { user, channel , text} = data;
-    // Send a Message
-    bot.chat.postMessage({
-        channel: '#general',
-        text: `Someone just DMd me. What a creep! Other people should also know that "${text}"`
-    });
-}
+// Global error handler
+app.error(console.log);
+
+// Handle `/echo` command invocations
+app.command('/pairup', async ({ command, ack, say }) => {
+    // Acknowledge command request
+
+    ack();
+    say(`Trying to pair up.`);
+    pairUp.pairUp(app, bot_token, "general");
+
+});
+
+app.command('/warmup', async({command, ack, say}) => {
+
+    ack();
+    say(`Trying to schedule a warmup at 9am`);
+    schedule.warmup(app, token); 
+    //schedule.show(app, token); //doesnt work yet. Check the code. 
+});
+
+app.message(async ({ message, context }) => {
+    try{
+        if(message.channel_type === 'im'){
+            app.client.chat.postMessage({
+                token: bot_token,
+                channel: '#general',
+                text: `<@${message.user}> just DMd me. What a creep?! Other people should also know that "${message.text}"`
+            });
+        }
+        onBoard.onBoard(app, bot_token);
+    }
+    catch(error){
+        console.error(error);
+    }
+
+});
+
+app.command('/firestore', async ({ command, ack, say }) => {	
+    // Acknowledge command request	
+
+    ack();	
+    let docRef = db.collection('Workspaces').doc('T0132EDC3M4').get().then((doc) => {	
+            if (!(doc && doc.exists)) {	
+                return console.log({ error: 'Unable to find the document' });	
+            }	
+            return say(String(doc.data().users));	
+        }).catch((err) => {	
+            return console.log('Error getting documents', err);	
+        });	
+    say(`Trying to firebase`);	
+
+
+}); 
+
+exports.slack = functions.https.onRequest(expressReceiver.app);
