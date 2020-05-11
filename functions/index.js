@@ -39,7 +39,7 @@ app.command('/pairup', async ({ command, ack, say }) => {
 app.command('/warmup', async({command, ack, say}) => {
 
     ack();
-    say(`Trying to schedule a warmup at 9am`);
+    say(`Trying to schedule a warmup`);
     schedule.warmup(app, bot_token); 
     //schedule.show(app, token); //doesnt work yet. Check the code. 
 });

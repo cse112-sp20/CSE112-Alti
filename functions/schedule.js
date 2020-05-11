@@ -4,7 +4,8 @@ exports.warmup = async function warmup(app, token) {
     try {
 
         // 86400000ms = 24 hours
-        let hour = 9;
+        let hour = 12;
+        let minute = 5;
 
         //invoke sayStuff every 2 second
         //let timerId = setInterval(sayStuff, 2000, app, token, hour);
@@ -14,78 +15,66 @@ exports.warmup = async function warmup(app, token) {
         // finalReminder which is going to run indefnitely every day at 9 am afterwards.
 
         // Need to figure out how to timeout until 9am. 
-        var d = new Date();
-        var c = new Date();
+        var now = new Date();
+        var reminder = new Date();
 
-        var currentHour = d.getHours();
+        reminder.setHours(hour);
+        reminder.setMinutes(minute);
+        reminder.setSeconds(0);
 
-        if( currentHour < 9 )
-        {
-            c.setHours(9);
-            c.setMinutes(0);
-            c.setSeconds(0);
-        }
-        else
-        {
-            c.setDate(d.getDate()+1);
-            c.setHours(9);
-            c.setMinutes(0);
-            c.setSeconds(0);
-        }
+        // within 30 sec
+        if(now.getTime() > reminder.getTime() - 30000)
+            reminder.setDate(now.getDate()+1);
 
-        var timeoutDuration = (c.getTime() - d.getTime());
+        //confirmation
+        app.client.chat.postMessage({
+            token: token,
+            channel: '#general',
+            text:  "Setting a reminder at " + reminder.toString()
+        });
 
-        // Timing out until the next 9:00 am time
-        let timerId = setTimeout(sayStuff, timeoutDuration, app, token, hour);
+        // Time out until the next 9:00 am time
+        var timeoutDuration = (reminder.getTime() - now.getTime());
+        let timerId = setTimeout(sayStuff, timeoutDuration, app, token, reminder);
 
     } catch(error) {
         console.error(error);
     }
 }
 
-async function sayStuff(app, token, hour) {
-    var d = new Date();
+async function sayStuff(app, token, reminder) {
+    var now = new Date();
+    let errorRange = 60000; // within 1 minute
+    
+    app.client.chat.postMessage({
+        token: token,
+        channel: '#general',
+        text:  (reminder.getTime()-now.getTime()).toString()
+    });
 
     // Just a check, but if working properly this if case is useless
-    if( d.getHours() == 9 )
+    if(reminder.getTime() - now.getTime() < errorRange)
     {
         app.client.chat.postMessage({
             token: token,
             channel: '#general',
-            text:  "This is your first 9:00 am Reminder"
+            text:  "This is your first Reminder"
         });
     }
 
-    // Change time val to 86400000 for recurring 24 hours, test with 2,3 sec
-    var time = setInterval(finalReminder, 86400000, app, token, hour);
+    // Change time val to 86400000 for recurring 24 hours, tested with 2,3 sec
+    var time = setInterval(finalReminder, 2000, app, token, reminder);
 
 }
 
-async function finalReminder(app, token, hour) {
+async function finalReminder(app, token, reminder) {
         app.client.chat.postMessage({
             token: token,
             channel: '#general',
-            text:  "This is your recurring 9:00 am Reminder"
+            text:  "This is your recurring Reminder"
         });
 }
 
-//doesnt show anything for some reason
-exports.show = async function show(app, token) {
-    try {
-        const result = await app.client.reminders.list({
-            token: token
-        });
-
-        app.client.chat.postMessage({
-            token: bot_token,
-            channel: '#general',
-            text: `${result.reminders}`
-        });
-
-    } catch(error) {
-        console.error(error)
-    }
-}
 
 
 // Scheduling message, testing
