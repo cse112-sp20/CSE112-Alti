@@ -1,4 +1,5 @@
 const shuffle = require('shuffle-array');
+const firestoreFuncs = require('./firestore');
 
 exports.pairUp = async function pairUp(app, token, channelName){
     try{
@@ -48,9 +49,16 @@ exports.pairUp = async function pairUp(app, token, channelName){
                 return_im: false,
                 users: ids[i]+','+ids[(ids.length/2) + i]
             })
-            responsePromise.then(response => handlePairingResponse(response, app, token))
-                                .catch(console.error);
+            responsePromise.then(async response => {
+                handlePairingResponse(response, app, token);
+                // TODO need to get workspace somehow
+                var workspacePromise = await app.client.team.info({
+                    token: token
+                })
 
+                firestoreFuncs.storeNewPairings(workspacePromise.team.id, await channelId, response.channel.id);
+            })
+            .catch(console.error);
         }
 
     }
