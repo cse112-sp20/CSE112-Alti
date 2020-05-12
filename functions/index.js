@@ -6,7 +6,6 @@ const config = functions.config();
 const signingSecret = config.slack.signing_secret;
 const user_token = config.slack.user_token;
 
-const pairUp = require('./pairUp');
 const schedule = require('./schedule');
 const onBoard = require('./onBoard');
 const appHome = require('./appHome');
@@ -33,19 +32,20 @@ exports.getBolt = function getBolt(){
 };
 const warmupMessage = require('./warmupMessage');
 const pubsubScheduler = require('./pubsubScheduler')
+const pairUp = require('./pairUp');
 exports.scheduledPairUp = pubsubScheduler.scheduledPairUp;
 
 
 // Global error handler
 app.error(console.log);
 
-// Handle `/echo` command invocations
+
 app.command('/pairup', async ({ command, ack, say }) => {
     // Acknowledge command request
 
     ack();
     say(`Trying to pair up.`);
-    pairUp.pairUp(app, bot_token, "general");
+    pairUp.pairUp("general");
 
 });
 
