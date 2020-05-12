@@ -118,46 +118,8 @@ return:
 na
 */
 app.action('request_custom_send', async ({ ack, body, context }) => {
-    await ack();
-	console.log(body.channel.id);
-    try {
-      const result = await app.client.views.open({
-        token: context.botToken,
-		trigger_id: body.trigger_id,
-        view: {
-			type: 'modal',
-			// View identifier
-			callback_id: 'custom_msg_view',
-			title: {
-			  type: 'plain_text',
-			  text: 'Custom Message Warmup'
-			},
-			blocks: [
-			  {
-				type: 'input',
-				block_id: body.channel.id,
-				label: {
-				  type: 'plain_text',
-				  text: 'Enter your custom message here below.'
-				},
-				element: {
-				  type: 'plain_text_input',
-				  action_id: 'input_text',
-				  multiline: true
-				}
-			  }
-			],
-			submit: {
-			  type: 'plain_text',
-			  text: 'Submit'
-			}
-		  }
-      });
-    }
-    catch (error) {
-      console.error(error);
-    }
-  });
+   warmupMessage.requestCustomSend(ack,body,context);
+ });
  
 /*
 custom_msg_view view Listener
@@ -168,47 +130,15 @@ return:
 na
 */
 app.view('custom_msg_view', async ({ ack, body, view, context }) => {
-  // Acknowledge the custom_msg_view event
-  ack({
-	  //clear the modal off the users screen
-	 "response_action": "clear"
-  });
-  // get a  reference to the view object's values
-  const valuesObject = view['state']['values']
-  let msgToSend = ''
-  let counter = 0;
-  let channelID = "";
-  //obtain the first key in the values object and use it to grab the user input 
-  //as well as the channel the user wants to send the input to
-  for (key in valuesObject) {
-	  if (counter === 0) {
-		msgToSend += valuesObject[key]['input_text']['value'];
-		counter++;
-		channelID=key;
-	  }
-  }
-  //gets teamID from the action which functions as workspace id
-  const teamID = body['team']['id'];
-  //gets the userID from the action
-  const userID = body['user']['id'];
-  //console.log used for local testing
-  console.log(userID + " in " + channelID + " sent the following: " + msgToSend+ "in team:"+ teamID);
-  //writes the data collected to the firebase
-  writeToDB(teamID, userID, channelID,msgToSend,true);
+	warmupMessage.customMsgView(ack, body, view, context);
 });
 
 
 async function writeToDB(teamId, userID, channelID,msgToSend,isWarmup) {
-	if (isWarmup === true) {
-		admin.firestore().collection("workspaces").doc(teamId+"/activeChannels/"+channelID+"/teammatePairings/"+userID).set({
-			warmupMessage: msgToSend
-		});
-	}
-	else {
-		admin.firestore().collection("workspaces").doc(teamId+"/activeChannels/"+channelID+"/teammatePairings/"+userID).set({
-			cooldownMessage: msgToSend
-		});
-	}
+	admin.firestore().collection("workspaces").doc(teamId+"/activeChannels/"+channelID+"/teammatePairings/"+userID).set({
+		warmupMessage: msgToSend
+	});
+
 }
 
 
