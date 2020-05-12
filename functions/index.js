@@ -6,7 +6,6 @@ const config = functions.config();
 const signingSecret = config.slack.signing_secret;
 const user_token = config.slack.user_token;
 const pairUp = require('./pairUp');
-const schedule = require('./schedule');
 const bot_token = config.slack.bot_token;
 
 
@@ -22,6 +21,15 @@ const app = new App({
     receiver: expressReceiver,
     token: bot_token
 });
+
+exports.getBolt = function getBolt(){
+    return {
+        app:app,
+        token:bot_token
+    }
+};
+
+const schedule = require('./schedule');
 
 // Global error handler
 app.error(console.log);
@@ -40,10 +48,10 @@ app.command('/warmup', async({command, ack, say}) => {
 
     ack();
     say(`Trying to schedule a warmup`);
-
-    let hour = parseInt(command.text.split(" ")[0])
-    let minute = parseInt(command.text.split(" ")[1])
-    schedule.warmup(app, bot_token, hour , minute); 
+    schedule.scheduleWarmup;
+    //let hour = parseInt(command.text.split(" ")[0])
+    //let minute = parseInt(command.text.split(" ")[1])
+    //schedule.warmup(app, bot_token, hour , minute); 
 });
 
 
