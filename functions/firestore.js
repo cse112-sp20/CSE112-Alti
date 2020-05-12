@@ -67,3 +67,7 @@ exports.writeMsgToDB = function writeMsgToDB(teamId, userID, channelID,msgToSend
 		warmupMessage: msgToSend
 	});
 }
+
+exports.storeNewPairingChannel = function storeNewPairingChannel(workspaceID, newChannel) {
+    db.collection("workspaces").doc(workspaceID).collection('activeChannels').doc(newChannel).set({});
+}
