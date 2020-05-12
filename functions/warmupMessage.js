@@ -1,5 +1,3 @@
-const index = require('./index');
-const {app, token} = index.getBolt();
 
 exports.sendSelectChoice = async function(targChannelID,app,token){
 	const notificationString = "Send a warmup to your buddy!"
@@ -128,7 +126,7 @@ exports.sendSelectChoice = async function(targChannelID,app,token){
 
 exports.requestCustomSend = async function(ack,body,context) {
 	await ack();
-	console.log(body.channel.id);
+	//console.log(body.channel.id);
     try {
       const result = await app.client.views.open({
         token: context.botToken,
@@ -193,7 +191,7 @@ exports.customMsgView =  async function(ack, body, view, context) {
   //gets the userID from the action
   const userID = body['user']['id'];
   //console.log used for local testing
-  console.log(userID + " in " + channelID + " sent the following: " + msgToSend+ "in team:"+ teamID);
+  //console.log(userID + " in " + channelID + " sent the following: " + msgToSend+ "in team:"+ teamID);
   //writes the data collected to the firebase
   writeToDB(teamID, userID, channelID,msgToSend,true);
 }
