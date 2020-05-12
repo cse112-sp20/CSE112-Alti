@@ -138,8 +138,6 @@ app.event("app_home_opened", async ({ payload, context }) => {
 app.command('/setup', async ({payload, ack, say }) => {
     ack();
     say("Trying to set up");
-    console.log("payload");
-    console.log(payload);
     onBoard.onBoard(app, bot_token, payload.team_id, "alti-pairing");
 
 });

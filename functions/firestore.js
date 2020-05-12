@@ -69,6 +69,5 @@ exports.writeMsgToDB = function writeMsgToDB(teamId, userID, channelID,msgToSend
 }
 
 exports.storeNewPairingChannel = function storeNewPairingChannel(workspaceID, newChannel) {
-    console.log("Storing new channel: " + newChannel);
     db.collection("workspaces").doc(workspaceID).collection('activeChannels').doc(newChannel).set({});
 }
