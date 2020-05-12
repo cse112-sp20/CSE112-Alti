@@ -12,7 +12,7 @@ const onBoard = require('./onBoard');
 const appHome = require('./appHome');
 const bot_token = config.slack.bot_token;
 
-const warmupMessage = require('./warmupMessage');
+
 
 const firestoreFuncs = require('./firestore');
 
@@ -33,7 +33,7 @@ exports.getBolt = function getBolt(){
         token:bot_token
     }
 };
-
+const warmupMessage = require('./warmupMessage');
 const pubsubScheduler = require('./pubsubScheduler')
 exports.scheduledPairUp = pubsubScheduler.scheduledPairUp;
 
@@ -130,15 +130,6 @@ na
 app.view('custom_msg_view', async ({ ack, body, view, context }) => {
 	warmupMessage.customMsgView(ack, body, view, context);
 });
-
-
-async function writeToDB(teamId, userID, channelID,msgToSend,isWarmup) {
-	admin.firestore().collection("workspaces").doc(teamId+"/activeChannels/"+channelID+"/teammatePairings/"+userID).set({
-		warmupMessage: msgToSend
-	});
-
-}
-
 
 
 // Listen to the app_home_opened Events API event to hear when a user opens your app from the sidebar
