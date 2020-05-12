@@ -5,8 +5,6 @@ const admin = require('firebase-admin');
 const config = functions.config();
 const signingSecret = config.slack.signing_secret;
 const user_token = config.slack.user_token;
-
-const schedule = require('./schedule');
 const onBoard = require('./onBoard');
 const appHome = require('./appHome');
 const bot_token = config.slack.bot_token;
@@ -30,11 +28,12 @@ exports.getBolt = function getBolt(){
         token:bot_token
     }
 };
+
 const warmupMessage = require('./warmupMessage');
 const pubsubScheduler = require('./pubsubScheduler')
 const pairUp = require('./pairUp');
 exports.scheduledPairUp = pubsubScheduler.scheduledPairUp;
-
+exports.scheduleWarmup = pubsubScheduler.scheduleWarmup;
 
 // Global error handler
 app.error(console.log);
@@ -49,12 +48,14 @@ app.command('/pairup', async ({ command, ack, say }) => {
 
 });
 
-app.command('/warmup', async({command, ack, say}) => {
-    ack();
-    say(`Trying to schedule a warmup at 9am`);
-    schedule.warmup(app, token); 
-    //schedule.show(app, token); //doesnt work yet. Check the code. 
-});
+// app.command('/warmup', async({command, ack, say}) => {
+//     ack();
+//     say(`Trying to schedule a warmup`);
+//     //let hour = parseInt(command.text.split(" ")[0])
+//     //let minute = parseInt(command.text.split(" ")[1])
+//     //schedule.warmup(app, bot_token, hour , minute); 
+// });
+
 
 app.message(async ({ message, context }) => {
     try{
