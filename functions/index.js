@@ -21,6 +21,17 @@ const app = new App({
     token: bot_token
 });
 
+exports.getBolt = function getBolt(){
+    return {
+        app:app,
+        token:bot_token
+    }
+};
+
+const pubsubScheduler = require('./pubsubScheduler')
+exports.scheduledPairUp = pubsubScheduler.scheduledPairUp;
+
+
 // Global error handler
 app.error(console.log);
 
@@ -35,7 +46,6 @@ app.command('/pairup', async ({ command, ack, say }) => {
 });
 
 app.command('/warmup', async({command, ack, say}) => {
-
     ack();
     say(`Trying to schedule a warmup at 9am`);
     schedule.warmup(app, token); 
@@ -55,7 +65,6 @@ app.message(async ({ message, context }) => {
     catch(error){
         console.error(error);
     }
-
 });
 exports.slack = functions.https.onRequest(expressReceiver.app);
 
@@ -65,3 +74,4 @@ app.command('/firestore', async ({ command, ack, say }) => {
     firestoreFuncs.firestoreTest();
     say(`Trying to firebase`);	
 }); 
+
