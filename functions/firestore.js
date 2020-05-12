@@ -1,13 +1,21 @@
 const functions = require('firebase-functions');
 const admin = require('firebase-admin');
 
-var serviceAccount = require('./serviceAccountKey.json');
+// console.log(typeof(process.env.FUNCTIONS_EMULATOR));
+if(process.env.FUNCTIONS_EMULATOR === "true"){
+    
+    var serviceAccount = require('./serviceAccountKey.json');
+    
+    admin.initializeApp({
+        credential: admin.credential.cert(serviceAccount),
+        databaseURL: "https://altitest-5f53d.firebaseio.com"
+    });
+}
+else{
+    admin.initializeApp(functions.config().firebase);
+}
 
-admin.initializeApp({
-    credential: admin.credential.cert(serviceAccount),
-    databaseURL: "https://altitest-5f53d.firebaseio.com"
-});
-// admin.initializeApp(functions.config().firebase);
+
 
 let db = admin.firestore();
 
@@ -23,7 +31,7 @@ let db = admin.firestore();
 exports.storeNewPairings = function storeNewPairings(workspace, channel, pairing) {
     let teammatePairingsRef = db.collection('workspaces').doc(workspace)
                                 .collection('activeChannels').doc(channel)
-                                .collection('teammatePairings').doc(pairing).set({test: 'this is another test'});
+                                .collection('teammatePairings').doc(pairing).set({test: 'this is another test hi daniel'});
 }
 
 exports.firestoreTest = function firestoreTest() {
