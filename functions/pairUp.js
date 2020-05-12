@@ -51,7 +51,7 @@ exports.pairUp = async function pairUp(channelName){
             // Randomize the order of people
             shuffle(ids);
             return ids
-        });
+        }); 
         //Pairing people up randomly and saving the response containing the paired channel information
         conversationInfos = []
         for (i = 0; i < ids.length/2; i++) {
