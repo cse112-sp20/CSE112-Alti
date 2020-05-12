@@ -1,8 +1,9 @@
 /* TODO 
 Send calls to database updating what the current pairing channel is */
+const firestoreFuncs = require('./firestore');
 
 
-exports.onBoard = async function createOnBoardingChannel(app, token, channelName) {
+exports.onBoard = async function createOnBoardingChannel(app, token, team_id, channelName) {
     try {
 
         var channels = await app.client.conversations.list({
@@ -61,6 +62,9 @@ exports.onBoard = async function createOnBoardingChannel(app, token, channelName
                         and fun warm up and cool down activities :)
                         (To opt out, just leave the channel.)`
             });
+            
+            firestoreFuncs.storeNewPairingChannel(team_id, conversationObj.channel.id);
+
         }
         else {
             console.log("Channel " + channelName + " already exists");
@@ -72,7 +76,7 @@ exports.onBoard = async function createOnBoardingChannel(app, token, channelName
     }
 }
 
-exports.onBoardExisting = async function boardExistingChannel(app, token, channelId) {
+exports.onBoardExisting = async function boardExistingChannel(app, token, team_id, channelId) {
     try {
         var usersDict = await findUsersChannel(app, token, channelId);
         //console.log("Users:");
@@ -93,6 +97,8 @@ exports.onBoardExisting = async function boardExistingChannel(app, token, channe
                     (To opt out, just leave the channel.)`
             
         });
+        firestoreFuncs.storeNewPairingChannel(team_id, channelId);
+
     }
     catch (error) {
         console.log(error);
