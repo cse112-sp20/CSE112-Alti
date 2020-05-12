@@ -32,7 +32,7 @@ exports.appHome = async function appHome(app, payload, context) {
                   "type": "section",
                   "text": {
                       "type": "mrkdwn",
-                      "text": "*Pick a channel* and I'll introduce myself and start pairing people up. I'm usually added to a team or project channel."
+                      "text": "*Pick a channel* to add me to and I'll introduce myself and start pairing people up. I'm usually added to a team or project channel."
                   },
                   "accessory": {
                     "action_id": "select",
