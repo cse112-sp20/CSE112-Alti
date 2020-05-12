@@ -11,17 +11,19 @@ app.command('/generatequote', async({command, ack, say}) => {
 
 app.command('/generatepuzzle', async({command, ack, say}) => {
     ack();
-    const puzzleGenerated = generatePuzzle(); 
+    const typeOfPuzzle = command.text;
+    const puzzleGenerated = generatePuzzle(typeOfPuzzle); 
     return puzzleGenerated.then( response => {
-        return Promise.resolve(say(`Generated a puzzle: ` + response));
+        return Promise.resolve(say('Generated a puzzle of type ' + command.text + ': ' + response));
     });
 });
 
 app.command('/generatetyping', async({command, ack, say}) => {
     ack();
-    const codingChallengeGenerated = generateCodingChallenge(); 
+    const codingLanguage = command.text;
+    const codingChallengeGenerated = generateCodingChallenge(codingLanguage); 
     return codingChallengeGenerated.then( response => {
-        return Promise.resolve(say(`Generated a code typing challenge: ` + response));
+        return Promise.resolve(say('Generated a code typing challenge in the language ' + command.text + ': '  + response));
     });
 });
 
@@ -31,11 +33,11 @@ async function generateQuote() {
 }
 
 // TODO
-async function generatePuzzle() {
+async function generatePuzzle(typeOfPuzzle) {
     return Promise.resolve("");
 }
 
 // TODO
-async function generateCodingChallenge() {
+async function generateCodingChallenge(codingLanguage) {
     return Promise.resolve("");
 }
