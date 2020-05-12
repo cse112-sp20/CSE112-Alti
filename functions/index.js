@@ -11,9 +11,6 @@ const bot_token = config.slack.bot_token;
 
 const warmupMessage = require('./warmupMessage');
 
-admin.initializeApp(functions.config().firebase);
-let db = admin.firestore();
-
 const firestoreFuncs = require('./firestore');
 
 
