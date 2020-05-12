@@ -96,7 +96,6 @@ exports.appHome = async function appHome(app, payload, context) {
           }
         });
     
-        //console.log(result);
       }
       catch (error) {
         console.error(error);

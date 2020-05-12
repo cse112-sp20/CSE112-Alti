@@ -101,9 +101,9 @@ app.command('/setup', async ({ command, ack, say }) => {
 
 app.action('select', async({payload, ack, say}) => {
     ack();
-    console.log("Selected a channel");
+    /// console.log("Selected a channel");
     // block action payload type
-    console.log(payload);
+    // console.log(payload);
     onBoard.onBoardExisting(app, bot_token, payload.selected_channel);
 });
 
