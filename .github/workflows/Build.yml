@@ -1,0 +1,26 @@
+name: Build non-master branches
+on:
+  push:
+    branches:
+    - '*'
+    - '*/*'
+    - '!master'
+jobs:
+  main:
+
+    name: Build non-master branches
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Check out code
+      uses: actions/checkout@master
+    - name: Install Dependencys 
+      working-directory: ./functions
+      run: npm install
+    - name: Run Linter
+      working-directory: ./functions
+      run: npm run lint
+    - name: Run Tests
+      working-directory: ./functions
+      run: npm test
+    
