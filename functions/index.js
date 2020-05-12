@@ -86,7 +86,7 @@ app.command('/firestore', async ({ command, ack, say }) => {
 }); 
 
 
-<<<<<<< HEAD
+
 // Handle '/setupWarmup` command invocations
 app.command('/setupwarmup', async ({ command, ack, say }) => {
     // Acknowledge command request
@@ -138,7 +138,7 @@ async function writeToDB(teamId, userID, channelID,msgToSend,isWarmup) {
 	});
 
 }
-=======
+
 
 
 // Listen to the app_home_opened Events API event to hear when a user opens your app from the sidebar
@@ -162,5 +162,4 @@ app.action('select', async({payload, ack, say}) => {
     // console.log(payload);
     onBoard.onBoardExisting(app, bot_token, payload.selected_channel);
 });
->>>>>>> d297d1c7ac01d72a2055cff7e891a8eee3d36391
 
