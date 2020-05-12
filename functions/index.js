@@ -23,6 +23,17 @@ const app = new App({
     token: bot_token
 });
 
+exports.getBolt = function getBolt(){
+    return {
+        app:app,
+        token:bot_token
+    }
+};
+
+const pubsubScheduler = require('./pubsubScheduler')
+exports.scheduledPairUp = pubsubScheduler.scheduledPairUp;
+
+
 // Global error handler
 app.error(console.log);
 
@@ -77,3 +88,5 @@ app.command('/firestore', async ({ command, ack, say }) => {
 
 
 }); 
+
+
