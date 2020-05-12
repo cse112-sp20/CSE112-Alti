@@ -1,6 +1,7 @@
 const shuffle = require('shuffle-array');
 const firestoreFuncs = require('./firestore');
 
+// Triggers the pairing up of all people in a given channel.
 exports.pairUp = async function pairUp(app, token, channelName){
     try{
         // TODO: Take this out of this function and pass it in as a parameter ideally
@@ -57,18 +58,6 @@ exports.pairUp = async function pairUp(app, token, channelName){
                 return_im: false,
                 users: ids[i]+','+ids[(ids.length/2) + i]
             })
-            responsePromise.then(async response => {
-                handlePairingResponse(response, app, token);
-                // TODO need to get workspace somehow
-                var workspacePromise = await app.client.team.info({
-                    token: token
-                })
-
-                firestoreFuncs.storeNewPairings(workspacePromise.team.id, await channelId, response.channel.id);
-                return null;
-            })
-            .catch(console.error);
-
             conversationInfos.push(responsePromise);
             
         }
@@ -103,6 +92,7 @@ async function handlePairingResponse(response, app, token, workspaceInfo, pairin
 }
 
 
+// Given a channel name, returns the channel ID.
 async function getChannelIdByName(app, token, channelName){
     const conversations = app.client.conversations.list({
         token:token

@@ -23,7 +23,7 @@ let db = admin.firestore();
 exports.storeNewPairings = function storeNewPairings(workspace, channel, pairing) {
     let teammatePairingsRef = db.collection('workspaces').doc(workspace)
                                 .collection('activeChannels').doc(channel)
-                                .collection('teammatePairings').doc(pairing).set({test: 'this is another test 1'});
+                                .collection('teammatePairings').doc(pairing).set({test: 'this is another test'});
 }
 
 exports.firestoreTest = function firestoreTest() {

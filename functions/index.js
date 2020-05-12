@@ -11,9 +11,6 @@ const bot_token = config.slack.bot_token;
 
 const firestoreFuncs = require('./firestore');
 
-// admin.initializeApp(functions.config().firebase);
-// let db = admin.firestore();
-
 const expressReceiver = new ExpressReceiver({
     signingSecret: signingSecret,
     endpoints: '/events',
@@ -68,5 +65,3 @@ app.command('/firestore', async ({ command, ack, say }) => {
     firestoreFuncs.firestoreTest();
     say(`Trying to firebase`);	
 }); 
-
-firestoreFuncs.printPairingData();
