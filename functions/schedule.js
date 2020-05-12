@@ -3,96 +3,21 @@ const index = require('./index')
 const functions = require('firebase-functions');
 const {app, token} = index.getBolt();
 
-exports.scheduleWarmup = functions.pubsub
-                            .schedule('every monday, thursday 23:50')
-                            .timeZone('America/Los_Angeles')
-                            .onRun((context) => {
-    app.client.chat.postMessage({
-        token: token,
-        channel: '#general',
-        text: `A reminder for warmup`
-    });
-    return null;
-  });
-// exports.warmup = async function warmup(app, token, hour, minute) {
-//     try {
-
-//         // Guide set timeout event to certain time, then set interval function every 24 hours.
-//         // Need to timeout until 9:00 am, it runs sayStuff once, sayStuff will run dummy function
-//         // finalReminder which is going to run indefnitely every day at 9 am afterwards.
-
-//         var now = new Date();
-//         var reminder = new Date();
-
-//         // set reminder
-//         reminder.setHours(hour);
-//         reminder.setMinutes(minute);
-//         reminder.setSeconds(0);
-
-//         //  30 sec prior 
-//         if(now.getTime() > reminder.getTime() - 30000)
-//             reminder.setDate(now.getDate()+1);
-
-//         //confirmation
-//         app.client.chat.postMessage({
-//             token: token,
-//             channel: '#general',
-//             text:  "Setting a reminder at " + reminder.toString()
-//         });
-
-//         // Time out until the next 9:00 am time
-//         var timeoutDuration = (reminder.getTime() - now.getTime());
-//         let timerId = setTimeout(sayStuff, timeoutDuration, app, token, reminder);
-
-//     } catch(error) {
-//         console.error(error);
-//     }
-// }
-
-// async function sayStuff(app, token, reminder) {
-//     var now = new Date();
-//     let errorRange = 60000; // within 1 minute
-
-//     // Just a check, but if working properly this if case is useless
-//     app.client.chat.postMessage({
-//         token: token,
-//         channel: '#general',
-//         text:  "This is your first Reminder"
-//     });
-
-//     // Change time val to 86400000 for recurring 24 hours, tested with 2,3 sec
-//     var time = setInterval(finalReminder, 86400000, app, token, reminder);
-// }
-
-// async function finalReminder(app, token, reminder) {
-//         app.client.chat.postMessage({
-//             token: token,
-//             channel: '#general',
-//             text:  "This is your recurring Reminder"
-//         });
-// }
 
 
+  exports.warmupMsgs = async function warmupMsgs() {
+    let reminderHour = 1;
+    let reminderMinute = 3;
 
-// // Scheduling message, testing
+    reminder = new Date();
+    reminder.setHours(reminderHour);
+    reminder.setMinutes(reminderMinute);
+    reminder.setSeconds(0);
 
-//         // 9 am time stamp for 11th May 2020
-//         //let timeStamp = 1589187600;
-//         // Add 86400 for next day 9 am
-
-//         // // Was experimenting with for loop simple scheduling messages, to schedule all reminders at once
-//         // var d = new Date('Mon, 11 May 2020 16:00:00 UTC');
-//         // var x = new Date();
-
-//         // var one_day=1000*60*60*24;    // Convert both dates to milliseconds
-//         // var fms = first.getTime();   
-//         // var sms = second.getTime();    // Calculate the difference in milliseconds  
-//         // var diff_ms = sms - fms;        // Convert back to days and return   
-//         // var daysdiff = Math.round(diff_ms/one_day); 
-
-//         // app.client.chat.scheduleMessage({
-//         //     token: token,
-//         //     channel: '#general',
-//         //     text:  "Warmup Reminder at 9:00 am"
-//         //     post_at: 1589187600
-//         // });
+    app.client.chat.scheduleMessage({
+                      token: token,
+                      channel: '#general',
+                      text:  `A reminder for warmup`,
+                      post_at: reminder.getTime()/1000
+                  });
+  }

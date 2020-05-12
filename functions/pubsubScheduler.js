@@ -1,5 +1,6 @@
 const index = require('./index')
 const pairUp = require('./pairUp');
+const schedule = require('./schedule');
 const functions = require('firebase-functions');
 const {app, token} = index.getBolt();
 
@@ -17,3 +18,11 @@ exports.scheduledPairUp = functions.pubsub
     });
     return null;
   });
+
+exports.scheduleWarmup = functions.pubsub
+                            .schedule('every mon,tue,wed,thu,fri 00:10')
+                            .timeZone('America/Los_Angeles')
+                            .onRun((context) => {
+    schedule.warmupMsgs();
+    return null;
+});

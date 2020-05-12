@@ -11,8 +11,6 @@ const onBoard = require('./onBoard');
 const appHome = require('./appHome');
 const bot_token = config.slack.bot_token;
 
-
-
 const firestoreFuncs = require('./firestore');
 
 
@@ -33,11 +31,10 @@ exports.getBolt = function getBolt(){
     }
 };
 
-const schedule = require('./schedule');
 const warmupMessage = require('./warmupMessage');
 const pubsubScheduler = require('./pubsubScheduler')
 exports.scheduledPairUp = pubsubScheduler.scheduledPairUp;
-
+exports.scheduleWarmup = pubsubScheduler.scheduleWarmup;
 
 // Global error handler
 app.error(console.log);
@@ -52,14 +49,13 @@ app.command('/pairup', async ({ command, ack, say }) => {
 
 });
 
-app.command('/warmup', async({command, ack, say}) => {
-    ack();
-    say(`Trying to schedule a warmup`);
-    schedule.scheduleWarmup;
-    //let hour = parseInt(command.text.split(" ")[0])
-    //let minute = parseInt(command.text.split(" ")[1])
-    //schedule.warmup(app, bot_token, hour , minute); 
-});
+// app.command('/warmup', async({command, ack, say}) => {
+//     ack();
+//     say(`Trying to schedule a warmup`);
+//     //let hour = parseInt(command.text.split(" ")[0])
+//     //let minute = parseInt(command.text.split(" ")[1])
+//     //schedule.warmup(app, bot_token, hour , minute); 
+// });
 
 
 app.message(async ({ message, context }) => {
