@@ -1,7 +1,7 @@
 const shuffle = require('shuffle-array');
 const firestoreFuncs = require('./firestore');
 const index = require('./index');
-// const {app, token} = index.getBolt();
+const {app, token} = index.getBolt();
 // Triggers the pairing up of all people in a given channel.
 exports.pairUp = async function pairUp(channelName){
     try{
