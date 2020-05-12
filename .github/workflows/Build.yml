@@ -1,4 +1,4 @@
-name: Build non-master branches
+name: Build non-master branches 
 on:
   push:
     branches:
