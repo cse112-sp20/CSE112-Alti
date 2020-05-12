@@ -5,9 +5,11 @@ const {app, token} = index.getBolt();
 
 
 
+  // schedule all warmups to differnet users at once.
   exports.warmupMsgs = async function warmupMsgs() {
-    let reminderHour = 1;
-    let reminderMinute = 3;
+    // testing with just one warmup
+    let reminderHour = 9;
+    let reminderMinute = 0;
 
     reminder = new Date();
     reminder.setHours(reminderHour);
