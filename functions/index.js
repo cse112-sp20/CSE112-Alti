@@ -12,7 +12,10 @@ const onBoard = require('./onBoard');
 const appHome = require('./appHome');
 const bot_token = config.slack.bot_token;
 
+
+
 const firestoreFuncs = require('./firestore');
+
 
 const expressReceiver = new ExpressReceiver({
     signingSecret: signingSecret,
@@ -30,7 +33,7 @@ exports.getBolt = function getBolt(){
         token:bot_token
     }
 };
-
+const warmupMessage = require('./warmupMessage');
 const pubsubScheduler = require('./pubsubScheduler')
 exports.scheduledPairUp = pubsubScheduler.scheduledPairUp;
 
@@ -83,6 +86,50 @@ app.command('/firestore', async ({ command, ack, say }) => {
 }); 
 
 
+
+// Handle '/setupWarmup` command invocations
+app.command('/setupwarmup', async ({ command, ack, say }) => {
+    // Acknowledge command request
+    ack();
+	//send Warmup prompts to the channel that this command was called from
+    warmupMessage.sendSelectChoice(command.channel_id,app,bot_token);
+});
+
+
+/*
+generic_button Action Listener
+Descr: Listens for a slack provided action id matching 'generic_button'
+and  acknowedlges it
+return:
+na
+*/
+app.action('generic_button', async ({ action, ack, context }) => {
+     ack();
+});
+/*
+request_custom_send Action Listener
+Descr: Listens for a slack provided action id matching 
+'request_custom_send' and opens a model for sending a custom message
+in the user's from where the action originated from window with a 
+model for sending a custom message
+return:
+na
+*/
+app.action('request_custom_send', async ({ ack, body, context }) => {
+   warmupMessage.requestCustomSend(ack,body,context);
+ });
+ 
+/*
+custom_msg_view view Listener
+Descr: Listens for a slack provided view id matching 
+'custom_msg_view' and stores a custom message submitted in this view
+within firebase. 
+return:
+na
+*/
+app.view('custom_msg_view', async ({ ack, body, view, context }) => {
+	warmupMessage.customMsgView(ack, body, view, context);
+});
 
 
 // Listen to the app_home_opened Events API event to hear when a user opens your app from the sidebar

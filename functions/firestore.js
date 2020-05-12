@@ -61,3 +61,9 @@ exports.printPairingData = function testEmulator1() {
         console.log('Error getting document', err);
         });
 }
+
+exports.writeMsgToDB = function writeMsgToDB(teamId, userID, channelID,msgToSend,isWarmup) {
+	db.collection("workspaces").doc(teamId+"/activeChannels/"+channelID+"/teammatePairings/"+userID).set({
+		warmupMessage: msgToSend
+	});
+}
