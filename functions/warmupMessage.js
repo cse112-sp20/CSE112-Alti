@@ -1,5 +1,5 @@
 const index = require('./index');
-const { app, token} = index.getBolt();
+const {app, token} = index.getBolt();
 
 exports.sendSelectChoice = async function(targChannelID,app,token){
 	const notificationString = "Send a warmup to your buddy!"

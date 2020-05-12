@@ -8,10 +8,14 @@ const user_token = config.slack.user_token;
 const pairUp = require('./pairUp');
 const schedule = require('./schedule');
 const bot_token = config.slack.bot_token;
+
 const warmupMessage = require('./warmupMessage');
 
 admin.initializeApp(functions.config().firebase);
 let db = admin.firestore();
+
+const firestoreFuncs = require('./firestore');
+
 
 const expressReceiver = new ExpressReceiver({
     signingSecret: signingSecret,
@@ -48,7 +52,6 @@ app.command('/pairup', async ({ command, ack, say }) => {
 });
 
 app.command('/warmup', async({command, ack, say}) => {
-
     ack();
     say(`Trying to schedule a warmup at 9am`);
     schedule.warmup(app, token); 
@@ -68,26 +71,16 @@ app.message(async ({ message, context }) => {
     catch(error){
         console.error(error);
     }
-
 });
 exports.slack = functions.https.onRequest(expressReceiver.app);
 
 app.command('/firestore', async ({ command, ack, say }) => {	
     // Acknowledge command request	
-
     ack();	
-    let docRef = db.collection('Workspaces').doc('T0132EDC3M4').get().then((doc) => {	
-            if (!(doc && doc.exists)) {	
-                return console.log({ error: 'Unable to find the document' });	
-            }	
-            return say(String(doc.data().users));	
-        }).catch((err) => {	
-            return console.log('Error getting documents', err);	
-        });	
+    firestoreFuncs.firestoreTest();
     say(`Trying to firebase`);	
-
-
 }); 
+
 
 // Handle '/setupWarmup` command invocations
 app.command('/setupwarmup', async ({ command, ack, say }) => {
@@ -140,9 +133,4 @@ async function writeToDB(teamId, userID, channelID,msgToSend,isWarmup) {
 	});
 
 }
-
-
-
-
-
 
