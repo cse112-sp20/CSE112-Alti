@@ -42,11 +42,12 @@ exports.printPairingData = function testEmulator1() {
     db.collection('workspaces').doc('workspace3').collection('activeChannels').doc('testchannel')
                             .collection('teammatePairings').doc('235363').get()
         .then(doc => {
-        if (!doc.exists) {
-            console.log('No such document! :(');
-        } else {
-            console.log('Document data:', doc.data());
-        }
+            if (!doc.exists) {
+                console.log('No such document! :(');
+            } else {
+                console.log('Document data:', doc.data());
+            }
+            return null;
         })
         .catch(err => {
         console.log('Error getting document', err);

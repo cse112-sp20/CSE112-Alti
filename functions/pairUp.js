@@ -57,6 +57,7 @@ exports.pairUp = async function pairUp(app, token, channelName){
                 })
 
                 firestoreFuncs.storeNewPairings(workspacePromise.team.id, await channelId, response.channel.id);
+                return null;
             })
             .catch(console.error);
         }
