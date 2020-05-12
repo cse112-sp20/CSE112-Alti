@@ -5,12 +5,6 @@ const admin = require('firebase-admin');
 const config = functions.config();
 const signingSecret = config.slack.signing_secret;
 const user_token = config.slack.user_token;
-
-<<<<<<< HEAD
-const pairUp = require('./pairUp');
-=======
-const schedule = require('./schedule');
->>>>>>> 87f68af118e41a629baf1523a0175931b1236f1f
 const onBoard = require('./onBoard');
 const appHome = require('./appHome');
 const bot_token = config.slack.bot_token;
