@@ -8,7 +8,7 @@ exports.scheduledPairUp = functions.pubsub
                             .timeZone('America/Los_Angeles')
                             .onRun((context) => {
     
-    pairUp.pairUp(app, token, "general");
+    pairUp.pairUp("general");
     
     app.client.chat.postMessage({
         token: token,

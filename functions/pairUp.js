@@ -1,14 +1,18 @@
 const shuffle = require('shuffle-array');
 const firestoreFuncs = require('./firestore');
-
+const index = require('./index');
+// const {app, token} = index.getBolt();
 // Triggers the pairing up of all people in a given channel.
-exports.pairUp = async function pairUp(app, token, channelName){
+exports.pairUp = async function pairUp(channelName){
     try{
         // TODO: Take this out of this function and pass it in as a parameter ideally
         const workspaceInfo = await app.client.team.info({
             token: token
         })
-        
+        const allUsers = app.client.users.list({
+            token: token
+        });
+
         const channelId = getChannelIdByName(app, token, channelName)
         var pairingChannelIdVal;
         // const workspaceInfo = await workspaceInfoPromise.then(result => result.data);
@@ -20,24 +24,23 @@ exports.pairUp = async function pairUp(app, token, channelName){
                     channel:id
             });
         });
-        const usersInfo = await members.then( members => {
-            
-            const ids = members.members;
-            return ids.map(id => {
-                return app.client.users.info({
-                    token:token,
-                    user:id
-                });
-            })
+
+        const usersInfo = await Promise.all([allUsers, members]).then(data => {
+            const allUsers = data[0];
+            const members = data[1];
+            const membersList = members.members;
+            const selectedUsers = allUsers.members.filter( user => membersList.includes(user.id));
+            return Promise.resolve(selectedUsers);
         });
+        
         // Get all the necessary user ids
-        const ids = await Promise.all(usersInfo).then( usersInfo => {
-            const users = usersInfo.map( info => info.user);
+        const ids = await Promise.all(usersInfo).then( users => {
+            // console.log(usersInfo)
+            // const users = usersInfo.map( info => info.user);
             const humans = users.filter( user => {
                 //SlackBot is also excluded. Filters non-humans
                 return !user.is_bot && user.id!=='USLACKBOT';
             });
-
             if(humans.length <= 1){
                 console.error("Could not pair since there is less than 2 people in the workspace");
                 return undefined;
@@ -49,7 +52,6 @@ exports.pairUp = async function pairUp(app, token, channelName){
             shuffle(ids);
             return ids
         });
-
         //Pairing people up randomly and saving the response containing the paired channel information
         conversationInfos = []
         for (i = 0; i < ids.length/2; i++) {
@@ -59,17 +61,12 @@ exports.pairUp = async function pairUp(app, token, channelName){
                 users: ids[i]+','+ids[(ids.length/2) + i]
             })
             conversationInfos.push(responsePromise);
-            
         }
         // Going through the paired channels and post messages to them.
         // also store the pairing info on the firebase
-        Promise.all(conversationInfos).then(async responses => {
-            return Promise.resolve(responses.map(response => {
-                return handlePairingResponse(response, app, token, workspaceInfo, pairingChannelIdVal);
-            }));
-
-        })
-        .catch(console.error);       
+        conversationInfos.map( conversationInfo => {
+            return conversationInfo.then( response => handlePairingResponse(response, app, token, workspaceInfo, pairingChannelIdVal));
+        });    
 
 
     }
