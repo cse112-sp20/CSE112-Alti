@@ -32,6 +32,8 @@ exports.getBolt = function getBolt(){
         token:bot_token
     }
 };
+
+const generateTaskData = require('./generateTaskData');
 const warmupMessage = require('./warmupMessage');
 const pubsubScheduler = require('./pubsubScheduler')
 const pairUp = require('./pairUp');
