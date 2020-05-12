@@ -61,7 +61,6 @@ exports.appHome = async function appHome(app, payload, context) {
                                 "text": "Stop, I've changed my mind!"
                             }
                         }
-                     
                   }
               },
               {

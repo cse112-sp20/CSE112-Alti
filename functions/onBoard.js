@@ -56,8 +56,8 @@ exports.onBoard = async function createOnBoardingChannel(app, token, channelName
             // send welcome message
             app.client.chat.postMessage({
                 token: token,
-                channel: '#'+channelName,
-                text: `Hey I've just been added to this channel! Everyone here will participate in quick 
+                channel: conversationObj.channel.id,
+                text: `Hi everyone! This is where we'll pair you up to participate in quick 
                         and fun warm up and cool down activities :)
                         (To opt out, just leave the channel.)`
             });

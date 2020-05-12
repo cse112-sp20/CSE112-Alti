@@ -12,9 +12,7 @@ const onBoard = require('./onBoard');
 const appHome = require('./appHome');
 const bot_token = config.slack.bot_token;
 
-
-admin.initializeApp(functions.config().firebase);
-let db = admin.firestore();
+const firestoreFuncs = require('./firestore');
 
 const expressReceiver = new ExpressReceiver({
     signingSecret: signingSecret,
@@ -25,6 +23,17 @@ const app = new App({
     receiver: expressReceiver,
     token: bot_token
 });
+
+exports.getBolt = function getBolt(){
+    return {
+        app:app,
+        token:bot_token
+    }
+};
+
+const pubsubScheduler = require('./pubsubScheduler')
+exports.scheduledPairUp = pubsubScheduler.scheduledPairUp;
+
 
 // Global error handler
 app.error(console.log);
@@ -40,7 +49,6 @@ app.command('/pairup', async ({ command, ack, say }) => {
 });
 
 app.command('/warmup', async({command, ack, say}) => {
-
     ack();
     say(`Trying to schedule a warmup at 9am`);
     schedule.warmup(app, token); 
@@ -69,20 +77,12 @@ exports.slack = functions.https.onRequest(expressReceiver.app);
 
 app.command('/firestore', async ({ command, ack, say }) => {	
     // Acknowledge command request	
-
     ack();	
-    let docRef = db.collection('Workspaces').doc('T0132EDC3M4').get().then((doc) => {	
-            if (!(doc && doc.exists)) {	
-                return console.log({ error: 'Unable to find the document' });	
-            }	
-            return say(String(doc.data().users));	
-        }).catch((err) => {	
-            return console.log('Error getting documents', err);	
-        });	
+    firestoreFuncs.firestoreTest();
     say(`Trying to firebase`);	
-
-
 }); 
+
+
 
 
 // Listen to the app_home_opened Events API event to hear when a user opens your app from the sidebar
