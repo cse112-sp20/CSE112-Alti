@@ -29,10 +29,7 @@ exports.getBolt = function getBolt(){
     }
 };
 
-<<<<<<< HEAD
 const generateTaskData = require('./generateTaskData');
-=======
->>>>>>> b7b287b2302098196e316634fb9fa894b3494481
 const warmupMessage = require('./warmupMessage');
 const pubsubScheduler = require('./pubsubScheduler')
 const pairUp = require('./pairUp');
