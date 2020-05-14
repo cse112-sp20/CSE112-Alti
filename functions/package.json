@@ -17,7 +17,7 @@
     "@google-cloud/firestore": "3.7.5",
     "@google-cloud/pubsub": "^1.7.3",
     "@slack/bolt": "^2.0.1",
-    "firebase-admin": "^8.10.0",
+    "firebase-admin": "^8.12.1",
     "firebase-functions": "^3.6.1",
     "shuffle-array": "^1.0.1"
   },

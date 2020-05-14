@@ -25,6 +25,7 @@ exports.getBolt = function getBolt(){
     }
 };
 
+app.client.conversations.list
 var assert = require('assert');
 
 describe('Array', function() {
