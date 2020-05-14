@@ -79,7 +79,7 @@ app.message(async ({ message, context }) => {
 exports.slack = functions.https.onRequest(expressReceiver.app);
 
 app.command('/firestore', async ({ command, ack, say }) => {	
-    // Acknowledge command request	
+    // Acknowledge command request	 
     ack();	
     firestoreFuncs.firestoreTest();
     say(`Trying to firebase`);	
@@ -128,7 +128,7 @@ return:
 na
 */
 app.view('custom_msg_view', async ({ ack, body, view, context }) => {
-	warmupMessage.customMsgView(ack, body, view, context);
+	warmupMessage.customMsgView(ack, body, view, context,true);
 });
 
 
@@ -154,3 +154,61 @@ app.action('select', async({payload, ack, say}) => {
     onBoard.onBoardExisting(app, bot_token, payload.selected_channel);
 });
 
+// Handle '/setupWarmup` command invocations
+app.command('/setupcooldown', async ({ command, ack, say }) => {
+    // Acknowledge command request
+    ack();
+	//send Warmup prompts to the channel that this command was called from
+    warmupMessage.sendSelectCooldownChoice(command.channel_id,app,bot_token);
+});
+
+app.action('cooldown_video_select', async ({ ack, body, context }) => {
+   warmupMessage.cooldownVideoSelect(ack,body,context);
+ });
+ 
+app.action('cooldown_article_select', async ({ ack, body, context }) => {
+   warmupMessage.cooldownArticleSelect(ack,body,context);
+ });
+
+app.action('cooldown_retro_select', async ({ ack, body, context }) => {
+   warmupMessage.cooldownRetroSelect(ack,body,context);
+ });
+ 
+app.action('cooldown_custom_select', async ({ ack, body, context }) => {
+   warmupMessage.requestCustomSendCooldown(ack,body,context);
+ });
+ 
+app.view('custom_msg_view_cooldown', async ({ ack, body, view, context }) => {
+	warmupMessage.customMsgView(ack, body, view, context,false);
+});
+ 
+app.action('warmup_coding_select', async ({ ack, body, context }) => {
+   warmupMessage.warmupCodingSelect(ack,body,context);
+ });
+ 
+ app.action('warmup_article_select', async ({ ack, body, context }) => {
+   warmupMessage.warmupArticleSelect(ack,body,context);
+ });
+
+app.action('warmup_puzzle_select', async ({ ack, body, context }) => {
+   warmupMessage.warmupPuzzleSelect(ack,body,context);
+ });
+
+app.action('warmup_quote_select', async ({ ack, body, context }) => {
+   warmupMessage.warmupQuoteSelect(ack,body,context);
+ });
+
+
+ 
+ app.view('generic_close', async ({ ack, body, context }) => {
+    ack({
+	  //clear the modal off the users screen
+	 "response_action": "clear"
+  });
+ });
+  
+ app.action('generic_ack', async ({ ack, body, context }) => {
+    ack();
+ });
+ 
+ 
