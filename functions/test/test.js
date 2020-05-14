@@ -29,6 +29,32 @@ app.client.conversations.list
 var assert = require('assert');
 
 const schedule = require('../schedule');
+// If it passes, means the function finished and message was scheduled, baseline test
+// Need more rigorous testing using promises of async function and validation from Slack API channel reading
+describe('Scheduler', function() {
+	describe('Reminder Message', function() {
+		it('schedule for 1 min after, should work', async function() {
+      now = new Date();
+      now.setTime(now.getTime() + 60000); 
+      response = await schedule.warmupMsgs(now.getHours(), now.getMinutes());
+      //console.log(response);
+      assert.equal(response.ok, true);
+      
+		});
+	});
+});
+
+describe('Scheduler', function() {
+	describe('Reminder Message', function() {
+		it('Schedule for 1 min before, should not work', async function() {
+      now = new Date();
+      now.setTime(now.getTime() - 60000);
+      response = await schedule.warmupMsgs(now.getHours(), now.getMinutes());
+      //console.log(response);
+      assert.equal(response.ok, false);
+		});
+	});
+});
 
 describe('Array', function() {
   describe('#indexOf()', function() {
@@ -38,19 +64,3 @@ describe('Array', function() {
   });
 });
 
-// If it passes, means the function finished and message was scheduled, baseline test
-// Need more rigorous testing using promises of async function and validation from Slack API channel reading
-describe('Scheduler', function() {
-	describe('Reminder Message', function() {
-		it('Should pass if correctly scheduled', async function() {
-			await assert(
-    			() => schedule.warmupMsgs(),
-    			{
-      				constructor: Error,
-     	 			message: 'This new error thows!'
-    			},
-    			'Promise not rejected'
-			);
-		});
-	});
-});
