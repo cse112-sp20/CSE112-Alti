@@ -34,23 +34,17 @@ async function generateQuote() {
 
 // TODO
 async function generatePuzzle(typeOfPuzzle) {
-    // return Promise.resolve("");
+    // Hardcoded difficulty, can be changed but also need to
+    // hardcode the upper limit for each game in that case
     const difficulty = "1";
-    var url = `https://brainbashers.com/show${typeOfPuzzle}.asp?`;
-    date = new Date();
-    var day = String(date.getDate());
-    if (day < 10){
-        day = "0" + day;
-    }
-    var month = String(date.getMonth() + 1); //As January is 0.
-    if (month < 10){
-        month = "0" + month;
-    }
-    const year = String(date.getFullYear());
 
+    // Hardcode the start of the url
+    var url = `https://brainbashers.com/show${typeOfPuzzle}.asp?`;
+
+    // Append the query parameters based on the type of game
     switch(typeOfPuzzle){
         case "sudoku":
-            url += generateSudokuParameters(difficulty, year, month, day);
+            url += generateSudokuParameters(difficulty);
             break;
         case "3inarow":
             url += generate3inarowParameters(difficulty);
@@ -64,6 +58,7 @@ async function generatePuzzle(typeOfPuzzle) {
         default:
             throw new Error('Parameter does not match any available games');
     }
+    // Return the url
     return Promise.resolve(url);
 
 }
@@ -73,23 +68,41 @@ function generate3inarowParameters(difficulty){
     const size = "6";
     return `date=${date}&diff=${diff}&size=${size}`;
 }
-function generateSudokuParameters(year, month, day){
-    const date = String(year) + String(month) + String(day);
+
+// Generates the query parameters for sudoku
+function generateSudokuParameters(difficulty){
+    // Sudoku does not take in RAND value to randomize, so randomize the date
+    // as a random date from this year.
+    const date = new Date();
+    const year = String(date.getFullYear());
+
+    var day = (Math.floor(Math.random() * date.getDate())) + 1;
+    var month = (Math.floor(Math.random() * date.getMonth())) + 1;
+    if (day < 10){
+        day = "0" + day;
+    }
+    if (month < 10){
+        month = "0" + month;
+    }
+    const dateString = String(year) + String(month) + String(day);
     const diff = String(difficulty);
-    return `date=${date}&diff=${diff}`;
+    return `date=${dateString}&diff=${diff}`;
 }
+// Generates the query parameters for calcudoku
 function generateCalcudokuParameters(difficulty){
     const diff = String(difficulty);
     const date = "RAND";
     const size = "4";
     return `date=${date}&diff=${diff}&size=${size}`;
 }
+// Generates the query parameters for hitori
 function generateHitoriParameters(difficulty){
     const diff = String(difficulty);
     const date = "RAND";
     const size = "5";
     return `date=${date}&diff=${diff}&size=${size}`;
 }
+
 // TODO
 async function generateCodingChallenge(codingLanguage) {
     return Promise.resolve("");
