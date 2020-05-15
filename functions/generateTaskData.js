@@ -34,9 +34,47 @@ async function generateQuote() {
 
 // TODO
 async function generatePuzzle(typeOfPuzzle) {
-    return Promise.resolve("");
-}
+    // return Promise.resolve("");
+    var url = `https://brainbashers.com/show${typeOfPuzzle}.asp?` ;
+    date = new Date();
+    var day = String(date.getDate());
+    if (day < 10){
+        day = "0" + day;
+    }
+    var month = String(date.getMonth() + 1); //As January is 0.
+    if (month < 10){
+        month = "0" + month;
+    }
+    const year = String(date.getFullYear());
+    if(typeOfPuzzle === "sudoku"){
+        url += generateSudokuParameters(year, month, day);
+    }
+    if(typeOfPuzzle === "3inarow"){
+        url += generate3inarowParameters();
+    }
+    if(typeOfPuzzle === "calcudoku"){
+        url += generateCalcudokuParameters();
+    }
+    return Promise.resolve(url);
 
+}
+function generate3inarowParameters(){
+    const diff = "1";
+    const date = "RAND";
+    const size = "6";
+    return `date=${date}&diff=${diff}&size=${size}`;
+}
+function generateSudokuParameters(year, month, day){
+    const date = String(year) + String(month) + String(day);
+    const diff = "1";
+    return `date=${date}&diff=${diff}`;
+}
+function generateCalcudokuParameters(){
+    const diff = "1";
+    const date = "RAND";
+    const size = "4";
+    return `date=${date}&diff=${diff}&size=${size}`;
+}
 // TODO
 async function generateCodingChallenge(codingLanguage) {
     return Promise.resolve("");
