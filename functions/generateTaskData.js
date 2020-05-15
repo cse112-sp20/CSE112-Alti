@@ -1,5 +1,7 @@
 const index = require('./index');
 const { app, token } = index.getBolt();
+const quotes = require('./quotes');
+const motivationalQuotes = quotes.getQuotesObj();
 
 app.command('/generatequote', async({command, ack, say}) => {
     ack();
@@ -29,7 +31,14 @@ app.command('/generatetyping', async({command, ack, say}) => {
 
 // TODO
 async function generateQuote() {
-    return Promise.resolve("");
+	let quotePoolSize =  Object.keys(motivationalQuotes).length;
+	let randomQuoteIndex = Math.floor(Math.random() * quotePoolSize);
+	let quoteText = motivationalQuotes[randomQuoteIndex].text; 
+	let quoteAuthor =  motivationalQuotes[randomQuoteIndex].author;
+	if (quoteAuthor === null) {
+		quoteAuthor = "Unknown";
+	}
+    return Promise.resolve(quoteText+" - " + quoteAuthor);
 }
 
 // TODO
