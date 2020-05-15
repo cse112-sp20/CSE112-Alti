@@ -78,6 +78,8 @@ function generateSudokuParameters(difficulty){
 
     var day = (Math.floor(Math.random() * date.getDate())) + 1;
     var month = (Math.floor(Math.random() * date.getMonth())) + 1;
+    // These need to be formatted as dd and mm, so if it is less than
+    // 10, prepend a 0.
     if (day < 10){
         day = "0" + day;
     }
