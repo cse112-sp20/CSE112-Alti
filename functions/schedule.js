@@ -5,7 +5,8 @@ const {app, token} = index.getBolt();
 
 
   // schedule all warmups to differnet users at once.
-  exports.warmupMsgs = async function warmupMsgs(hour, minute) {
+  // id could be channel or user or dm thread, or name.
+  exports.scheduleMsg = async function scheduleMsg(hour, minute, text, id) {
     // testing with just one warmup
 
     reminder = new Date();
@@ -14,8 +15,8 @@ const {app, token} = index.getBolt();
     reminder.setSeconds(0);
     return app.client.chat.scheduleMessage({
                       token: token,
-                      channel: '#general',
-                      text:  `A reminder for warmup`,
+                      channel: id,
+                      text:  text,
                       post_at: reminder.getTime()/1000
                   }).catch((error) => {
                     return error.data;
