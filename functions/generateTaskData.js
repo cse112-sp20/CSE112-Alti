@@ -201,3 +201,40 @@ async function generateCodingChallenge(codingLanguage='english',time = 1)
   url = url + '/' + rand + '/';
   return Promise.resolve(url);
 }
+
+// Generates a message to store in Firebase and send at a later time,
+// given that the user has chosen an exercise type (and secondary type if needed)
+// PARAMS:
+// exerciseType: type of exercise (puzzle, typing, quote)
+// arg: arg passed when calling a generateABC() function
+//      ie. if exerciseType is puzzle, arg could be: sudoku, calcdoku, etc.
+//          if exerciseType is quote, then arg could be an empty string
+function generateMessageToSend(exerciseType, arg) {
+  var url = "";     // generated url (for exerciseTypes: puzzle, typing)
+  var quote = "";   // generated quote (for exerciseType: quote)
+  var message = ""; // full message to store
+
+  switch(exerciseType) {
+    case "puzzle":
+      url = generatePuzzle(arg);
+      message = "Your partner sent you this " + arg + 
+                "puzzle to help you get those brain juices flowing!\nComplete it here: " + url;
+      break;
+
+    case "typing":
+      url = generateCodingChallenge(arg);
+      message = "Your partner sent you this cool speed coding challenge in " + arg + 
+                "to get your mind and fingers ready for the day!\nComplete it here: " + url;
+      break;
+
+    case "quote":
+      quote = generateQuote();
+      message = "Your partner sent you a motivational quote to help you start your day right! It says:\n" + quote;
+      break;
+
+    default:
+      message = "";
+  }
+
+  return message;
+}   
