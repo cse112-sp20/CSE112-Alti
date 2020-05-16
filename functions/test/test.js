@@ -10,7 +10,7 @@ describe('Scheduler', function() {
     let now = new Date();
     now.setTime(now.getTime() + 60000); 
     let response = await schedule.warmupMsgs(now.getHours(), now.getMinutes());
-    console.log(response);
+    //console.log(response);
     assert.equal(response.ok, true);
   });
 
