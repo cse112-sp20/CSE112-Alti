@@ -23,6 +23,6 @@ exports.scheduleWarmup = functions.pubsub
                             .schedule('every mon,tue,wed,thu,fri 00:10')
                             .timeZone('America/Los_Angeles')
                             .onRun((context) => {
-    schedule.warmupMsgs(9, 0);
+    schedule.warmupMsgs();
     return null;
 });
