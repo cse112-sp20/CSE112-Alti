@@ -71,7 +71,7 @@ exports.pairUp = async function pairUp(channelName){
 
     }
     catch(error){
-        console.error(error);
+        return error.data;
     }
 }
 

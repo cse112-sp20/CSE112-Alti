@@ -2,6 +2,7 @@
 
 var assert = require('assert');
 var schedule = require('../schedule');
+var pairUp = require('../pairUp');
 // If it passes, means the function finished and message was scheduled, baseline test
 // Need more rigorous testing using promises of async function and validation from Slack API channel reading
 describe('Scheduler', function() {
