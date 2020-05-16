@@ -10,7 +10,7 @@ describe('Scheduler', function() {
     let now = new Date();
     now.setTime(now.getTime() + 60000); 
     let response = await schedule.scheduleMsg(now.getHours(), now.getMinutes(), 
-                                                    "A reminder", "#general");
+                                                    "A reminder", "#testing");
     //console.log(response);
     assert.equal(response.ok, true);
   });
