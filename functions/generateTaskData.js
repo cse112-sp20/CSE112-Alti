@@ -5,7 +5,7 @@ const motivationalQuotes = quotes.getQuotesObj();
 
 app.command('/generatequote', async({command, ack, say}) => {
     ack();
-    const quoteGenerated = generateQuote(); 
+    const quoteGenerated = generateQuote();
     return quoteGenerated.then( response => {
         return Promise.resolve(say(`Generated a quote: ` + response));
     });
@@ -14,7 +14,7 @@ app.command('/generatequote', async({command, ack, say}) => {
 app.command('/generatepuzzle', async({command, ack, say}) => {
     ack();
     const typeOfPuzzle = command.text;
-    const puzzleGenerated = generatePuzzle(typeOfPuzzle); 
+    const puzzleGenerated = generatePuzzle(typeOfPuzzle);
     return puzzleGenerated.then( response => {
         return Promise.resolve(say('Generated a puzzle of type ' + command.text + ': ' + response));
     });
@@ -23,7 +23,7 @@ app.command('/generatepuzzle', async({command, ack, say}) => {
 app.command('/generatetyping', async({command, ack, say}) => {
     ack();
     const codingLanguage = command.text;
-    const codingChallengeGenerated = generateCodingChallenge(codingLanguage); 
+    const codingChallengeGenerated = generateCodingChallenge(codingLanguage);
     return codingChallengeGenerated.then( response => {
         return Promise.resolve(say('Generated a code typing challenge in the language ' + command.text + ': '  + response));
     });
@@ -33,7 +33,7 @@ app.command('/generatetyping', async({command, ack, say}) => {
 async function generateQuote() {
 	let quotePoolSize =  Object.keys(motivationalQuotes).length;
 	let randomQuoteIndex = Math.floor(Math.random() * quotePoolSize);
-	let quoteText = motivationalQuotes[randomQuoteIndex].text; 
+	let quoteText = motivationalQuotes[randomQuoteIndex].text;
 	let quoteAuthor =  motivationalQuotes[randomQuoteIndex].author;
 	if (quoteAuthor === null) {
 		quoteAuthor = "Unknown";
@@ -115,6 +115,89 @@ function generateHitoriParameters(difficulty){
 }
 
 // TODO
-async function generateCodingChallenge(codingLanguage) {
-    return Promise.resolve("");
+async function generateCodingChallenge(codingLanguage='english',time = 1)
+{
+  exercises = [];
+  url  = `http://www.speedcoder.net/lessons/`;
+  if (codingLanguage === 'english')
+  {
+    if (time <=2 )
+    {
+      url = 'https://www.typing.com/student/typing-test/1-minute';
+    }
+    else if (time <= 3)
+    {
+      url = 'https://www.typing.com/student/typing-test/3-minute';
+    }
+    else
+    {
+      url = 'https://www.typing.com/student/typing-test/5-minute';
+    }
+    return Promise.resolve(url);
+  }
+  else if (codingLanguage === 'python')
+  {
+    if (time <= 2)
+    {
+      exercises.push(1,2,3,4,5,6,10,12,13);
+    }
+    else
+    {
+      exercises.push(7,8,9,14);
+    }
+    url = url + 'py';
+
+  }
+  else if (codingLanguage === 'javascript')
+  {
+    if (time <= 2)
+    {
+      exercises.push(2,3);
+    }
+    else
+    {
+      exercises.push(4,5);
+    }
+    url = url + 'js';
+  }
+  else if (codingLanguage === 'c++')
+  {
+    if (time <=2)
+    {
+      exercises.push(1,2,3);
+    }
+    else
+    {
+      exercises.push(3,4);
+    }
+    url = url + 'cpp';
+  }
+  else if (codingLanguage === 'java')
+  {
+    if (time <= 2)
+    {
+      exercises.push(1,2,3,4,5,7);
+    }
+    else
+    {
+      exercises.push(6,8,9,10);
+    }
+    url = url + 'java';
+  }
+  else
+  {
+    if(time <= 2)
+    {
+      exercises.push(1,2,3);
+    }
+    else
+    {
+      exercises.push(4,5);
+    }
+    url = url + 'c';
+  }
+
+  rand = exercises[Math.floor(Math.random()*exercises.length)];
+  url = url + '/' + rand + '/';
+  return Promise.resolve(url);
 }
