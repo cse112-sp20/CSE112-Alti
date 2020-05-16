@@ -1,0 +1,7 @@
+{
+  "slack": {
+    "token": "xoxb-610778912375-1107444837857-M8TyBOepbtpPLfqBDD4JqBqX",
+    "bot_token": "xoxb-610778912375-1107444837857-M8TyBOepbtpPLfqBDD4JqBqX",
+    "signing_secret": "90a46add414521581d2e57bd88a2232d"
+  }
+}
