@@ -21,15 +21,34 @@ let db = admin.firestore();
     Stores the new pairings (DM thread ids?) in the corresponding place (with the corresponding
     workspace and channel) in cloud firestore.
 
+    ASSUMPTION: pairedUsers length is always 2
+
     Inputs:
         workspace - workspace id where the new pairings were made
         channel - channel name/id that the pairings were made based off of
-        pairing - a singular DM thread id of a new pairing
+        dmThreadID - a singular DM thread id of a new pairing
+        pairedUsers - the user IDs of the newly paired teammates
 */
-exports.storeNewPairings = function storeNewPairings(workspace, channel, pairing) {
-    let teammatePairingsRef = db.collection('workspaces').doc(workspace)
-                                .collection('activeChannels').doc(channel)
-                                .collection('teammatePairings').doc(pairing).set({test: 'this is another test hi daniel'});
+exports.storeNewPairing = function storeNewPairings(workspace, channel, dmThreadID, pairedUsers) {
+    let usersRef = db.collection('workspaces').doc(workspace)
+                           .collection('activeChannels').doc(channel)
+                           .collection('pairedUsers');
+    
+    console.log("HERE@");
+    usersRef.doc(pairedUsers[0]).set({
+        dmThreadID: dmThreadID,
+        partnerID: pairedUsers[1],
+    }, {merge: true});
+
+    usersRef.doc(pairedUsers[1]).set({
+        dmThreadID: dmThreadID,
+        partnerID: pairedUsers[0],
+    }, {merge: true})
+    
+
+    // let teammatePairingsRef = db.collection('workspaces').doc(workspace)
+    //                             .collection('activeChannels').doc(channel)
+    //                             .collection('teammatePairings').doc(dmThreadID).set({test: 'this is another test hi daniel'});
 }
 
 exports.writeMsgToDB = function writeMsgToDB(teamId, userID, channelID,msgToSend,isWarmup) {
