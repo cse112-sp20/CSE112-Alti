@@ -19,6 +19,40 @@ else{
 
 let db = admin.firestore();
 
+
+exports.storeAPIPair = (team_id, api_key) => { 
+    db.collection('api_keys').doc(team_id).set({
+        userToken: api_key.token,
+        botToken: api_key.botToken,
+        botId: api_key.botId,
+        botUserId: api_key.botUserId
+    })
+};
+exports.getAPIPair = (team_id) => { 
+
+    //default workspace
+    if (team_id === "T013YTT91B6"){ 
+        return ({ 
+            botToken: "xoxb-1134945307380-1141390769793-fiMOhaTu74UVw4Dc2fAVQHVJ",
+            //userToken: "xoxb-1134945307380-1141390769793-fiMOhaTu74UVw4Dc2fAVQHVJ",
+            botId: "B013C0RV06T",
+            botUserId: "U0145BGNMPB"
+        });
+
+    } else{
+        db.collection('api_keys').doc(team_id).then((doc) => {	
+        if (!(doc && doc.exists)) {	
+            return null;	
+        }	 
+        return doc.data();
+        }).catch(() => {	
+            return null;
+        });
+    }
+
+
+}
+
 /* 
     Stores the new pairings (DM thread ids?) in the corresponding place (with the corresponding
     workspace and channel) in cloud firestore.

@@ -23,29 +23,17 @@ const expressReceiver = new ExpressReceiver({
 
 
 const authorizeFn = async ({ teamId }) => {
-    // Fetch team info from database
-    /*
-    for (const team of installations) {
-      // Check for matching teamId and enterpriseId in the installations array
-      if (team.teamId === teamId) {
-        // This is a match. Use these installation credentials.
-        return {
-          // You could also set userToken instead
+    
+        // Fetch team info from database
+        let apiResponse = firestoreFuncs.getAPIPair(teamId);
 
-          botToken: team.botToken,
-          botId: team.botId,
-          botUserId: team.botUserId
-        };
-      }
-    }
-    */
-   return { 
-       botToken: bot_token, 
-       botId: 0, 
-       botUserId: 0
-   };
-  
-    //throw new Error('No matching authorizations');
+        if(apiResponse !== null) {
+            return apiResponse;
+        } else 
+        { 
+            throw new Error('No matching authorizations');
+        }
+
 }
 
 
@@ -54,26 +42,11 @@ const app = new App({
     authorize: authorizeFn,
 });
 
-// exports.challenge = functions.https.onRequest(expressReceiver.app.post('/', (req, res) => {
-//     if(req.body.challenge){
-//         let obj = req.body.challenge; 
-//         res.set('Content-Type', 'application/json');
-//         res.sendStatus(200);
-//         res.send({ challenge: obj });
-        
-//       } else {
-//         console.log("failure")
-//         res.sendStatus(401);
-//       }
-//       return;
-// }));
-
-
 
 exports.getBolt = function getBolt(){
     return {
-        app:app,
-        token:bot_token
+        app:app//,
+        //token:bot_token
     }
 };
 
