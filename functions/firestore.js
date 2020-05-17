@@ -153,4 +153,4 @@ exports.getPairedUsers = async function getPairedUsers(workspaceID, channelID) {
         });
         return pairings;
     });
-} 
+}
