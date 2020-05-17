@@ -596,18 +596,18 @@ createModalView = function(title,callbackID,actionID,responseText,choiceText,cha
 }	
    
 
-app.action('warmup_quote_selected_ack', ({ ack, body, context }) => {
-	ack();
-	const selected_option = body.actions[0].selected_option;
-	const selected_quote = motivationalQuotes[selected_option.value];
-	const author = selected_quote.author;
-	const text = selected_quote.text;
-	const data = generateData.generateMessageToSend('quote', selected_quote);
-	console.log(data);
-	// console.log(text);
-	var quoteIndex = selected_option.value;
-	// var quote = motivationalQuotes[]
- });
+// app.action('warmup_quote_selected_ack', ({ ack, body, context }) => {
+// 	ack();
+// 	const selected_option = body.actions[0].selected_option;
+// 	const selected_quote = motivationalQuotes[selected_option.value];
+// 	const author = selected_quote.author;
+// 	const text = selected_quote.text;
+// 	const data = generateData.generateMessageToSend('quote', selected_quote);
+// 	console.log(data);
+// 	// console.log(text);
+// 	var quoteIndex = selected_option.value;
+// 	// var quote = motivationalQuotes[]
+//  });
 
  app.action('warmup_puzzle_selected_ack', ({ ack, body, context }) => {
 	ack();
