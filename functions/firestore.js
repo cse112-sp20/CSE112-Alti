@@ -52,8 +52,18 @@ exports.writeMsgToDB = function writeMsgToDB(teamId, userID, channelID,msgToSend
 	});
 }
 
+/*
+    Description:
+        This function will store a newly designated pairing channel under the 'activeChannels' collection
+
+    TODO: might have to change this so it deletes the previously designated pairing channel before inserting new one
+
+    Input: 
+        workspaceID - workspace id
+        channelID - channel id of the new channel designated as the pairing channel
+*/
 exports.storeNewPairingChannel = function storeNewPairingChannel(workspaceID, newChannel) {
-    db.collection("workspaces").doc(workspaceID).collection('activeChannels').doc(newChannel).set({});
+    db.collection("workspaces").doc(workspaceID).collection('activeChannels').doc(newChannel).set({}, {merge: true});
 }
 
 /* 
@@ -65,7 +75,7 @@ exports.storeNewPairingChannel = function storeNewPairingChannel(workspaceID, ne
 
     Input: 
         workspaceID - workspace id
-        channelID - channel id over channel from which pairing was created
+        channelID - channel id of channel from which pairing was created
         userID - user id of user who selected this task for their partner
         isWarmup - (boolean) true if warmup, false if cooldown
         exercisePrompt - for example: "_____ sent you this C++ coding speed typing test to warmup your
