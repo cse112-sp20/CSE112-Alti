@@ -1,14 +1,17 @@
 'use strict'
 
 const assert = require('assert');
-const schedule = require('../schedule');
-const firestoreFuncs = require('../firestore');
 const index = require('../index');
 const {app, token} = index.getBolt();
 
 // If it passes, means the function finished and message was scheduled, baseline test
 // Need more rigorous testing using promises of async function and validation from Slack API channel reading
 describe('Scheduler', function() {
+
+  let schedule;
+  before(function () {
+    schedule = require('../schedule');
+  });
 
   it('schedule for 1 min after', async function() {
     let now = new Date();
@@ -30,25 +33,37 @@ describe('Scheduler', function() {
 });
 
 describe('Pairup', function() {
+  let pairUp;
 
-
-  it('Test Pairup', async function() {
-    const workspaceInfo = await app.client.team.info({
-      token: token
-    })
+  before(function() {
+    pairUp = require('../pairUp');
   });
-
-  describe('Test getChannelIdByName', function(){
-
-    let pairUp;
+  
+  describe('Test the pairup function as a whole', function() {
+    let firestoreFuncs;
+    let workspaceInfo;
     before(async function () {
-      pairUp = require('../pairUp');
+      firestoreFuncs = require('../firestore');
+      workspaceInfo = await app.client.team.info({
+        token: token
+      })
+    });
+
+    it('Test Pairup with testing channel', async function() {
+      
+    });  
+  });
+  
+  describe('Test getChannelIdByName', function(){
+    // helps to find the channel ids
+    before(async function () {
+
       var response = await app.client.conversations.list({
         token: token
       })
       var channels = response.channels;
       //console.log(channels)
-    })
+    });
 
     it('Test with channel general', async function() {
       var channelId = await pairUp.getChannelIdByName(app, token, "general");
@@ -62,7 +77,7 @@ describe('Pairup', function() {
 
     it('Test with channel that doesnt exist', async function() {
       var channelId = await pairUp.getChannelIdByName(app, token, "should not exist");
-      assert.equal(channelId, undefined); //hardcoded it with console.log
+      assert.equal(channelId, undefined); 
     });
   })
   
