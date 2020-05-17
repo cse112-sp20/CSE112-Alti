@@ -2,7 +2,7 @@ const functions = require('firebase-functions');
 const admin = require('firebase-admin');
 
 // console.log(typeof(process.env.FUNCTIONS_EMULATOR));
-if(process.env.FUNCTIONS_EMULATOR === "true"){
+if(process.env.FUNCTIONS_EMULATOR !== "true"){
     
     var serviceAccount = require('./serviceAccountKey.json');
     

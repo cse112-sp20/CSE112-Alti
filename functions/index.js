@@ -2,6 +2,7 @@ const functions = require('firebase-functions');
 const { App, ExpressReceiver } = require('@slack/bolt');
 const admin = require('firebase-admin');
 
+
 const config = functions.config();
 const signingSecret = config.slack.signing_secret;
 const user_token = config.slack.user_token;
@@ -11,16 +12,63 @@ const bot_token = config.slack.bot_token;
 
 const firestoreFuncs = require('./firestore');
 
+//dev
+const request = require("request");
+
 
 const expressReceiver = new ExpressReceiver({
     signingSecret: signingSecret,
     endpoints: '/events',
 });
 
+
+const authorizeFn = async ({ teamId }) => {
+    // Fetch team info from database
+    /*
+    for (const team of installations) {
+      // Check for matching teamId and enterpriseId in the installations array
+      if (team.teamId === teamId) {
+        // This is a match. Use these installation credentials.
+        return {
+          // You could also set userToken instead
+
+          botToken: team.botToken,
+          botId: team.botId,
+          botUserId: team.botUserId
+        };
+      }
+    }
+    */
+   return { 
+       botToken: bot_token, 
+       botId: 0, 
+       botUserId: 0
+   };
+  
+    //throw new Error('No matching authorizations');
+}
+
+
 const app = new App({
     receiver: expressReceiver,
-    token: bot_token
+    authorize: authorizeFn,
 });
+
+// exports.challenge = functions.https.onRequest(expressReceiver.app.post('/', (req, res) => {
+//     if(req.body.challenge){
+//         let obj = req.body.challenge; 
+//         res.set('Content-Type', 'application/json');
+//         res.sendStatus(200);
+//         res.send({ challenge: obj });
+        
+//       } else {
+//         console.log("failure")
+//         res.sendStatus(401);
+//       }
+//       return;
+// }));
+
+
 
 exports.getBolt = function getBolt(){
     return {
@@ -32,6 +80,7 @@ exports.getBolt = function getBolt(){
 const warmupMessage = require('./warmupMessage');
 const pubsubScheduler = require('./pubsubScheduler')
 const pairUp = require('./pairUp');
+
 exports.scheduledPairUp = pubsubScheduler.scheduledPairUp;
 exports.scheduleWarmup = pubsubScheduler.scheduleWarmup;
 
@@ -76,6 +125,13 @@ app.message(async ({ message, context }) => {
 
 });
 exports.slack = functions.https.onRequest(expressReceiver.app);
+
+//OAuth Endpoint for Authentication
+const oauthEndpoint = require('./oauth');
+//export this to separate file 
+exports.oauth = oauthEndpoint.oAuthFunction; 
+
+
 
 app.command('/firestore', async ({ command, ack, say }) => {	
     // Acknowledge command request	 
