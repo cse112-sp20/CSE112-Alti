@@ -17,6 +17,12 @@ jobs:
     - name: Modify .runtimeconfig.json
       working-directory: ./functions
       run: cp -f ./test/.runtimeconfig.json ./runtimeconfig.json
+    - name: Cat ./test/.runtimeconfig.json
+      working-directory: ./functions
+      run: cat ./test/.runtimeconfig.json
+    - name: Cat ./runtimeconfig.json
+      working-directory: ./functions
+      run: cat ./runtimeconfig.json
     - name: Install Dependencys 
       working-directory: ./functions
       run: npm install
