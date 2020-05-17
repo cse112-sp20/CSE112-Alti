@@ -11,7 +11,7 @@ describe('Scheduler', function() {
     now.setTime(now.getTime() + 60000); 
     let response = await schedule.scheduleMsg(now.getHours(), now.getMinutes(), 
                                                     "A reminder", "#general");
-    //console.log(response);
+    console.log(response);
     assert.equal(response.ok, true);
   });
 
@@ -20,7 +20,7 @@ describe('Scheduler', function() {
     now.setTime(now.getTime() - 60000); 
     let response = await schedule.scheduleMsg(now.getHours(), now.getMinutes(), 
                                                     "A reminder", "#general");
-    //console.log(response);
+    console.log(response);
     assert.equal(response.ok, false);
   });
 });
