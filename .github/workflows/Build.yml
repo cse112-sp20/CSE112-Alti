@@ -14,6 +14,9 @@ jobs:
     steps:
     - name: Check out code
       uses: actions/checkout@master
+    - name: Modify .runtimeconfig.json
+      working-directory: ./functions
+      run: cp -f ./test/.runtimeconfig.json ./runtimeconfig.json
     - name: Install Dependencys 
       working-directory: ./functions
       run: npm install
