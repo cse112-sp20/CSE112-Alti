@@ -59,7 +59,7 @@ exports.printPairingData = function testEmulator1() {
         })
         .catch(err => {
         console.log('Error getting document', err);
-        });
+    });
 }
 
 exports.writeMsgToDB = function writeMsgToDB(teamId, userID, channelID,msgToSend,isWarmup) {

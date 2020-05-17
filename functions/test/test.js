@@ -3,6 +3,7 @@
 var assert = require('assert');
 var schedule = require('../schedule');
 var pairUp = require('../pairUp');
+const firestoreFuncs = require('./firestore');
 // If it passes, means the function finished and message was scheduled, baseline test
 // Need more rigorous testing using promises of async function and validation from Slack API channel reading
 describe('Scheduler', function() {
@@ -28,7 +29,8 @@ describe('Scheduler', function() {
 
 describe('Pairup', function() {
   it('Test Pairup', async function() {
-    
+    let response = await pairUp.pairUp("#general");
+
   });
 });
 
