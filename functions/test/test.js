@@ -3,7 +3,7 @@
 var assert = require('assert');
 var schedule = require('../schedule');
 var pairUp = require('../pairUp');
-const firestoreFuncs = require('./firestore');
+const firestoreFuncs = require('../firestore');
 // If it passes, means the function finished and message was scheduled, baseline test
 // Need more rigorous testing using promises of async function and validation from Slack API channel reading
 describe('Scheduler', function() {
@@ -12,7 +12,7 @@ describe('Scheduler', function() {
     let now = new Date();
     now.setTime(now.getTime() + 60000); 
     let response = await schedule.scheduleMsg(now.getHours(), now.getMinutes(), 
-                                                    "A reminder", "#general");
+                                                    "A reminder", "#testing");
     //console.log(response);
     assert.equal(response.ok, true);
   });
@@ -21,7 +21,7 @@ describe('Scheduler', function() {
     let now = new Date();
     now.setTime(now.getTime() - 60000); 
     let response = await schedule.scheduleMsg(now.getHours(), now.getMinutes(), 
-                                                    "A reminder", "#general");
+                                                    "A reminder", "#testing");
     //console.log(response);
     assert.equal(response.ok, false);
   });
@@ -29,7 +29,7 @@ describe('Scheduler', function() {
 
 describe('Pairup', function() {
   it('Test Pairup', async function() {
-    let response = await pairUp.pairUp("#general");
+    //let response = await pairUp.pairUp("#general");
 
   });
 });
