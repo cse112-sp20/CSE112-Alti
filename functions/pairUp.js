@@ -85,6 +85,24 @@ async function handlePairingResponse(response, app, token, workspaceInfo, pairin
         channel: response.channel.id,
         text: "You ppl just got paired!"
     });
+
+    let users = await app.client.conversations.members({
+        token: token,
+        channel: response.channel.id
+    });
+
+    let paired_users = [];
+    for (var i = 0; i < users.members.length; i++) {
+        let profile = await app.client.users.profile.get({
+            token: token,
+            user: users.members[i]
+        });
+        if (!profile.profile.bot_id) {
+            console.log('bot id: ', profile.bot_id);
+            paired_users.push(users.members[i]);
+        }
+    }
+
     return firestoreFuncs.storeNewPairings(workspaceInfo.team.id, pairingChannelIdVal, response.channel.id);
 }
 
