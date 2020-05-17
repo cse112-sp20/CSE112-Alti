@@ -44,11 +44,6 @@ exports.storeNewPairing = function storeNewPairings(workspace, channel, dmThread
         dmThreadID: dmThreadID,
         partnerID: pairedUsers[0],
     }, {merge: true})
-    
-
-    // let teammatePairingsRef = db.collection('workspaces').doc(workspace)
-    //                             .collection('activeChannels').doc(channel)
-    //                             .collection('teammatePairings').doc(dmThreadID).set({test: 'this is another test hi daniel'});
 }
 
 exports.writeMsgToDB = function writeMsgToDB(teamId, userID, channelID,msgToSend,isWarmup) {
@@ -127,7 +122,25 @@ exports.getPartner = function getPartner(workspaceID, channelID, userID) {
     Input: 
         workspaceID - workspace id
         channelID - channel id of pairing channel you're looking to get paired users from
+    
+    Return:
+        If u1 is paired with u2, and u3 paired with u4:
+        [[u1, u2], [u3, u4]]
 */
-exports.getPairedUsers = function getPairedUsers(workspaceID, channelID) {
-
+exports.getPairedUsers = async function getPairedUsers(workspaceID, channelID) {
+    let userRef = db.collection("workspaces").doc(workspaceID).collection("activeChannels")
+                    .doc(channelID).collection('pairedUsers');
+    
+    return userRef.get().then((querySnapshot) => {
+        let partnerIDs = [];
+        let pairings = [];
+        querySnapshot.forEach((doc) => {
+            let partner = doc.data().partnerID;
+            if (!partnerIDs.includes(doc.id)) {
+                pairings.push([doc.id, partner]);
+                partnerIDs.push(partner)
+            }
+        });
+        return pairings;
+    });
 }
