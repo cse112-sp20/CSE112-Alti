@@ -621,7 +621,7 @@ handleQuoteSelect = async function(ack,body,context) {
 	let quoteID = body.actions[0].value;
 	let quoteText = motivationalQuotes[quoteID].text;
 	let quoteAuthor = motivationalQuotes[quoteID].author;
-	if (quoteAuthor == null) {
+	if (quoteAuthor === null) {
 		quoteAuthor = "Unknown";
 	}
 	console.log("quoteText:" + quoteText);
