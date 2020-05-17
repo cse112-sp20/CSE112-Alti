@@ -92,6 +92,7 @@ async function handlePairingResponse(response, app, token, workspaceInfo, pairin
     });
 
     let pairedUsers = [];
+    /* eslint-disable no-await-in-loop */
     for (var i = 0; i < users.members.length; i++) {
         let profile = await app.client.users.profile.get({
             token: token,
@@ -102,6 +103,7 @@ async function handlePairingResponse(response, app, token, workspaceInfo, pairin
             pairedUsers.push(users.members[i]);
         }
     }
+    /* eslint-enable no-await-in-loop */
 
     return firestoreFuncs.storeNewPairing(workspaceInfo.team.id, pairingChannelIdVal, response.channel.id, pairedUsers);
 }
