@@ -209,7 +209,7 @@ async function generateCodingChallenge(codingLanguage='english',time = 1)
 // arg: arg passed when calling a generateABC() function
 //      ie. if exerciseType is puzzle, arg could be: sudoku, calcdoku, etc.
 //          if exerciseType is quote, then arg could be an empty string
-function generateMessageToSend(exerciseType, arg) {
+exports.generateMessageToSend = function generateMessageToSend(exerciseType, arg) {
   var url = "";     // generated url (for exerciseTypes: puzzle, typing)
   var quote = "";   // generated quote (for exerciseType: quote)
   var message = ""; // full message to store
@@ -228,8 +228,9 @@ function generateMessageToSend(exerciseType, arg) {
       break;
 
     case "quote":
-      quote = generateQuote();
-      message = "Your partner sent you a motivational quote to help you start your day right! It says:\n" + quote;
+      quote = arg.text;
+      var author = arg.author;
+      message = `Your partner sent you a motivational quote to help you start your day right! ${author} says: ${quote}\n`;
       break;
 
     default:
