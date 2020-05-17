@@ -6,9 +6,7 @@ const motivationalQuotes = quotes.getQuotesObj();
 app.command('/generatequote', async({command, ack, say}) => {
     ack();
     const quoteGenerated = generateQuote();
-    return quoteGenerated.then( response => {
-        return Promise.resolve(say(`Generated a quote: ` + response));
-    });
+    say(quoteGenerated);
 });
 
 app.command('/generatepuzzle', async({command, ack, say}) => {
@@ -29,8 +27,8 @@ app.command('/generatetyping', async({command, ack, say}) => {
     });
 });
 
-// TODO
-async function generateQuote() {
+// Generates a quote object
+exports.generateQuote = function() {
 	let quotePoolSize =  Object.keys(motivationalQuotes).length;
 	let randomQuoteIndex = Math.floor(Math.random() * quotePoolSize);
 	let quoteText = motivationalQuotes[randomQuoteIndex].text;
@@ -38,7 +36,7 @@ async function generateQuote() {
 	if (quoteAuthor === null) {
 		quoteAuthor = "Unknown";
 	}
-    return Promise.resolve(quoteText+" - " + quoteAuthor);
+    return randomQuoteIndex+"-"+quoteText+" - "+ quoteAuthor ;
 }
 
 // TODO
