@@ -1,9 +1,11 @@
 'use strict'
 
-var assert = require('assert');
-var schedule = require('../schedule');
-var pairUp = require('../pairUp');
+const assert = require('assert');
+const schedule = require('../schedule');
 const firestoreFuncs = require('../firestore');
+const index = require('../index');
+const {app, token} = index.getBolt();
+
 // If it passes, means the function finished and message was scheduled, baseline test
 // Need more rigorous testing using promises of async function and validation from Slack API channel reading
 describe('Scheduler', function() {
@@ -28,10 +30,42 @@ describe('Scheduler', function() {
 });
 
 describe('Pairup', function() {
-  it('Test Pairup', async function() {
-    //let response = await pairUp.pairUp("#general");
 
+
+  it('Test Pairup', async function() {
+    const workspaceInfo = await app.client.team.info({
+      token: token
+    })
   });
+
+  describe('Test getChannelIdByName', function(){
+
+    let pairUp;
+    before(async function () {
+      pairUp = require('../pairUp');
+      var response = await app.client.conversations.list({
+        token: token
+      })
+      var channels = response.channels;
+      //console.log(channels)
+    })
+
+    it('Test with channel general', async function() {
+      var channelId = await pairUp.getChannelIdByName(app, token, "general");
+      assert.equal(channelId, "C012WGXPYC9"); //hardcoded it with console.log
+    });
+
+    it('Test with channel alti-paring', async function() {
+      var channelId = await pairUp.getChannelIdByName(app, token, "alti-pairing");
+      assert.equal(channelId, "C01391DPZV4"); //hardcoded it with console.log
+    });
+
+    it('Test with channel that doesnt exist', async function() {
+      var channelId = await pairUp.getChannelIdByName(app, token, "should not exist");
+      assert.equal(channelId, undefined); //hardcoded it with console.log
+    });
+  })
+  
 });
 
 

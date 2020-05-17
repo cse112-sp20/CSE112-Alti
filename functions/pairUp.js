@@ -110,7 +110,7 @@ async function handlePairingResponse(response, app, token, workspaceInfo, pairin
 
 
 // Given a channel name, returns the channel ID.
-async function getChannelIdByName(app, token, channelName){
+exports.getChannelIdByName = async function getChannelIdByName(app, token, channelName){
     const conversations = app.client.conversations.list({
         token:token
     });
