@@ -3,6 +3,7 @@ const quotes = require('./quotes');
 const {app,token} = index.getBolt();
 const firestoreFuncs = require('./firestore');
 const motivationalQuotes = quotes.getQuotesObj();
+const generateData = require('./generateTaskData');
 exports.sendSelectChoice = async function(targChannelID,app,token){
 	const notificationString = "Send a warmup to your buddy!"
 	//warmup selection message json
@@ -416,7 +417,7 @@ exports.warmupCodingSelect = async function(ack,body,context) {
 
 exports.warmupPuzzleSelect = async function(ack,body,context) {
 	await ack();
-	let thisView = createModalView("Alti","generic_close","generic_ack","Awesome puzzles are fun!","Pick a puzzle",body.channel.id,["2048","sudoku","chess"],["1","2", "3"]);
+	let thisView = createModalView("Alti","generic_close","warmup_puzzle_selected_ack","Awesome puzzles are fun!","Pick a puzzle",body.channel.id,["Hitori","Sudoku","Calcudoku"],["1","2", "3"]);
     try {
       const result = await app.client.views.open({
         token: context.botToken,
@@ -451,8 +452,8 @@ exports.warmupQuoteSelect = async function(ack,body,context) {
 	let amountOfQuotes = 6; 
 	//generate values for above array
 	generateQuoteArray(amountOfQuotes,refArray,valArray);
-	let thisView = createModalView("Alti","generic_close","generic_ack","Great choice quotes are fun!","Pick an author",body.channel.id,refArray,valArray);
-	console.log(JSON.stringify(thisView));
+	let thisView = createModalView("Alti","generic_close","warmup_quote_selected_ack","Great choice quotes are fun!","Pick an author",body.channel.id,refArray,valArray);
+	// console.log(JSON.stringify(thisView));
     try {
       const result = await app.client.views.open({
         token: context.botToken,
@@ -595,3 +596,28 @@ createModalView = function(title,callbackID,actionID,responseText,choiceText,cha
 }	
    
 
+app.action('warmup_quote_selected_ack', ({ ack, body, context }) => {
+	ack();
+// 	const selected_option = body.actions[0].selected_option;
+// 	const selected_quote = motivationalQuotes[selected_option.value];
+// 	const author = selected_quote.author;
+// 	const text = selected_quote.text;
+// 	const data = generateData.generateMessageToSend('quote', selected_quote);
+// 	console.log(data);
+// 	// console.log(text);
+// 	var quoteIndex = selected_option.value;
+// 	// var quote = motivationalQuotes[]
+ });
+
+ app.action('warmup_puzzle_selected_ack', ({ ack, body, context }) => {
+	ack();
+	const selected_option = body.actions[0].selected_option;
+	// const selected_quote = motivationalQuotes[selected_option.value];
+	// const author = selected_quote.author;
+	// const text = selected_quote.text;
+	// const data = generateData.generateMessageToSend('quote', selected_quote);
+	console.log(selected_option);
+	// console.log(text);
+	var quoteIndex = selected_option.value;
+	// var quote = motivationalQuotes[]
+ });
