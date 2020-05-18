@@ -1,11 +1,12 @@
 const shuffle = require('shuffle-array');
 const firestoreFuncs = require('./firestore');
 const index = require('./index');
-const {app, token} = index.getBolt();
+const app = index.getBolt();
 const util = require('./util');
 // Triggers the pairing up of all people in a given channel.
-exports.pairUp = async function pairUp(channelName){
+exports.pairUp = async function pairUp(channelName, context){
     try{
+        token = context.botToken;
         // TODO: Take this out of this function and pass it in as a parameter ideally
         const workspaceInfo = await app.client.team.info({
             token: token
@@ -100,7 +101,7 @@ async function handlePairingResponse(response, app, token, workspaceInfo, pairin
             user: users.members[i]
         });
         if (!profile.profile.bot_id) {
-            console.log('bot id: ', profile.bot_id);
+            // console.log('bot id: ', profile.bot_id);
             pairedUsers.push(users.members[i]);
         }
     }
@@ -110,3 +111,10 @@ async function handlePairingResponse(response, app, token, workspaceInfo, pairin
 }
 
 
+app.command('/pairup', async ({ command, ack, say, context }) => {
+    // Acknowledge command request
+    ack();
+    say(`Trying to pair up.`);
+    exports.pairUp("general", context);
+
+});

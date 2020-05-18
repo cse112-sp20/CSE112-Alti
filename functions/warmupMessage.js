@@ -1,6 +1,6 @@
 const index = require('./index');
 const quotes = require('./quotes');
-const {app,token} = index.getBolt();
+const app = index.getBolt();
 const firestoreFuncs = require('./firestore');
 const motivationalQuotes = quotes.getQuotesObj();
 const generateData = require('./generateTaskData');
@@ -625,16 +625,11 @@ handleQuoteSelect = async function(ack,body,context) {
 	if (quoteAuthor === null) {
 		quoteAuthor = "Unknown";
 	}
-
-	// console.log("quoteText:" + quoteText);
-	// console.log("quoteAuthor:" + quoteAuthor);
 	var text = generateData.generateMessageToSend('quote', [quoteAuthor, quoteText]);
 	// console.log(body);
 	var workspaceId = body.team.id;
-	// TODO: DONT HARDCODE
-	var channelId = "C013MQUHC9X";
 	var userId = body.user.id;
-	firestoreFuncs.storeTypeOfExercise(workspaceId, channelId, userId, true, text);
+	firestoreFuncs.storeTypeOfExercise(workspaceId, userId, true, text);
 
 	
 	let confirmationJSON = createConfirmationView("Alti-Confirmation","*Your buddy will receive the motiviational quote for warmup tomorrow!*");
@@ -659,10 +654,8 @@ handlePuzzleSelect = async function(ack,body,context) {
 
 	// console.log(text);
 	var workspaceId = body.team.id;
-	// TODO: DONT HARDCODE
-	var channelId = "C013MQUHC9X";
 	var userId = body.user.id;
-	firestoreFuncs.storeTypeOfExercise(workspaceId, channelId, userId, true, text);
+	firestoreFuncs.storeTypeOfExercise(workspaceId, userId, true, text);
 		let confirmationJSON = createConfirmationView("Alti-Confirmation","*Your buddy will receive the motiviational quote for warmup tomorrow!*");
     try {
 		//push new view above old
@@ -684,11 +677,9 @@ handleTypingSelect = async function(ack,body,context) {
 	var text = generateData.generateMessageToSend('typing', language);
 
 	var workspaceId = body.team.id;
-	// TODO: DONT HARDCODE
-	var channelId = "C013MQUHC9X";
 	var userId = body.user.id;
-	firestoreFuncs.storeTypeOfExercise(workspaceId, channelId, userId, true, text);
-		let confirmationJSON = createConfirmationView("Alti-Confirmation","*Your buddy will receive the typing challenge for warmup tomorrow!*");
+	firestoreFuncs.storeTypeOfExercise(workspaceId, userId, true, text);
+	let confirmationJSON = createConfirmationView("Alti-Confirmation","*Your buddy will receive the typing challenge for warmup tomorrow!*");
     try {
 		//push new view above old
       const result = await app.client.views.update({
