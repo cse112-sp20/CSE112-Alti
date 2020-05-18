@@ -67,8 +67,6 @@ exports.pairUp = async function pairUp(channelName){
         conversationInfos.map( conversationInfo => {
             return conversationInfo.then( response => handlePairingResponse(response, app, token, workspaceInfo, pairingChannelIdVal));
         });    
-
-
     }
     catch(error){
         return error.data;

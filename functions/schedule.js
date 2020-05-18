@@ -27,7 +27,7 @@ const {app, token} = index.getBolt();
                       token: token,
                       channel: id,
                       text:  text,
-                      post_at: reminder.getTime()/1000
+                      post_at: reminder.getTime()/1000 // conversion from milli sec to sec
                   }).catch((error) => {
                     return error.data;
                 });
