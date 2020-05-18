@@ -124,7 +124,7 @@ function deleteQueryBatch(query, resolve, reject) {
       })
       .catch(reject);
 }
-
+ 
 /*
     Description:
         This function will retrieve the single pairing channel (id) corresponding to a workspace
