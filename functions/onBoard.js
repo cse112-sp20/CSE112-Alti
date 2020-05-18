@@ -1,9 +1,39 @@
 /* TODO 
 Send calls to database updating what the current pairing channel is */
 const firestoreFuncs = require('./firestore');
+const index = require('./index');
+const {app, token} = index.getBolt();
+/*
+// Listen to channel dropdown select menu for new pairing channel
+app.action('pairing_channel_selected', async({payload, ack, say}) => {
+    ack();
+    console.log("Select");
+    console.log(payload);
+    // block action payload type
+    var team_info = await app.client.team.info({
+        token: token
+    }).catch((error) => {
+        console.log(error);
+    });
+    console.log(team_info);
+    var team_id = team_info.team.id;
+    boardExistingChannel(app, bot_token, team_id, payload.selected_channel);
+});
+*/
 
+// Listen for slash command /setup which creates new channel alti-pairing, 
+// invites all users in workspace, and designate as active pairing channel
+app.command('/setup', async ({payload, body, ack, say }) => {
+    ack();
+    say("Trying to set up");
+    console.log(payload);
+    createOnBoardingChannel(app, token, payload.team_id, "alti-pairing");
+  
+});
 
-exports.onBoard = async function createOnBoardingChannel(app, token, team_id, channelName) {
+// Create a channel with all the users in the workspace and set as active pairing channel
+exports.onBoard = createOnBoardingChannel;
+async function createOnBoardingChannel(app, token, team_id, channelName) {
     try {
 
         var channels = await app.client.conversations.list({
@@ -76,7 +106,8 @@ exports.onBoard = async function createOnBoardingChannel(app, token, team_id, ch
     }
 }
 
-exports.onBoardExisting = async function boardExistingChannel(app, token, team_id, channelId) {
+exports.onBoardExisting = boardExistingChannel;
+async function boardExistingChannel(app, token, team_id, channelId) {
     try {
         var usersDict = await findUsersChannel(app, token, channelId);
         //console.log("Users:");
@@ -148,3 +179,5 @@ async function findUsersChannel(app, token, channelId) {
     return usersDict;
 
 }
+
+
