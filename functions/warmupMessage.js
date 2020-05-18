@@ -1,6 +1,6 @@
 const index = require('./index');
 const quotes = require('./quotes');
-const {app,token} = index.getBolt();
+const {app} = index.getBolt();
 const firestoreFuncs = require('./firestore');
 const motivationalQuotes = quotes.getQuotesObj();
 const generateData = require('./generateTaskData');
@@ -687,6 +687,9 @@ handleTypingSelect = async function(ack,body,context) {
 	// TODO: DONT HARDCODE
 	var channelId = "C013MQUHC9X";
 	var userId = body.user.id;
+	console.log(userId);
+	console.log(workspaceId);
+	console.log(text);
 	firestoreFuncs.storeTypeOfExercise(workspaceId, channelId, userId, true, text);
 		let confirmationJSON = createConfirmationView("Alti-Confirmation","*Your buddy will receive the typing challenge for warmup tomorrow!*");
     try {

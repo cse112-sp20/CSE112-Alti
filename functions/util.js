@@ -1,3 +1,6 @@
+// File containing all the utility functions
+
+
 // Given a channel name, returns the channel ID.
 exports.getChannelIdByName = async function getChannelIdByName(app, token, channelName){
     const conversations = app.client.conversations.list({
