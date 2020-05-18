@@ -1,5 +1,6 @@
 const functions = require('firebase-functions');
 const admin = require('firebase-admin');
+const request = require('request');
 
 // console.log(typeof(process.env.FUNCTIONS_EMULATOR));
 if(process.env.FUNCTIONS_EMULATOR === "true"){
@@ -34,16 +35,44 @@ exports.getAPIPair = (team_id) => {
 
     //default workspace (uncomment for testing)
 
-    /*if (team_id === "T013YTT91B6"){ 
+    /*
+    //team id here
+    if (team_id === "T013YTT91B6"){ 
+
+        //hardcode bot token here
+        let botToken = "xoxb-1134945307380-1141390769793-fiMOhaTu74UVw4Dc2fAVQHVJ";
+
+            let botInfo = request.get({
+                uri: 'https://slack.com/api/auth.test?token='+botToken,
+                method: 'GET'
+            }, (e, res, bd) => {
+                if (!e && res.statusCode === 200) {
+                    return JSON.parse(bd);
+                } else {
+                    return null;
+                }
+            });
+        
+
         return ({ 
-            botToken: "xoxb-1134945307380-1141390769793-fiMOhaTu74UVw4Dc2fAVQHVJ",
-            botId: "B013C0RV06T",
-            botUserId: "U0145BGNMPB"
+
+            botToken: botToken,
+            botId: botInfo.bot_id,
+            botUserId: botInfo.user_id
+
         });
+       
 
     } else 
     {
-    */
+         */
+
+
+
+          
+            
+          
+    
     return db.collection('api_keys').doc(team_id).get().then((doc) => {
         if (!(doc && doc.exists)) {	
             console.log("doc does not exist");
