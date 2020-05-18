@@ -39,8 +39,6 @@ exports.scheduleWarmup = pubsubScheduler.scheduleWarmup;
 // Global error handler
 app.error(console.log);
 
-
-
 // app.command('/warmup', async({command, ack, say}) => {
 //     ack();
 //     say(`Trying to schedule a warmup`);
