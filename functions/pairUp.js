@@ -2,6 +2,7 @@ const shuffle = require('shuffle-array');
 const firestoreFuncs = require('./firestore');
 const index = require('./index');
 const {app, token} = index.getBolt();
+const util = require('./util');
 // Triggers the pairing up of all people in a given channel.
 exports.pairUp = async function pairUp(channelName){
     try{
@@ -13,7 +14,7 @@ exports.pairUp = async function pairUp(channelName){
             token: token
         });
 
-        const channelId = getChannelIdByName(app, token, channelName)
+        const channelId = util.getChannelIdByName(app, token, channelName)
         var pairingChannelIdVal;
         // const workspaceInfo = await workspaceInfoPromise.then(result => result.data);
 
@@ -109,29 +110,3 @@ async function handlePairingResponse(response, app, token, workspaceInfo, pairin
 }
 
 
-// Given a channel name, returns the channel ID.
-async function getChannelIdByName(app, token, channelName){
-    const conversations = app.client.conversations.list({
-        token:token
-    });
-    const channelId = conversations.then( conversations => {
-        const filteredChannels = conversations.channels.filter( channel => {
-            if(channel.name === channelName){
-                return true;
-            }
-            else return false;
-        })
-
-        if (filteredChannels.length === 0){
-            console.error("Target channel not found");
-            return undefined;
-        }
-        if (filteredChannels.length > 1){
-            console.error("Multiple channels found");
-            return undefined;
-        }
-
-        return filteredChannels[0].id;
-    });
-    return channelId;
-}

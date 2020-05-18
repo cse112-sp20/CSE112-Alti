@@ -30,7 +30,7 @@ exports.sendSelectChoice = async function(targChannelID,app,token){
 				"type": "section",
 				"text": {
 					"type": "mrkdwn",
-					"text": "*Code Speed Typing Test*"
+					"text": "*Speed Typing Test*"
 				},
 				"accessory": {
 					"action_id": "warmup_coding_select",
@@ -402,7 +402,9 @@ exports.requestCustomSendCooldown = async function(ack,body,context) {
 
 exports.warmupCodingSelect = async function(ack,body,context) {
 	await ack();
-	let thisView = createModalView("Alti","generic_close","generic_ack","Nice, warmup coding challenges are awesome!","Pick a language",body.channel.id,["C","C++","C#"],["1","2", "3"]);
+	let thisView = createModalView("Alti","generic_close","warmup_typing_selected_ack","Nice, warmup typing challenges are awesome!",
+											"Pick a language",body.channel.id,["Python","JS","C++","C","Java", "English"],
+											["python","javascript", "c++","c","java","english"]);
     try {
       const result = await app.client.views.open({
         token: context.botToken,
@@ -417,7 +419,7 @@ exports.warmupCodingSelect = async function(ack,body,context) {
 
 exports.warmupPuzzleSelect = async function(ack,body,context) {
 	await ack();
-	let thisView = createModalView("Alti","generic_close","warmup_puzzle_selected_ack","Awesome puzzles are fun!","Pick a puzzle",body.channel.id,["Hitori","Sudoku","Calcudoku"],["1","2", "3"]);
+	let thisView = createModalView("Alti","generic_close","warmup_puzzle_selected_ack","Awesome puzzles are fun!","Pick a puzzle",body.channel.id,["Hitori","Sudoku","Calcudoku", "3 in a Row"],["hitori","sudoku", "calcudoku", "3inarow"]);
     try {
       const result = await app.client.views.open({
         token: context.botToken,
@@ -616,24 +618,82 @@ createConfirmationView = function(title,confirmationText) {
 //handles asynchrounous handling of confirmation for selection 
 handleQuoteSelect = async function(ack,body,context) {
 	await ack();
-	console.log(context);
-	console.log(body.actions[0]);
+	// console.log(body.actions[0]);
 	let quoteID = body.actions[0].value;
 	let quoteText = motivationalQuotes[quoteID].text;
 	let quoteAuthor = motivationalQuotes[quoteID].author;
 	if (quoteAuthor === null) {
 		quoteAuthor = "Unknown";
 	}
-	console.log("quoteText:" + quoteText);
-	console.log("quoteAuthor:" + quoteAuthor);
-	
+
+	// console.log("quoteText:" + quoteText);
+	// console.log("quoteAuthor:" + quoteAuthor);
+	var text = generateData.generateMessageToSend('quote', [quoteAuthor, quoteText]);
+	// console.log(body);
+	var workspaceId = body.team.id;
+	// TODO: DONT HARDCODE
+	var channelId = "C013MQUHC9X";
+	var userId = body.user.id;
+	firestoreFuncs.storeTypeOfExercise(workspaceId, channelId, userId, true, text);
+
 	
 	let confirmationJSON = createConfirmationView("Alti-Confirmation","*Your buddy will receive the motiviational quote for warmup tomorrow!*");
     try {
 		//push new view above old
-      const result = await app.client.views.push({
-        token: context.botToken,
-		trigger_id: body.trigger_id,
+      const result = await app.client.views.update({
+		token: context.botToken,
+		view_id: body.view.id,
+        view: JSON.stringify(confirmationJSON)
+      });
+    }
+    catch (error) {
+      console.error(error);
+    }
+}
+
+handlePuzzleSelect = async function(ack,body,context) {
+	await ack();
+	var action = body.actions[0];
+	var puzzleType = action.value;
+	var text = generateData.generateMessageToSend('puzzle', puzzleType);
+
+	// console.log(text);
+	var workspaceId = body.team.id;
+	// TODO: DONT HARDCODE
+	var channelId = "C013MQUHC9X";
+	var userId = body.user.id;
+	firestoreFuncs.storeTypeOfExercise(workspaceId, channelId, userId, true, text);
+		let confirmationJSON = createConfirmationView("Alti-Confirmation","*Your buddy will receive the motiviational quote for warmup tomorrow!*");
+    try {
+		//push new view above old
+      const result = await app.client.views.update({
+		token: context.botToken,
+		view_id: body.view.id,
+        view: JSON.stringify(confirmationJSON)
+      });
+    }
+    catch (error) {
+      console.error(error);
+    }
+}
+handleTypingSelect = async function(ack,body,context) {
+	await ack();
+	var action = body.actions[0];
+	var language = action.value;
+
+	var text = generateData.generateMessageToSend('typing', language);
+
+	var workspaceId = body.team.id;
+	// TODO: DONT HARDCODE
+	var channelId = "C013MQUHC9X";
+	var userId = body.user.id;
+	firestoreFuncs.storeTypeOfExercise(workspaceId, channelId, userId, true, text);
+		let confirmationJSON = createConfirmationView("Alti-Confirmation","*Your buddy will receive the typing challenge for warmup tomorrow!*");
+    try {
+		//push new view above old
+      const result = await app.client.views.update({
+		token: context.botToken,
+		view_id: body.view.id,
         view: JSON.stringify(confirmationJSON)
       });
     }
@@ -643,26 +703,11 @@ handleQuoteSelect = async function(ack,body,context) {
 }
 app.action('warmup_quote_selected_ack', ({ ack, body, context }) => {
 	handleQuoteSelect(ack,body,context);
-// 	const selected_option = body.actions[0].selected_option;
-// 	const selected_quote = motivationalQuotes[selected_option.value];
-// 	const author = selected_quote.author;
-// 	const text = selected_quote.text;
-// 	const data = generateData.generateMessageToSend('quote', selected_quote);
-// 	console.log(data);
-// 	// console.log(text);
-// 	var quoteIndex = selected_option.value;
-// 	// var quote = motivationalQuotes[]
  });
 
  app.action('warmup_puzzle_selected_ack', ({ ack, body, context }) => {
-	ack();
-	const selected_option = body.actions[0].selected_option;
-	// const selected_quote = motivationalQuotes[selected_option.value];
-	// const author = selected_quote.author;
-	// const text = selected_quote.text;
-	// const data = generateData.generateMessageToSend('quote', selected_quote);
-	console.log(selected_option);
-	// console.log(text);
-	var quoteIndex = selected_option.value;
-	// var quote = motivationalQuotes[]
+	handlePuzzleSelect(ack,body,context);
+ });
+ app.action('warmup_typing_selected_ack', ({ ack, body, context }) => {
+	handleTypingSelect(ack,body,context);
  });

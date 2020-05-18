@@ -40,7 +40,7 @@ exports.generateQuote = function() {
 }
 
 // TODO
-async function generatePuzzle(typeOfPuzzle) {
+function generatePuzzle(typeOfPuzzle) {
     // Hardcoded difficulty, can be changed but also need to
     // hardcode the upper limit for each game in that case
     const difficulty = "1";
@@ -66,7 +66,7 @@ async function generatePuzzle(typeOfPuzzle) {
             throw new Error('Parameter does not match any available games');
     }
     // Return the url
-    return Promise.resolve(url);
+    return url;
 
 }
 function generate3inarowParameters(difficulty){
@@ -112,8 +112,8 @@ function generateHitoriParameters(difficulty){
     return `date=${date}&diff=${diff}&size=${size}`;
 }
 
-// TODO
-async function generateCodingChallenge(codingLanguage='english',time = 1)
+
+function generateCodingChallenge(codingLanguage='english',time = 1)
 {
   exercises = [];
   url  = `http://www.speedcoder.net/lessons/`;
@@ -131,7 +131,7 @@ async function generateCodingChallenge(codingLanguage='english',time = 1)
     {
       url = 'https://www.typing.com/student/typing-test/5-minute';
     }
-    return Promise.resolve(url);
+    return url;
   }
   else if (codingLanguage === 'python')
   {
@@ -182,7 +182,7 @@ async function generateCodingChallenge(codingLanguage='english',time = 1)
     }
     url = url + 'java';
   }
-  else
+  else if(codingLanguage === 'c')
   {
     if(time <= 2)
     {
@@ -194,10 +194,14 @@ async function generateCodingChallenge(codingLanguage='english',time = 1)
     }
     url = url + 'c';
   }
+  else
+  {
+    throw new Exception("Coding language does not match availeble ones");
+  }
 
   rand = exercises[Math.floor(Math.random()*exercises.length)];
   url = url + '/' + rand + '/';
-  return Promise.resolve(url);
+  return url;
 }
 
 // Generates a message to store in Firebase and send at a later time,
@@ -209,30 +213,28 @@ async function generateCodingChallenge(codingLanguage='english',time = 1)
 //          if exerciseType is quote, then arg could be an empty string
 exports.generateMessageToSend = function generateMessageToSend(exerciseType, arg) {
   var url = "";     // generated url (for exerciseTypes: puzzle, typing)
-  var quote = "";   // generated quote (for exerciseType: quote)
   var message = ""; // full message to store
 
   switch(exerciseType) {
     case "puzzle":
       url = generatePuzzle(arg);
       message = "Your partner sent you this " + arg + 
-                "puzzle to help you get those brain juices flowing!\nComplete it here: " + url;
+                " puzzle to help you get those brain juices flowing!\nComplete it here: " + url;
       break;
 
     case "typing":
       url = generateCodingChallenge(arg);
       message = "Your partner sent you this cool speed coding challenge in " + arg + 
-                "to get your mind and fingers ready for the day!\nComplete it here: " + url;
+                " to get your mind and fingers ready for the day!\nComplete it here: " + url;
       break;
 
     case "quote":
-      quote = arg.text;
-      var author = arg.author;
-      message = `Your partner sent you a motivational quote to help you start your day right! ${author} says: ${quote}\n`;
+      var author, quote = arg; // generated quote and its author
+      message = `Your partner sent you a motivational quote to help you start your day right! ${author} says: ${quote}`;
       break;
 
     default:
-      message = "";
+      throw new Exception('Exercise Type did not match any of the provided types.');
   }
 
   return message;
