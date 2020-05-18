@@ -18,7 +18,6 @@ describe('Scheduler', function() {
     now.setTime(now.getTime() + 120000); 
     var response = await schedule.scheduleMsg(now.getHours(), now.getMinutes(), 
                                                     "A reminder", "#testing");
-    console.log(response.scheduled_message_id);
     app.client.chat.deleteScheduledMessage({
       token: token,
       channel: "testing",
@@ -27,8 +26,6 @@ describe('Scheduler', function() {
                                                     
     //console.log(response);
     assert.equal(response.ok, true);
-    
-    
   });
 
   it('schedule for 1 min before', async function() {
@@ -61,15 +58,24 @@ describe('Pairup', function() {
       workspaceId = workspaceInfo.team.id;
     });
 
-    it('Test Pairup with testing channel', async function() {
-      //var response = pairUp.pairUp("testing");
-      var channelId = pairUp.getChannelIdByName(app, token, "testing");
-      //firestoreFuncs.getPairedUsers(workspaceId, channelId);
+    it('Test Pairup with testing channel', async function(done) {
+      this.timeout(180000)
+      await pairUp.pairUp("testing");
+      var channelId = await pairUp.getChannelIdByName(app, token, "general");
+      var pairs = await firestoreFuncs.getPairedUsers(workspaceId, channelId);
+      console.log(pairs);
       var slackResponse = await app.client.conversations.list({
         token: token,
         types: "mpim"
       })
+
       //console.log(slackResponse.channels[0]);
+      var members = await app.client.conversations.members({
+        token:token, 
+        channel: slackResponse.channels[0].id
+      });
+      done();
+      //console.log(members);
     });  
   });
   

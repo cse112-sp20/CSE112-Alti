@@ -17,13 +17,13 @@ const expressReceiver = new ExpressReceiver({
     endpoints: '/events',
 });
 
+
+
 const app = new App({
     receiver: expressReceiver,
     token: bot_token
 });
-exports.getUserToken = function getUserToken() {
-    return user_token;
-}
+
 exports.getBolt = function getBolt(){
     return {
         app:app,
