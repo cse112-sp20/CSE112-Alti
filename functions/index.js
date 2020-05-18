@@ -5,50 +5,32 @@ const admin = require('firebase-admin');
 
 const config = functions.config();
 const signingSecret = config.slack.signing_secret;
-const user_token = config.slack.user_token;
+
+//const user_token = config.slack.user_token;
+
 const onBoard = require('./onBoard');
 const appHome = require('./appHome');
 const bot_token = config.slack.bot_token;
 
 const firestoreFuncs = require('./firestore');
 
-//dev
-const request = require("request");
-
-
 const expressReceiver = new ExpressReceiver({
     signingSecret: signingSecret,
     endpoints: '/events',
 });
 
+const authorizeFunction = async ({ teamId }) => firestoreFuncs.getAPIPair(teamId);
 
-const authorizeFn = async ({ teamId }) => {
-    
-        // Fetch team info from database
-        let apiResponse = firestoreFuncs.getAPIPair(teamId);
-
-        if(apiResponse !== null) {
-            return apiResponse;
-        } else 
-        { 
-            throw new Error('No matching authorizations');
-        }
-
-}
 
 
 const app = new App({
     receiver: expressReceiver,
-    authorize: authorizeFn,
+    authorize: authorizeFunction,
 });
 
+//arrow function for simplicity 
+exports.getBolt = () => app;
 
-exports.getBolt = function getBolt(){
-    return {
-        app:app//,
-        //token:bot_token
-    }
-};
 
 const warmupMessage = require('./warmupMessage');
 const pubsubScheduler = require('./pubsubScheduler')
@@ -85,7 +67,7 @@ app.message(async ({ message, context }) => {
             console.log("Message object: ");
             console.log(message);
             app.client.chat.postMessage({
-                token: bot_token,
+                token: context.botToken, 
                 channel: '#general',
                 text: `<@${message.user}> just DMd me. What a creep?! Other people should also know that "${message.text}"`
             });
