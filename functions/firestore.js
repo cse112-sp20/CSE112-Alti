@@ -54,17 +54,76 @@ exports.writeMsgToDB = function writeMsgToDB(teamId, userID, channelID,msgToSend
 
 /*
     Description:
-        This function will store a newly designated pairing channel under the 'activeChannels' collection
-
-    TODO: might have to change this so it deletes the previously designated pairing channel before inserting new one
+        This function will store a newly designated pairing channel under the 'activeChannels' collection.
+        In addition, it will delete the currently designated pairing channel and all data associated with it.
+        We do this to enforce one pairing channel per workspace (for now).
 
     Input: 
         workspaceID - workspace id
         channelID - channel id of the new channel designated as the pairing channel
 */
 exports.storeNewPairingChannel = function storeNewPairingChannel(workspaceID, newChannel) {
+    deleteCollection('workspaces/'+ workspaceID + '/activeChannels', 100);
     db.collection("workspaces").doc(workspaceID).collection('activeChannels').doc(newChannel).set({}, {merge: true});
 }
+
+/*
+    Description:
+        Recursively deletes a specified collection from the db.
+    
+    Input:
+        collectionPath - path to get to the collection you want to delete.
+        batchSize - the max # of documents you want to delete within that collection, I think?
+*/
+function deleteCollection(collectionPath, batchSize) {
+    let collectionRef = db.collection(collectionPath);
+    let query = collectionRef.orderBy('__name__').limit(batchSize);
+
+    return new Promise((resolve, reject) => {
+      deleteQueryBatch(query, resolve, reject);
+    });
+  }
+  
+/*
+    Description:
+        Helper function for deleteCollection
+*/
+function deleteQueryBatch(query, resolve, reject) {
+    query.get()
+      .then((snapshot) => {
+        // When there are no documents left, we are done
+        console.log("SNAPSHOT: ", snapshot);
+        if (snapshot.size === 0) {
+            return 0;
+        }
+  
+        // Delete documents in a batch
+        let batch = db.batch();
+        snapshot.docs.forEach((doc) => {
+          batch.delete(doc.ref);
+          console.log(doc.ref);
+        });
+  
+        // eslint-disable-next-line promise/no-nesting
+        return batch.commit().then(() => {
+          return snapshot.size;
+        });
+      }).then((numDeleted) => {
+        if (numDeleted === 0) {
+          resolve();
+          return;
+        }
+  
+        // Recurse on the next process tick, to avoid
+        // exploding the stack.
+        process.nextTick(() => {
+          deleteQueryBatch(db, query, resolve, reject);
+        });
+        // eslint-disable-next-line consistent-return
+        return null;
+      })
+      .catch(reject);
+  }
 
 /* 
     Description:
@@ -153,4 +212,19 @@ exports.getPairedUsers = async function getPairedUsers(workspaceID, channelID) {
         });
         return pairings;
     });
+}
+
+exports.setWarmupTime = function setWarmupTime(workspaceID, userID, time, day) {
+}
+
+exports.getWarmupTime = function getWarmupTime(workspaceID, userID, day) {
+
+}
+
+exports.setCooldownTime = function setWarmupTime(workspaceID, userID, time, day) {
+
+}
+
+exports.getCooldownTime = function getWarmupTime(workspaceID, userID, day) {
+
 }
