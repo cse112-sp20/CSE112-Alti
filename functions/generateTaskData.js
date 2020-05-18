@@ -1,5 +1,5 @@
 const index = require('./index');
-const { app } = index.getBolt();
+const app = index.getBolt();
 const quotes = require('./quotes');
 const motivationalQuotes = quotes.getQuotesObj();
 
