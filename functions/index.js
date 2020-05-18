@@ -90,6 +90,7 @@ app.command('/firestore', async ({ command, ack, say }) => {
 // Handle '/setupWarmup` command invocations
 app.command('/setupwarmup', async ({ command, ack, say }) => {
     // Acknowledge command request
+	console.log(command);
     ack();
 	//send Warmup prompts to the channel that this command was called from
     warmupMessage.sendSelectChoice(command.channel_id,app,bot_token);
