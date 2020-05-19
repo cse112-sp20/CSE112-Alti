@@ -39,16 +39,6 @@ exports.scheduleWarmup = pubsubScheduler.scheduleWarmup;
 // Global error handler
 app.error(console.log);
 
-
-app.command('/pairup', async ({ command, ack, say }) => {
-    // Acknowledge command request
-
-    ack();
-    say(`Trying to pair up.`);
-    pairUp.pairUp("general");
-
-});
-
 // app.command('/warmup', async({command, ack, say}) => {
 //     ack();
 //     say(`Trying to schedule a warmup`);

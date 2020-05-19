@@ -1,8 +1,9 @@
 const index = require('./index');
 const quotes = require('./quotes');
-const {app,token} = index.getBolt();
+const { app } = index.getBolt();
 const firestoreFuncs = require('./firestore');
 const motivationalQuotes = quotes.getQuotesObj();
+const generateData = require('./generateTaskData');
 exports.sendSelectChoice = async function(targChannelID,app,token){
 	const notificationString = "Send a warmup to your buddy!"
 	//warmup selection message json
@@ -29,7 +30,7 @@ exports.sendSelectChoice = async function(targChannelID,app,token){
 				"type": "section",
 				"text": {
 					"type": "mrkdwn",
-					"text": "*Code Speed Typing Test*"
+					"text": "*Speed Typing Test*"
 				},
 				"accessory": {
 					"action_id": "warmup_coding_select",
@@ -401,7 +402,9 @@ exports.requestCustomSendCooldown = async function(ack,body,context) {
 
 exports.warmupCodingSelect = async function(ack,body,context) {
 	await ack();
-	let thisView = createModalView("Alti","generic_close","generic_ack","Nice, warmup coding challenges are awesome!","Pick a language",body.channel.id,["C","C++","C#"],["1","2", "3"]);
+	let thisView = createModalView("Alti","generic_close","warmup_typing_selected_ack","Nice, warmup typing challenges are awesome!",
+											"Pick a language",body.channel.id,["Python","JS","C++","C","Java", "English"],
+											["python","javascript", "c++","c","java","english"]);
     try {
       const result = await app.client.views.open({
         token: context.botToken,
@@ -416,7 +419,7 @@ exports.warmupCodingSelect = async function(ack,body,context) {
 
 exports.warmupPuzzleSelect = async function(ack,body,context) {
 	await ack();
-	let thisView = createModalView("Alti","generic_close","generic_ack","Awesome puzzles are fun!","Pick a puzzle",body.channel.id,["2048","sudoku","chess"],["1","2", "3"]);
+	let thisView = createModalView("Alti","generic_close","warmup_puzzle_selected_ack","Awesome puzzles are fun!","Pick a puzzle",body.channel.id,["Hitori","Sudoku","Calcudoku", "3 in a Row"],["hitori","sudoku", "calcudoku", "3inarow"]);
     try {
       const result = await app.client.views.open({
         token: context.botToken,
@@ -444,15 +447,24 @@ exports.warmupArticleSelect = async function(ack,body,context) {
     }
 }
 
+
 exports.warmupQuoteSelect = async function(ack,body,context) {
 	ack();
 	let refArray = []; //array with quote author names
 	let valArray = []; //array with quote values
 	let amountOfQuotes = 6; 
+	for (var quoteGenerationIter = 0; quoteGenerationIter < amountOfQuotes; quoteGenerationIter++) {
+		let quoteGenerated = generateData.generateQuote();
+		//cut the index out of the quote generated
+		let index = quoteGenerated.substr(0, quoteGenerated.indexOf('-')); 
+		quoteGenerated = quoteGenerated.substr(quoteGenerated.indexOf('-')); 
+		valArray[quoteGenerationIter] = index;
+		refArray[quoteGenerationIter] = quoteGenerated;
+	}
+	
 	//generate values for above array
-	generateQuoteArray(amountOfQuotes,refArray,valArray);
-	let thisView = createModalView("Alti","generic_close","generic_ack","Great choice quotes are fun!","Pick an author",body.channel.id,refArray,valArray);
-	console.log(JSON.stringify(thisView));
+	let thisView = createModalView("Alti","generic_close","warmup_quote_selected_ack","Great choice quotes are fun!","Pick an author",body.channel.id,refArray,valArray);
+	// console.log(JSON.stringify(thisView));
     try {
       const result = await app.client.views.open({
         token: context.botToken,
@@ -465,24 +477,6 @@ exports.warmupQuoteSelect = async function(ack,body,context) {
     }
 }
 
-
-generateQuoteArray = function(arrayLen, repRefArray, repValArray){ 
-	for (var quoteGenIndex = 0; quoteGenIndex < arrayLen; quoteGenIndex++) {
-		generateQuote(quoteGenIndex,repRefArray,repValArray);
-	}
-}
-
-generateQuote = function(index,repRefArray,repValArray) {
-	let quotePoolSize =  Object.keys(motivationalQuotes).length;
-	let randomQuoteIndex = Math.floor(Math.random() * quotePoolSize);
-	let quoteText = motivationalQuotes[randomQuoteIndex].text; 
-	let quoteAuthor =  motivationalQuotes[randomQuoteIndex].author;	
-	if (quoteAuthor === null) {
-		quoteAuthor = "Unknown";
-	}
-	repRefArray[index] = quoteAuthor;
-	repValArray[index] = randomQuoteIndex.toString();
-}
 /*
 createModalView
 Creates a json modal view with specified arguments.
@@ -501,7 +495,6 @@ would contain strings with links to said puzzle types.
 
 returns (json)
 
-TODO HANDLE INVALID INPUT
 */
 createModalView = function(title,callbackID,actionID,responseText,choiceText,channelID, choiceRepArray, choiceValueArray) {
 	let newView = {};
@@ -517,18 +510,11 @@ createModalView = function(title,callbackID,actionID,responseText,choiceText,cha
 	
 	newView["title"] = titleObj;
 	
-	//create submit view properties
-	let submitObj = {};
-	submitObj["type"]= "plain_text";
-	submitObj["text"] = "Submit";
-	submitObj["emoji"] = true;
-	
-	newView["submit"] = submitObj;
 	
 	//create close view properties
 	let closeObj = {};
 	closeObj["type"] = "plain_text";
-	closeObj["text"] = "Cancel";
+	closeObj["text"] = "Close";
 	closeObj["emoji"] = true;
 	
 	newView["close"] = closeObj;
@@ -547,51 +533,172 @@ createModalView = function(title,callbackID,actionID,responseText,choiceText,cha
 	//push this block onto blocks obj
 	blocksObj.push(descriptionBlock);
 	
-	
-	//create choice object
-	let choiceObj = {};
-	choiceObj["type"] = "section";
-	choiceObj["block_id"]= "choiceSelection";
-	
-	let choiceTextField = {} 
-	choiceTextField["type"] = "mrkdwn";
-	choiceTextField["text"] = choiceText;
-	//append text to choice obj
-	choiceObj["text"] = choiceTextField;
-	
-	let choiceAccessory = {};
-	choiceAccessory["action_id"]= actionID;
-	choiceAccessory["type"] = "static_select";
-	
-	let placeholder = {};
-	placeholder["type"]= "plain_text";
-	placeholder["text"] = "Option"
-	choiceAccessory["placeholder"] = placeholder;
-	//append accesory to choice obj
-	
-	
-	let options = [];
-	
 	//iterate through arrays to generate options
 	var amountOfChoices = choiceRepArray.length;
 	for (var choiceIterator = 0; choiceIterator < amountOfChoices; choiceIterator++) {
-		let newOption = {};
+		let newBlock = {};
+		newBlock["type"] = "section";
 		let newText = {};
 		newText["type"] = "plain_text";
 		newText["text"] = choiceRepArray[choiceIterator];
-		newOption["text"] = newText;
-		newOption["value"] = choiceValueArray[choiceIterator];
-		options.push(newOption);
+		
+		let newAccessory = {};
+		newAccessory["action_id"]= actionID;
+		newAccessory["type"]= "button";
+		newAccessory["value"]= choiceValueArray[choiceIterator];
+		
+		let newAccessoryText = {};
+		newAccessoryText["type"] = "plain_text";
+		newAccessoryText["text"] = "Choose";
+		
+		newAccessory["text"] = newAccessoryText;
+		
+		newBlock["text"] = newText;
+		newBlock["accessory"] = newAccessory;
+		
+		blocksObj.push(newBlock);
 	}
-	choiceAccessory["options"]  = options;
-	//add options to choice object
-	choiceObj["accessory"] = choiceAccessory;
-	//push choice object into the blocks object
-	blocksObj.push(choiceObj);
 	//place blocks object into view
 	newView["blocks"] = blocksObj;
 	
 	return newView;
 }	
    
+/*
+createConfirmationView
+Creates a json modal view with specified arguments.
 
+title (string) - title of modal (been using "Alti" for now)
+choiceText (string) - string prompting a user to select something
+
+
+returns (json)
+
+*/
+createConfirmationView = function(title,confirmationText) {
+	let newView = {};
+	//begin populating view object with properties
+	newView["type"] = "modal";
+	
+	//create title of view properties
+	let titleObj = {};
+	titleObj["type"] = "plain_text";
+	titleObj["text"] = title;
+	titleObj["emoji"] = true;
+	
+	newView["title"] = titleObj;
+	
+	
+	//create close view properties
+	let closeObj = {};
+	closeObj["type"] = "plain_text";
+	closeObj["text"] = "Close";
+	closeObj["emoji"] = true;
+	
+	newView["close"] = closeObj;
+	
+	let blocksObj = [];
+	
+	let descriptionBlock = {};
+	descriptionBlock["type"] = "section"
+	descrTextObj = {};
+	descrTextObj["type"] = "mrkdwn";
+	descrTextObj["text"] = confirmationText;
+	
+	descriptionBlock["text"] = descrTextObj;
+
+	//push this block onto blocks obj
+	blocksObj.push(descriptionBlock);
+
+	newView["blocks"] = blocksObj;
+	
+	return newView;
+}	
+ 
+//handles asynchrounous handling of confirmation for selection 
+handleQuoteSelect = async function(ack,body,context) {
+	await ack();
+	// console.log(body.actions[0]);
+	let quoteID = body.actions[0].value;
+	let quoteText = motivationalQuotes[quoteID].text;
+	let quoteAuthor = motivationalQuotes[quoteID].author;
+	if (quoteAuthor === null) {
+		quoteAuthor = "Unknown";
+	}
+	var text = generateData.generateMessageToSend('quote', [quoteAuthor, quoteText]);
+	// console.log(body);
+	var workspaceId = body.team.id;
+	var userId = body.user.id;
+	firestoreFuncs.storeTypeOfExercise(workspaceId, userId, true, text);
+
+	
+	let confirmationJSON = createConfirmationView("Alti-Confirmation","*Your buddy will receive the motiviational quote for warmup tomorrow!*");
+    try {
+		//push new view above old
+      const result = await app.client.views.update({
+		token: context.botToken,
+		view_id: body.view.id,
+        view: JSON.stringify(confirmationJSON)
+      });
+    }
+    catch (error) {
+      console.error(error);
+    }
+}
+
+handlePuzzleSelect = async function(ack,body,context) {
+	await ack();
+	var action = body.actions[0];
+	var puzzleType = action.value;
+	var text = generateData.generateMessageToSend('puzzle', puzzleType);
+
+	// console.log(text);
+	var workspaceId = body.team.id;
+	var userId = body.user.id;
+	firestoreFuncs.storeTypeOfExercise(workspaceId, userId, true, text);
+		let confirmationJSON = createConfirmationView("Alti-Confirmation","*Your buddy will receive the motiviational quote for warmup tomorrow!*");
+    try {
+		//push new view above old
+      const result = await app.client.views.update({
+		token: context.botToken,
+		view_id: body.view.id,
+        view: JSON.stringify(confirmationJSON)
+      });
+    }
+    catch (error) {
+      console.error(error);
+    }
+}
+handleTypingSelect = async function(ack,body,context) {
+	await ack();
+	var action = body.actions[0];
+	var language = action.value;
+
+	var text = generateData.generateMessageToSend('typing', language);
+
+	var workspaceId = body.team.id;
+	var userId = body.user.id;
+	firestoreFuncs.storeTypeOfExercise(workspaceId, userId, true, text);
+	let confirmationJSON = createConfirmationView("Alti-Confirmation","*Your buddy will receive the typing challenge for warmup tomorrow!*");
+    try {
+		//push new view above old
+      const result = await app.client.views.update({
+		token: context.botToken,
+		view_id: body.view.id,
+        view: JSON.stringify(confirmationJSON)
+      });
+    }
+    catch (error) {
+      console.error(error);
+    }
+}
+app.action('warmup_quote_selected_ack', ({ ack, body, context }) => {
+	handleQuoteSelect(ack,body,context);
+ });
+
+ app.action('warmup_puzzle_selected_ack', ({ ack, body, context }) => {
+	handlePuzzleSelect(ack,body,context);
+ });
+ app.action('warmup_typing_selected_ack', ({ ack, body, context }) => {
+	handleTypingSelect(ack,body,context);
+ });
