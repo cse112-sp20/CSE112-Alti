@@ -4,6 +4,7 @@ const should = require('chai').should();
 const expect = require('chai').expect;
 const index = require('../index');
 const {app, token} = index.getBolt();
+var generateTaskData = require('../generateTaskData');
 
 // If it passes, means the function finished and message was scheduled, baseline test
 // Need more rigorous testing using promises of async function and validation from Slack API channel reading
@@ -65,7 +66,7 @@ describe('Pairup', function() {
     it('Test Pairup with testing channel', async function() {
       this.timeout(180000) // 3 min
 
-      //const response = await pairUp.pairUp("testing");
+      //const response = await pairUp.pairUp("testing", undefined, token);
       var pairs = await firestoreFuncs.getPairedUsers(workspaceId);
 
       for(var i = 0; i < pairs.length; i++)
@@ -83,11 +84,14 @@ describe('Pairup', function() {
       }
     });  
   });
-  
-  describe('Test getChannelIdByName', function(){
-    // helps to find the channel ids
-    before(async function () {
+});
 
+describe('util', function(){
+  describe('Test getChannelIdByName', function() {
+    // helps to find the channel ids
+    let util;
+    before(async function () {
+      util = require('../util');
       var response = await app.client.conversations.list({
         token: token
       })
@@ -96,29 +100,65 @@ describe('Pairup', function() {
     });
     
     it('Test with channel general', async function() {
-      var channelId = await pairUp.getChannelIdByName(app, token, "general");
+      var channelId = await util.getChannelIdByName(app, token, "general");
       assert.equal(channelId, "C012WGXPYC9"); //hardcoded it with console.log
     });
 
     it('Test with channel alti-paring', async function() {
-      var channelId = await pairUp.getChannelIdByName(app, token, "alti-pairing");
+      var channelId = await util.getChannelIdByName(app, token, "alti-pairing");
       assert.equal(channelId, "C01391DPZV4"); //hardcoded it with console.log
     });
 
     it('Test with channel that doesnt exist', async function() {
-      var channelId = await pairUp.getChannelIdByName(app, token, "should not exist");
+      var channelId = await util.getChannelIdByName(app, token, "should not exist");
       assert.equal(channelId, undefined); 
     });
-  })
+  });
   
-});
+})
 
 
-describe('Array', function() {
-  describe('#indexOf()', function() {
-    it('should return -1 when the value is not present', function() {
-      assert.equal([1, 2, 3].indexOf(4), -1);
-    });
+describe('generateCodingChallenge', function() {
+  it('Testing english', function()
+  {
+    //generateCodingChallenge();
+    url = generateTaskData.generateCodingChallenge('english');
+    assert.equal(url,'https://www.typing.com/student/typing-test/1-minute');
+
+    url = generateTaskData.generateCodingChallenge('english',3);
+    assert.equal(url,'https://www.typing.com/student/typing-test/3-minute');
+
+    url = generateTaskData.generateCodingChallenge('english',10);
+    assert.equal(url,'https://www.typing.com/student/typing-test/5-minute');
+  });
+
+  it('Testing python', function()
+  {
+    url = generateTaskData.generateCodingChallenge('python',5);
+    assert.equal(url.substring(0, 37),'http://www.speedcoder.net/lessons/py/');
+  });
+
+  it('Testing javascript', function()
+  {
+    url = generateTaskData.generateCodingChallenge('javascript',1);
+    assert.equal(url.substring(0, 37),'http://www.speedcoder.net/lessons/js/');
+  });
+
+  it('Testing java', function()
+  {
+    url = generateTaskData.generateCodingChallenge('java',2);
+    assert.equal(url.substring(0, 38),'http://www.speedcoder.net/lessons/java');
+  });
+
+  it('Testing c', function()
+  {
+    url = generateTaskData.generateCodingChallenge('c',3);
+    assert.equal(url.substring(0, 35),'http://www.speedcoder.net/lessons/c');
+  });
+
+  it('Testing c++', function()
+  {
+    url = generateTaskData.generateCodingChallenge('c++',5);
+    assert.equal(url.substring(0, 37),'http://www.speedcoder.net/lessons/cpp');
   });
 });
-
