@@ -32,7 +32,7 @@ jobs:
       working-directory: ./functions
       run: npm test
       env:
-        GOOGLE_APPLICATION_CREDENTIALS: ./serviceAccountKey.json”
+        GOOGLE_APPLICATION_CREDENTIALS: ./serviceAccountKey.json
     - uses: w9jds/firebase-action@master
       with:
         args: deploy --only functions
