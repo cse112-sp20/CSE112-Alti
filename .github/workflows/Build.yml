@@ -24,7 +24,9 @@ jobs:
       run: cp -f ./test/.runtimeconfig.json ./.runtimeconfig.json
     - name: Add serviceAccountKey
       working-directory: ./functions
-      run: echo ${{ secrets.SERVICE_ACCOUNT_KEY }} > ./serviceAccountKey.json
+      env:
+        SERVICE_ACCOUNT_KEY: ${{ secrets.SERVICE_ACCOUNT_KEY }}
+      run: echo $SERVICE_ACCOUNT_KEY > ./serviceAccountKey.json
     - name: Run Linter
       working-directory: ./functions
       run: npm run lint
