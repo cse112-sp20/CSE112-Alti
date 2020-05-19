@@ -109,7 +109,7 @@ function generateHitoriParameters(difficulty){
 }
 
 
-function generateCodingChallenge(codingLanguage='english',time = 1)
+exports.generateCodingChallenge = function (codingLanguage,time=1)
 {
   exercises = [];
   url  = `http://www.speedcoder.net/lessons/`;
@@ -214,13 +214,13 @@ exports.generateMessageToSend = function generateMessageToSend(exerciseType, arg
   switch(exerciseType) {
     case "puzzle":
       url = generatePuzzle(arg);
-      message = "Your partner sent you this " + arg + 
+      message = "Your partner sent you this " + arg +
                 " puzzle to help you get those brain juices flowing!\nComplete it here: " + url;
       break;
 
     case "typing":
       url = generateCodingChallenge(arg);
-      message = "Your partner sent you this cool speed coding challenge in " + arg + 
+      message = "Your partner sent you this cool speed coding challenge in " + arg +
                 " to get your mind and fingers ready for the day!\nComplete it here: " + url;
       break;
 
@@ -234,4 +234,4 @@ exports.generateMessageToSend = function generateMessageToSend(exerciseType, arg
   }
 
   return message;
-}   
+}
