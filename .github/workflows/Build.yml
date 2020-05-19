@@ -16,28 +16,22 @@ jobs:
     steps:
     - name: Check out code
       uses: actions/checkout@master
-    - name: Extract branch name
-      shell: bash
-      run: echo "##[set-output name=branch;]$(echo ${GITHUB_REF#refs/heads/})"
-      id: extract_branch
+#    - name: Extract branch name
+#      shell: bash
+#      run: echo "##[set-output name=branch;]$(echo ${GITHUB_REF#refs/heads/})"
+#      id: extract_branch
     - name: Modify .runtimeconfig.json
       working-directory: ./functions
-      run: cp -f ./test/.runtimeconfig.json ./runtimeconfig.json
-    - name: Cat ./test/.runtimeconfig.json
-      working-directory: ./functions
-      run: cat ./test/.runtimeconfig.json
-    - name: Cat ./runtimeconfig.json
-      working-directory: ./functions
-      run: cat ./runtimeconfig.json
+      run: cp -f ./test/.runtimeconfig.json ./.runtimeconfig.json
     - name: Git add/commit
       uses: EndBug/add-and-commit@v4
       env: 
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-    - name: Git push
-      uses: ad-m/github-push-action@master
-      with:
-        github_token: ${{ secrets.GITHUB_TOKEN }}
-        branch: ${{ steps.extract_branch.outputs.branch }}
+#    - name: Git push
+#      uses: ad-m/github-push-action@master
+#      with:
+#        github_token: ${{ secrets.GITHUB_TOKEN }}
+#        branch: ${{ steps.extract_branch.outputs.branch }}
 
 
     
