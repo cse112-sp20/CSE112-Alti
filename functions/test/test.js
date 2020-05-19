@@ -59,7 +59,7 @@ describe('Pairup', function() {
     });
 
     it('Test Pairup with alti-pairing channel', async function(done) {
-      this.timeout(60000) // 3 min
+      //his.timeout(60000) // 3 min
       try {
         // this will take long time. Testing with get ParingChannel first
         // await pairUp.pairUp("alti-pairing");
@@ -90,7 +90,7 @@ describe('Pairup', function() {
       var channels = response.channels;
       //console.log(channels)
     });
-
+    
     it('Test with channel general', async function() {
       var channelId = await pairUp.getChannelIdByName(app, token, "general");
       assert.equal(channelId, "C012WGXPYC9"); //hardcoded it with console.log
