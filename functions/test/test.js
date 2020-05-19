@@ -23,7 +23,7 @@ describe('Scheduler', function() {
     //console.log(response);
     assert.equal(response.ok, false);
   });
-});
+}); 
 
 describe('Pairup', function() {
   it('Test Pairup', async function() {
