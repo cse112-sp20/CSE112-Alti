@@ -66,7 +66,7 @@ describe('Pairup', function() {
     it('Test Pairup with testing channel', async function() {
       this.timeout(180000) // 3 min
 
-      //const response = await pairUp.pairUp("testing", undefined, token);
+      await pairUp.pairUp("testing", undefined, token);
       var pairs = await firestoreFuncs.getPairedUsers(workspaceId);
 
       for(var i = 0; i < pairs.length; i++)
