@@ -5,6 +5,7 @@ const firestoreFuncs = require('./firestore');
 const index = require('./index');
 const {app, token} = index.getBolt();
 
+var days = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"];
 
 // Listen for slash command /setup which creates new channel alti-pairing, 
 // invites all users in workspace, and designate as active pairing channel
@@ -19,7 +20,6 @@ app.command('/setup', async ({payload, body, ack, say }) => {
 // Listen to channel dropdown select menu for new pairing channel
 app.action('pairing_channel_selected', async({body, ack, say}) => {
     ack();
-    console.log("Select");
     // block action payload type
     var team_info = await app.client.team.info({
         token: token
@@ -56,15 +56,12 @@ async function createOnBoardingChannel(app, token, team_id, channelName) {
             //console.log("No channel called " + channelName);
 
             var usersDict = await findUsersWorkSpace(app, token);
-    
-            //console.log("Users:");
-            //console.log(usersDict);
+
             var userString = '';
             Object.keys(usersDict).forEach((u) => {
                 userString += u + ',';
             });
             userString = userString.substring(0, userString.length - 1);
-            //console.log(userString);
 
             // create channel
             var conversationObj = await app.client.conversations.create({
@@ -95,6 +92,13 @@ async function createOnBoardingChannel(app, token, team_id, channelName) {
             
             firestoreFuncs.storeNewPairingChannel(team_id, conversationObj.channel.id);
 
+            for (userId in usersDict) {
+                for (day of days) {
+                    firestoreFuncs.setWarmupTime(team_id, userId, "9:00 AM", day);
+                    firestoreFuncs.setCooldownTime(team_id, userId, "5:00 PM", day);
+                }
+            }
+
         }
         else {
             console.log("Channel " + channelName + " already exists");
@@ -110,15 +114,7 @@ async function createOnBoardingChannel(app, token, team_id, channelName) {
 exports.onBoardExisting = boardExistingChannel;
 async function boardExistingChannel(app, token, team_id, channelId) {
     try {
-        var usersDict = await findUsersChannel(app, token, channelId);
-        //console.log("Users:");
-        //console.log(usersDict);
-        var userString = '';
-        Object.keys(usersDict).forEach((u) => {
-            userString += u + ',';
-        });
-        userString = userString.substring(0, userString.length - 1);
-        //console.log(userString);
+        var userList = await findUsersChannel(app, token, channelId);
 
         // send welcome message
         app.client.chat.postMessage({
@@ -130,7 +126,12 @@ async function boardExistingChannel(app, token, team_id, channelId) {
             
         });
         firestoreFuncs.storeNewPairingChannel(team_id, channelId);
-
+        for (userId of userList) {
+            for (day of days) {
+                firestoreFuncs.setWarmupTime(team_id, userId, "9:00 AM", day);
+                firestoreFuncs.setCooldownTime(team_id, userId, "5:00 PM", day);
+            }
+        }
     }
     catch (error) {
         console.log(error);
@@ -156,6 +157,7 @@ async function findUsersWorkSpace(app, token) {
             usersDict[id] = u.name;
         }
     });
+    
     return usersDict;
 }
 
@@ -165,20 +167,13 @@ async function findUsersChannel(app, token, channelId) {
         token: token,
         channel: channelId
     }).then((obj) => {
+        console.log(obj);
         return obj.members;
     }).catch((error) => {
         console.log(error);
     });
 
-    var usersDict = {};
-
-    users.forEach((u) => {
-        if (u.is_bot === false && u.name !== "slackbot") {
-            var id = u.id;
-            usersDict[id] = u.name;
-        }
-    });
-    return usersDict;
+    return users;
 
 }
 
