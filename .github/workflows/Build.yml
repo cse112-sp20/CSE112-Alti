@@ -23,8 +23,7 @@ jobs:
       working-directory: ./functions
       run: cat ./runtimeconfig.json
     - name: Git add/commit
-      working-directory: ./functions
-    - uses: EndBug/add-and-commit@v4
+      uses: EndBug/add-and-commit@v4
       env: 
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
