@@ -13,7 +13,7 @@ jobs:
     name: Build non-master branches
     runs-on: ubuntu-latest
 
-    steps:
+    steps: 
     - name: Check out code
       uses: actions/checkout@master
     - name: Install Dependencys 
