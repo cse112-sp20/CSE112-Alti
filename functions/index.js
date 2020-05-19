@@ -5,8 +5,6 @@ const admin = require('firebase-admin');
 const config = functions.config();
 const signingSecret = config.slack.signing_secret;
 const user_token = config.slack.user_token;
-const onBoard = require('./onBoard');
-const appHome = require('./appHome');
 const bot_token = config.slack.bot_token;
 
 const firestoreFuncs = require('./firestore');
@@ -32,6 +30,9 @@ exports.getBolt = function getBolt(){
 const warmupMessage = require('./warmupMessage');
 const pubsubScheduler = require('./pubsubScheduler')
 const pairUp = require('./pairUp');
+const onBoard = require('./onBoard');
+const appHome = require('./appHome');
+const appHomeSchedule = require('./appHomeSchedule');
 exports.scheduledPairUp = pubsubScheduler.scheduledPairUp;
 exports.scheduleWarmup = pubsubScheduler.scheduleWarmup;
 
@@ -131,30 +132,6 @@ app.view('custom_msg_view', async ({ ack, body, view, context }) => {
 });
 
 
-// Listen to the app_home_opened Events API event to hear when a user opens your app from the sidebar
-app.event("app_home_opened", async ({ payload, context }) => {
-    appHome.appHome(app, payload, context);
-});
-
-app.command('/setup', async ({payload, ack, say }) => {
-    ack();
-    say("Trying to set up");
-    onBoard.onBoard(app, bot_token, payload.team_id, "alti-pairing");
-
-});
-
-app.action('select', async({payload, ack, say}) => {
-    ack();
-    // block action payload type
-    var team_info = await app.client.team.info({
-        token: bot_token
-    }).catch((error) => {
-        console.log(error);
-    });
-    var team_id = team_info.team.id;
-    onBoard.onBoardExisting(app, bot_token, team_id, payload.selected_channel);
-});
-
 // Handle '/setupWarmup` command invocations
 app.command('/setupcooldown', async ({ command, ack, say }) => {
     // Acknowledge command request
@@ -212,4 +189,4 @@ app.action('warmup_quote_select', async ({ ack, body, context }) => {
     ack();
  });
  
- 
+
