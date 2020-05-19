@@ -1,5 +1,7 @@
 'use strict'
 const assert = require('assert');
+const should = require('chai').should();
+const expect = require('chai').expect;
 const index = require('../index');
 const {app, token} = index.getBolt();
 
@@ -57,29 +59,27 @@ describe('Pairup', function() {
         token: token
       })
       workspaceId = workspaceInfo.team.id;
-      // await firestoreFuncs.getPairingChannel(workspaceId).then( channel => {
-      //   if(channel == undefined)
-      //     firestoreFuncs.storeNewPairingChannel(workspaceId, testChannelId);
-      // });
       
     });
 
     it('Test Pairup with testing channel', async function() {
-     this.timeout(180000) // 1 min
-      try {
-        const response = await pairUp.pairUp("testing");
-        var pairs = await firestoreFuncs.getPairedUsers(workspaceId);
-        console.log(pairs);
+      this.timeout(180000) // 3 min
 
-        // //console.log(slackResponse.channels[0]);
-        // var members = await app.client.conversations.members({
-        //   token:token, 
-        //   channel: slackResponse.channels[0].id
-        // });
+      //const response = await pairUp.pairUp("testing");
+      var pairs = await firestoreFuncs.getPairedUsers(workspaceId);
 
-      } catch(error) {
-        console.log("----------- ERROR ------------")
-        console.log(error);
+      for(var i = 0; i < pairs.length; i++)
+      {
+        var pair = pairs[i];
+        var m = await app.client.conversations.members({
+          token:token, 
+          channel: pair["dmThreadID"]
+        });
+        //console.log(m.members);
+        //console.log(pair);
+
+        (((m.members).should).have).lengthOf(3);
+        expect(m.members).to.include.members(pair["users"]);
       }
     });  
   });
