@@ -31,7 +31,7 @@ jobs:
       run: npm run lint
     - name: Run Tests
       working-directory: ./functions
-      run: npm 
+      run: npm test
       env:
         GOOGLE_APPLICATION_CREDENTIALS: ./serviceAccountKey.json”
     
