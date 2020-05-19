@@ -199,8 +199,6 @@ app.action('warmup_quote_select', async ({ ack, body, context }) => {
    warmupMessage.warmupQuoteSelect(ack,body,context);
  });
 
-
- 
  app.view('generic_close', async ({ ack, body, context }) => {
     ack({
 	  //clear the modal off the users screen
@@ -213,3 +211,18 @@ app.action('warmup_quote_select', async ({ ack, body, context }) => {
  });
  
  
+
+//  Below used for testing new firestore.js functions
+exports.testFirestore = functions.https.onRequest(async (req, res) => {
+    // let partnerID = await firestoreFuncs.getPartner('T0137P851BJ', 'C0123456789', 'u2');
+    // firestoreFuncs.storeNewPairing('T1111111111', 'C1111111111', 'D1', ['u1', 'u2']);
+    // firestoreFuncs.writeMsgToDB('T2222222222', 'u1', 'C2222222222', 'hello sir', true);
+    firestoreFuncs.storeNewPairingChannel('T5555555555', 'C5555555555');
+    // firestoreFuncs.storeTypeOfExercise('T1111111111', 'u2', false, 'u1, here is your cooldown prompt');
+    // let pairedUsers = await firestoreFuncs.getPairedUsers('T0137P851BJ', 'C0123456789');
+    // console.log(await firestoreFuncs.getPairingChannel('T013FNS5Z4L'));
+    // firestoreFuncs.setCooldownTime('T0000000000', 'u1', '05:00 PM', 'monday');
+    // console.log(await firestoreFuncs.getCooldownTime('T0000000000', 'u1', 'monday'));
+    // console.log(await firestoreFuncs.getTimeZone('T0000000000'));
+    // console.log(await firestoreFuncs.getPairingChannel('T0000000000'));
+});
