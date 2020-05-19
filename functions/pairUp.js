@@ -4,9 +4,18 @@ const index = require('./index');
 const { app } = index.getBolt();
 const util = require('./util');
 // Triggers the pairing up of all people in a given channel.
-exports.pairUp = async function pairUp(channelName, context){
+exports.pairUp = async function pairUp(channelName, context=undefined, botToken=undefined){
+    
+    if(context === undefined && botToken === undefined){
+        throw new Exception("Both the context and bot token is undefined. Cannot pair up.")
+    }
     try{
-        token = context.botToken;
+        if(context !== undefined){
+            token = context.botToken;
+        }
+        else{
+            token = botToken;
+        }
         // TODO: Take this out of this function and pass it in as a parameter ideally
         const workspaceInfo = await app.client.team.info({
             token: token
@@ -111,7 +120,7 @@ async function handlePairingResponse(response, app, token, workspaceInfo, pairin
 }
 
 
-app.command('/pairup', async ({ command, ack, say, context }) => {
+app.command('/pairup', ({ command, ack, say, context }) => {
     // Acknowledge command request
     ack();
     say(`Trying to pair up.`);
