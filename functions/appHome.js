@@ -4,6 +4,7 @@ const {app, token} = index.getBolt();
 const appHomeObjects = require('./appHomeObjects');
 const firestoreFuncs = require('./firestore');
 
+var days = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"];
 
 // Listen to the app_home_opened Events API event to hear when a user opens your app from the sidebar
 app.event("app_home_opened", async ({ body, context }) => {
@@ -64,6 +65,35 @@ async function checkOwner(workspaceID, userId) {
 	}
 }
 
+function getAllTimes(workspaceId, userId) {
+  var results = [];
+  for (day of days) {
+    results.push(firestoreFuncs.getWarmupTime(workspaceId, userId, day));
+    results.push(firestoreFuncs.getCooldownTime(workspaceId, userId, day));
+  }
+  return Promise.all(results);
+}
+
+// returns a dictionary of section blocks containing mon-fri schedule
+async function createScheduleDisplay(workspaceId, userId) {
+  var res = await getAllTimes(workspaceId, userId);  
+  console.log(res);
+  var sched = {};
+  var index = 0;
+  for (day of days) {
+    var block = {
+      "type": "section",
+      "text": {
+        "type": "mrkdwn",
+        "text": day + ": " + res[index] + "-" + res[index+1]
+      }
+    }
+    sched[day] = block;
+    index += 2;
+  }
+  return sched;
+}
+
 /* Checks if user is owner or not and loads up either owner home tab or non-owner home tab
 */
 async function loadHomeTabUI(app, workspaceID, userId, context) {
@@ -101,6 +131,9 @@ async function loadHomeTabUI(app, workspaceID, userId, context) {
   else {
     channelName = "None";
   }
+
+  var sched = await createScheduleDisplay(workspaceID, userId);
+  console.log(sched);
 
 	if(await checkOwner(workspaceID, userId)){
 		view = {
@@ -253,7 +286,22 @@ async function loadHomeTabUI(app, workspaceID, userId, context) {
 				},
 				{
 					"type": "divider"
-				  },
+          },
+          {
+            "type": "section",
+            "text": {
+              "type": "mrkdwn",
+              "text": "Current schedule:"
+            }
+          },
+          sched.Monday,
+          sched.Tuesday,
+          sched.Wednesday,
+          sched.Thursday,
+          sched.Friday,
+          {
+            "type": "divider",
+          },
 				  {
 					"type": "section",
 					"text": {

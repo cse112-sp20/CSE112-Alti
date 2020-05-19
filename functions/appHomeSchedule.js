@@ -40,10 +40,6 @@ var cooldownTimes =
 
 var days = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"];
 
-// DISPLAYING SCHEDULE
-async function createScheduleDisplay(workspaceId, userId) {
-  
-}
 
 // APP HOME SCHEDULE SETTERS AND LISTENERS
 
