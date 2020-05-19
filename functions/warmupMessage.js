@@ -446,7 +446,12 @@ exports.warmupArticleSelect = async function(ack,body,context) {
 
 exports.warmupQuoteSelect = async function(ack,body,context) {
 	ack();
-	let thisView = createModalView("Alti","generic_close","generic_ack","Great choice quotes are fun!","Pick an author",body.channel.id,["bob","dog","fog"],["1","2", "3"]);
+	let refArray = []; //array with quote author names
+	let valArray = []; //array with quote values
+	let amountOfQuotes = 6; 
+	//generate values for above array
+	generateQuoteArray(amountOfQuotes,refArray,valArray);
+	let thisView = createModalView("Alti","generic_close","generic_ack","Great choice quotes are fun!","Pick an author",body.channel.id,refArray,valArray);
 	console.log(JSON.stringify(thisView));
     try {
       const result = await app.client.views.open({
@@ -460,6 +465,24 @@ exports.warmupQuoteSelect = async function(ack,body,context) {
     }
 }
 
+
+generateQuoteArray = function(arrayLen, repRefArray, repValArray){ 
+	for (var quoteGenIndex = 0; quoteGenIndex < arrayLen; quoteGenIndex++) {
+		generateQuote(quoteGenIndex,repRefArray,repValArray);
+	}
+}
+
+generateQuote = function(index,repRefArray,repValArray) {
+	let quotePoolSize =  Object.keys(motivationalQuotes).length;
+	let randomQuoteIndex = Math.floor(Math.random() * quotePoolSize);
+	let quoteText = motivationalQuotes[randomQuoteIndex].text; 
+	let quoteAuthor =  motivationalQuotes[randomQuoteIndex].author;	
+	if (quoteAuthor === null) {
+		quoteAuthor = "Unknown";
+	}
+	repRefArray[index] = quoteAuthor;
+	repValArray[index] = randomQuoteIndex.toString();
+}
 /*
 createModalView
 Creates a json modal view with specified arguments.
@@ -480,7 +503,6 @@ returns (json)
 
 TODO HANDLE INVALID INPUT
 */
-
 createModalView = function(title,callbackID,actionID,responseText,choiceText,channelID, choiceRepArray, choiceValueArray) {
 	let newView = {};
 	//begin populating view object with properties
