@@ -1,7 +1,7 @@
 {
   "slack": {
-    "signing_secret": "7104dde5b0ddbaf3851c0ae377e323e0",
-    "bot_token": "xoxb-1098633798133-1135481517280-zqdp7yEtNqqFloYBPBxb3M6j",
-    "user_token": "xoxb-1098633798133-1135481517280-zqdp7yEtNqqFloYBPBxb3M6j"
+    "bot_token": "xoxb-1098633798133-1113204394610-IHw7WsIppBNtt7B6yvFMikZh",
+    "user_token": "xoxb-1098633798133-1113204394610-IHw7WsIppBNtt7B6yvFMikZh",
+    "signing_secret": "4491bd99bb2558d907e213c0fc07deea"
   }
 }

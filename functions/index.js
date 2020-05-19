@@ -2,46 +2,52 @@ const functions = require('firebase-functions');
 const { App, ExpressReceiver } = require('@slack/bolt');
 const admin = require('firebase-admin');
 
-
 const config = functions.config();
 const signingSecret = config.slack.signing_secret;
-
-//const user_token = config.slack.user_token;
-
+const user_token = config.slack.user_token;
 const onBoard = require('./onBoard');
 const appHome = require('./appHome');
 const bot_token = config.slack.bot_token;
 
 const firestoreFuncs = require('./firestore');
 
+
 const expressReceiver = new ExpressReceiver({
     signingSecret: signingSecret,
     endpoints: '/events',
 });
 
-const authorizeFunction = async ({ teamId }) => firestoreFuncs.getAPIPair(teamId);
-
-
-
 const app = new App({
     receiver: expressReceiver,
-    authorize: authorizeFunction,
+    token: bot_token
 });
 
-//arrow function for simplicity 
-exports.getBolt = () => app;
-
+exports.getBolt = function getBolt(){
+    return {
+        app:app,
+        token:bot_token
+    }
+};
 
 const generateTaskData = require('./generateTaskData');
 const warmupMessage = require('./warmupMessage');
 const pubsubScheduler = require('./pubsubScheduler')
 const pairUp = require('./pairUp');
-
 exports.scheduledPairUp = pubsubScheduler.scheduledPairUp;
 exports.scheduleWarmup = pubsubScheduler.scheduleWarmup;
 
 // Global error handler
 app.error(console.log);
+
+
+app.command('/pairup', async ({ command, ack, say }) => {
+    // Acknowledge command request
+
+    ack();
+    say(`Trying to pair up.`);
+    pairUp.pairUp("general");
+
+});
 
 // app.command('/warmup', async({command, ack, say}) => {
 //     ack();
@@ -58,7 +64,7 @@ app.message(async ({ message, context }) => {
             console.log("Message object: ");
             console.log(message);
             app.client.chat.postMessage({
-                token: context.botToken, 
+                token: bot_token,
                 channel: '#general',
                 text: `<@${message.user}> just DMd me. What a creep?! Other people should also know that "${message.text}"`
             });
@@ -72,13 +78,6 @@ app.message(async ({ message, context }) => {
 });
 exports.slack = functions.https.onRequest(expressReceiver.app);
 
-//OAuth Endpoint for Authentication
-const oauthEndpoint = require('./oauth');
-//export this to separate file 
-exports.oauth = oauthEndpoint.oAuthFunction; 
-
-
-
 app.command('/firestore', async ({ command, ack, say }) => {	
     // Acknowledge command request	 
     ack();	
@@ -91,7 +90,6 @@ app.command('/firestore', async ({ command, ack, say }) => {
 // Handle '/setupWarmup` command invocations
 app.command('/setupwarmup', async ({ command, ack, say }) => {
     // Acknowledge command request
-	console.log(command);
     ack();
 	//send Warmup prompts to the channel that this command was called from
     warmupMessage.sendSelectChoice(command.channel_id,app,bot_token);
