@@ -7,28 +7,8 @@ on:
     - '!master'
 jobs:
   
-  RuntimeUpdate:
-
-    name: Update runtimeconfig.json
-    runs-on: ubuntu-latest
-
-
-    steps:
-    - name: Check out code
-      uses: actions/checkout@master
-    - name: Modify .runtimeconfig.json
-      working-directory: ./functions
-      run: cp -f ./test/.runtimeconfig.json ./.runtimeconfig.json
-    - name: Git add/commit
-      uses: EndBug/add-and-commit@v4
-      env: 
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
-
-    
-  
+ 
   main:
-    needs: RuntimeUpdate
 
     name: Build non-master branches
     runs-on: ubuntu-latest
@@ -42,10 +22,16 @@ jobs:
     - name: Modify .runtimeconfig.json
       working-directory: ./functions
       run: cp -f ./test/.runtimeconfig.json ./.runtimeconfig.json
+    - name: Git add/commit
+      uses: EndBug/add-and-commit@v4
+      env: 
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
     - name: Run Linter
       working-directory: ./functions
       run: npm run lint
     - name: Run Tests
       working-directory: ./functions
-      run: npm test
+      run: npm 
+      env:
+        GOOGLE_APPLICATION_CREDENTIALS: ./serviceAccountKey.json”
     
