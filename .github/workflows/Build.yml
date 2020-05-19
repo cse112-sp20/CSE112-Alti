@@ -12,7 +12,10 @@ jobs:
     name: Update runtimeconfig.json
     runs-on: ubuntu-latest
 
+
     steps:
+    - name: Check out code
+      uses: actions/checkout@master
     - name: Modify .runtimeconfig.json
       working-directory: ./functions
       run: cp -f ./test/.runtimeconfig.json ./runtimeconfig.json
