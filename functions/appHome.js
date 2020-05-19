@@ -123,9 +123,8 @@ async function loadHomeTabUI(app, workspaceID, userId, context) {
 				{
 					"type": "section",
 					"text": {
-						"type": "plain_text",
+						"type": "mrkdwn",
 						"text": `Current Pairing Channel: #${  channelName  }`,
-						"emoji": true
 					}
 				},
 				{
@@ -141,7 +140,7 @@ async function loadHomeTabUI(app, workspaceID, userId, context) {
 					"block_id": "section678",
 					"text": {
 						"type": "mrkdwn",
-						"text": "🤝 *Pick a folk* to be the leader of Alti. The leader can pick pairing channel or change the time zone of the worksapce"
+						"text": "🤝 *Pick a folk* to be the leader of Alti. The leader can pick pairing channel or change the time zone of the workspace"
 					},
 					"accessory": {
 						"action_id": "selectOwner",
@@ -248,7 +247,7 @@ async function loadHomeTabUI(app, workspaceID, userId, context) {
 					"elements": [
 						{
 							"type": "mrkdwn",
-							"text": "or... do `/setup` to create an #alti-pair channel with everyone in the workspace\n"
+							"text": "or... do `/setup` to create an #alti-pair channel with everyone in the workspace\nIf you have never set a schedule before, you'll have a default 9am to 5pm"
 						}
 					]
 				},
