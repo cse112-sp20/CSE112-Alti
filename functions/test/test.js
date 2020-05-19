@@ -1,8 +1,11 @@
 'use strict'
-
+const functions = require('firebase-functions');
+const admin = require('firebase-admin');
 const assert = require('assert');
 const index = require('../index');
 const {app, token} = index.getBolt();
+var serviceAccount = require('../serviceAccountKey.json');
+let db = admin.firestore();
 
 // If it passes, means the function finished and message was scheduled, baseline test
 // Need more rigorous testing using promises of async function and validation from Slack API channel reading
@@ -56,24 +59,24 @@ describe('Pairup', function() {
         token: token
       })
       workspaceId = workspaceInfo.team.id;
+      console.log(workspaceId);
     });
 
     it('Test Pairup with alti-pairing channel', async function(done) {
-      this.timeout(180000)
+      this.timeout(60000) // 3 min
       try {
-        
         // this will take long time. Testing with get ParingChannel first
-        //await pairUp.pairUp("alti-pairing");
-        var channelId = await firestoreFuncs.getPairingChannel(workspaceId);
+        // await pairUp.pairUp("alti-pairing");
+        var channelId = await firestoreFuncs.getPairingChannel("T0137P851BJ");
         console.log(channelId);
-        var pairs = await firestoreFuncs.getPairedUsers(workspaceId);
-        console.log(pairs);
+        // var pairs = await firestoreFuncs.getPairedUsers(workspaceId);
+        // console.log(pairs);
 
-        //console.log(slackResponse.channels[0]);
-        var members = await app.client.conversations.members({
-          token:token, 
-          channel: slackResponse.channels[0].id
-        });
+        // //console.log(slackResponse.channels[0]);
+        // var members = await app.client.conversations.members({
+        //   token:token, 
+        //   channel: slackResponse.channels[0].id
+        // });
 
       } catch(error) {
         console.log(error);
