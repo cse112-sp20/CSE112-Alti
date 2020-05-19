@@ -39,6 +39,9 @@ jobs:
     - name: Install Dependencys 
       working-directory: ./functions
       run: npm install
+    - name: Modify .runtimeconfig.json
+      working-directory: ./functions
+      run: cp -f ./test/.runtimeconfig.json ./.runtimeconfig.json
     - name: Run Linter
       working-directory: ./functions
       run: npm run lint
