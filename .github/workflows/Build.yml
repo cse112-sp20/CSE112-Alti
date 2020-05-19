@@ -22,10 +22,9 @@ jobs:
     - name: Modify .runtimeconfig.json
       working-directory: ./functions
       run: cp -f ./test/.runtimeconfig.json ./.runtimeconfig.json
-    - name: Git add/commit
-      uses: EndBug/add-and-commit@v4
-      env: 
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    - name: Add serviceAccountKey
+      working-directory: ./functions
+      run: echo ${{ secrets.SERVICE_ACCOUNT_KEY }} > ./serviceAccountKey.json
     - name: Run Linter
       working-directory: ./functions
       run: npm run lint
