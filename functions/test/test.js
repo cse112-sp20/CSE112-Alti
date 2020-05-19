@@ -58,7 +58,7 @@ describe('Pairup', function() {
       console.log(workspaceId);
     });
 
-    it('Test Pairup with alti-pairing channel', async function(done) {
+    it('Test Pairup with alti-pairing channel', async function() {
       //his.timeout(60000) // 3 min
       try {
         // this will take long time. Testing with get ParingChannel first
