@@ -1,10 +1,12 @@
 const shuffle = require('shuffle-array');
 const firestoreFuncs = require('./firestore');
 const index = require('./index');
-const {app, token} = index.getBolt();
+const { app } = index.getBolt();
+const util = require('./util');
 // Triggers the pairing up of all people in a given channel.
-exports.pairUp = async function pairUp(channelName){
+exports.pairUp = async function pairUp(channelName, context){
     try{
+        token = context.botToken;
         // TODO: Take this out of this function and pass it in as a parameter ideally
         const workspaceInfo = await app.client.team.info({
             token: token
@@ -13,7 +15,7 @@ exports.pairUp = async function pairUp(channelName){
             token: token
         });
 
-        const channelId = getChannelIdByName(app, token, channelName)
+        const channelId = util.getChannelIdByName(app, token, channelName)
         var pairingChannelIdVal;
         // const workspaceInfo = await workspaceInfoPromise.then(result => result.data);
 
@@ -99,7 +101,7 @@ async function handlePairingResponse(response, app, token, workspaceInfo, pairin
             user: users.members[i]
         });
         if (!profile.profile.bot_id) {
-            console.log('bot id: ', profile.bot_id);
+            // console.log('bot id: ', profile.bot_id);
             pairedUsers.push(users.members[i]);
         }
     }
@@ -109,29 +111,10 @@ async function handlePairingResponse(response, app, token, workspaceInfo, pairin
 }
 
 
-// Given a channel name, returns the channel ID.
-async function getChannelIdByName(app, token, channelName){
-    const conversations = app.client.conversations.list({
-        token:token
-    });
-    const channelId = conversations.then( conversations => {
-        const filteredChannels = conversations.channels.filter( channel => {
-            if(channel.name === channelName){
-                return true;
-            }
-            else return false;
-        })
+app.command('/pairup', async ({ command, ack, say, context }) => {
+    // Acknowledge command request
+    ack();
+    say(`Trying to pair up.`);
+    exports.pairUp("general", context);
 
-        if (filteredChannels.length === 0){
-            console.error("Target channel not found");
-            return undefined;
-        }
-        if (filteredChannels.length > 1){
-            console.error("Multiple channels found");
-            return undefined;
-        }
-
-        return filteredChannels[0].id;
-    });
-    return channelId;
-}
+});

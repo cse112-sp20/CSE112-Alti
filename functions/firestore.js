@@ -1,5 +1,6 @@
 const functions = require('firebase-functions');
 const admin = require('firebase-admin');
+const request = require('request');
 
 // console.log(typeof(process.env.FUNCTIONS_EMULATOR));
 if(process.env.FUNCTIONS_EMULATOR === "true"){
@@ -20,9 +21,7 @@ let db = admin.firestore();
 /* 
     Stores the new pairings (DM thread ids?) in the corresponding place (with the corresponding
     workspace and channel) in cloud firestore.
-
     ASSUMPTION: pairedUsers length is always 2
-
     Inputs:
         workspace - workspace id where the new pairings were made
         channel - channel name/id that the pairings were made based off of
@@ -57,7 +56,6 @@ exports.writeMsgToDB = function writeMsgToDB(teamId, userID, channelID,msgToSend
         This function will store a newly designated pairing channel under the 'activeChannels' collection.
         In addition, it will delete the currently designated pairing channel and all data associated with it.
         We do this to enforce one pairing channel per workspace (for now).
-
     Input: 
         workspaceID - workspace id
         channelID - channel id of the new channel designated as the pairing channel
@@ -145,7 +143,6 @@ exports.getPairingChannel = async function getPairingChannel(workspaceID) {
         The activity task prompt gets stored in the user's partner's warmup or cooldown task field.
         This function needs to determine the given user's partner as a part of the functionality which can
         be found in the entry for that user in teammatePairings collection. 
-
     Input: 
         workspaceID - workspace id
         userID - user id of user who selected this task for their partner
@@ -255,7 +252,6 @@ exports.setWarmupTime = function setWarmupTime(workspaceID, userID, time, day) {
     Description:
         Retrieves the warmup time for a particular user in a workspace for a given day.
         Returns a promise that you need to 'await'
-
     Inputs:
         workspaceID - workspace id of where time is getting retrieved
         userID - user id for which the time/day is getting retrieved
@@ -306,7 +302,6 @@ exports.setCooldownTime = function setWarmupTime(workspaceID, userID, time, day)
     Description:
         Retrieves the warmup time for a particular user in a workspace for a given day.
         Returns a promise that you need to 'await'
-
     Inputs:
         workspaceID - workspace id of where time is getting retrieved
         userID - user id for which the time/day is getting retrieved
