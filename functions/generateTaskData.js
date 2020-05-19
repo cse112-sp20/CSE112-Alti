@@ -1,11 +1,11 @@
 const index = require('./index');
-const app = index.getBolt();
+const {app} = index.getBolt();
 const quotes = require('./quotes');
 const motivationalQuotes = quotes.getQuotesObj();
 
 app.command('/generatequote', async({command, ack, say}) => {
     ack();
-    const quoteGenerated = generateQuote();
+    const quoteGenerated = exports.generateQuote();
     say(quoteGenerated);
 });
 
@@ -13,18 +13,14 @@ app.command('/generatepuzzle', async({command, ack, say}) => {
     ack();
     const typeOfPuzzle = command.text;
     const puzzleGenerated = generatePuzzle(typeOfPuzzle);
-    return puzzleGenerated.then( response => {
-        return Promise.resolve(say('Generated a puzzle of type ' + command.text + ': ' + response));
-    });
+    say('Generated a puzzle of type ' + command.text + ': ' + puzzleGenerated);
 });
 
 app.command('/generatetyping', async({command, ack, say}) => {
     ack();
     const codingLanguage = command.text;
     const codingChallengeGenerated = generateCodingChallenge(codingLanguage);
-    return codingChallengeGenerated.then( response => {
-        return Promise.resolve(say('Generated a code typing challenge in the language ' + command.text + ': '  + response));
-    });
+    say('Generated a code typing challenge in the language ' + command.text + ': '  + codingChallengeGenerated);
 });
 
 // Generates a quote object

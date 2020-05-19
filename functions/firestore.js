@@ -18,76 +18,6 @@ else{
 
 let db = admin.firestore();
 
-
-exports.storeAPIPair = (team_id, api_key) => { 
-
-    let setValue = {
-        botToken: api_key.botToken,
-        botId: api_key.botId,
-        botUserId: api_key.botUserId
-    }; 
-    console.log("SETVALUE : @@@@@@@: " + JSON.stringify(setValue)); 
-    db.collection('api_keys').doc(team_id).set(setValue);
-};
-
-
-exports.getAPIPair = (team_id) => { 
-
-    //default workspace (uncomment for testing)
-
-    /*
-    //team id here
-    if (team_id === "T013YTT91B6"){ 
-
-        //hardcode bot token here
-        let botToken = "xoxb-1134945307380-1141390769793-fiMOhaTu74UVw4Dc2fAVQHVJ";
-
-            let botInfo = request.get({
-                uri: 'https://slack.com/api/auth.test?token='+botToken,
-                method: 'GET'
-            }, (e, res, bd) => {
-                if (!e && res.statusCode === 200) {
-                    return JSON.parse(bd);
-                } else {
-                    return null;
-                }
-            });
-        
-
-        return ({ 
-
-            botToken: botToken,
-            botId: botInfo.bot_id,
-            botUserId: botInfo.user_id
-
-        });
-       
-
-    } else 
-    {
-         */
-
-
-
-          
-            
-          
-    
-    return db.collection('api_keys').doc(team_id).get().then((doc) => {
-        if (!(doc && doc.exists)) {	
-            console.log("doc does not exist");
-            return null;	
-        }
-        console.log("JSON - data: " + JSON.stringify(doc.data()));
-        return doc.data();
-    }).catch(() => {	
-        return null;
-    });
-    //}
-
-
-}
-
 /* 
     Stores the new pairings (DM thread ids?) in the corresponding place (with the corresponding
     workspace and channel) in cloud firestore.
@@ -192,7 +122,7 @@ function deleteQueryBatch(query, resolve, reject) {
       })
       .catch(reject);
 }
-
+ 
 /*
     Description:
         This function will retrieve the single pairing channel (id) corresponding to a workspace
@@ -267,17 +197,19 @@ exports.getPartner = function getPartner(workspaceID, channelID, userID) {
 
 /*
     Description:
-        Given a workspace and pairing channel id, return a list of lists that contain paired user IDs
+        Given a workspace and pairing channel id, return a list of objects, where
+        each object contains the paired users, and the DM thread id they are paired within.
     
     Input: 
         workspaceID - workspace id
-        channelID - channel id of pairing channel you're looking to get paired users from
     
     Return:
-        If u1 is paired with u2, and u3 paired with u4:
-        [[u1, u2], [u3, u4]]
+        If u1 is paired with u2 (in dm thread 'd1'), and u3 paired with u4 (in dm thread 'd2'),
+        this function will return:
+            [{users: [u1, u2], dmThreadID: 'd1'}, {users: [u3, u4], dmThreadID: 'd2'}]
 */
-exports.getPairedUsers = async function getPairedUsers(workspaceID, channelID) {
+exports.getPairedUsers = async function getPairedUsers(workspaceID) {
+    let channelID = await this.getPairingChannel(workspaceID);
     let userRef = db.collection("workspaces").doc(workspaceID).collection("activeChannels")
                     .doc(channelID).collection('pairedUsers');
     
@@ -287,14 +219,14 @@ exports.getPairedUsers = async function getPairedUsers(workspaceID, channelID) {
         querySnapshot.forEach((doc) => {
             let partner = doc.data().partnerID;
             if (!partnerIDs.includes(doc.id)) {
-                pairings.push([doc.id, partner]);
+                pairings.push({users: [doc.id, partner], dmThreadID: doc.data().dmThreadID});
                 partnerIDs.push(partner)
             }
         });
         return pairings;
     });
 }
-
+ 
 /*
     Description:
         Sets the warmup time (when they will receive their warmup task) for
@@ -393,4 +325,91 @@ exports.getCooldownTime = function getWarmupTime(workspaceID, userID, day) {
             console.log('Error getting user document: ', err);
             return undefined;
         });
+}
+
+/*
+    Description:
+        Gets the current workspace 'owner'
+        Returns a promise that you have to 'await'
+    
+    Input:
+        workspaceID - workspace id that you want to get owner of
+*/
+exports.getOwner = function getOwner(workspaceID) {
+    let workspaceDocRef = db.collection('workspaces').doc(workspaceID);
+
+    return workspaceDocRef.get()
+        .then(doc => {
+            if (!doc.exists) {
+                console.log('No such document!');
+                return undefined;
+            }
+            else {
+                return doc.data().owner;
+            }
+        })
+        .catch(err => {
+            console.log('Error getting workspace document: ', err);
+            return undefined;
+        });
+}
+
+/*
+    Description:
+        Sets the owner associated with a given workspace
+    
+    Inputs:
+        workspaceID - workspace id of the workspace you want to set owner of
+        userID - user id of the new owner
+*/
+exports.setOwner = function updateOwner(workspaceID, userID) {
+    let workspaceDocRef = db.collection('workspaces').doc(workspaceID);
+
+    workspaceDocRef.set({
+        owner: userID
+    }, {merge: true});
+}
+
+/*
+    Description:
+        Gets timezone associated with the given workspace and the schedules of
+        everyone paired up within the designated pairing-channel in that workspace.
+        Returns a promise that you have to 'await'
+    
+    Input:
+        workspaceID - workspace id that you want the associated timezone of
+*/
+exports.getTimeZone = function getTimezone(workspaceID) {
+    let workspaceDocRef = db.collection('workspaces').doc(workspaceID);
+
+    return workspaceDocRef.get()
+        .then(doc => {
+            if (!doc.exists) {
+                console.log('No such document!');
+                return undefined;
+            }
+            else {
+                return doc.data().timezone;
+            }
+        })
+        .catch(err => {
+            console.log('Error getting workspace document: ', err);
+            return undefined;
+        });
+}
+
+/*
+    Description:
+        Sets the timezone associated with a given workspace
+    
+    Inputs:
+        workspaceID - workspace id of the workspace you want to set timezone for
+        timeZone - new timezone you want to set, in abbreviated format, ex: "PST"
+*/
+exports.setTimeZone = function updateTimeZone(workspaceID, timeZone) {
+    let workspaceDocRef = db.collection('workspaces').doc(workspaceID);
+
+    workspaceDocRef.set({
+        timezone: timeZone
+    }, {merge: true})
 }
