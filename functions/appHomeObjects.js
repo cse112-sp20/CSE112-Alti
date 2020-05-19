@@ -1,3 +1,5 @@
+// Helper file to store json objects for App Home
+
 // List of times every half hour to be used in the options field of a dropdown menu select
 var times = [
     {
@@ -215,6 +217,329 @@ var ampm =
     }
 ];
   
+var time_zones = 
+[
+  {
+    "text": {
+      "type": "plain_text",
+      "text": "UTC -12:00",
+      "emoji": true
+    },
+    "value": "-12:00"
+  },
+  {
+    "text": {
+      "type": "plain_text",
+      "text": "UTC -11:00",
+      "emoji": true
+    },
+    "value": "-11:00"
+  },
+  {
+    "text": {
+      "type": "plain_text",
+      "text": "UTC -10:00",
+      "emoji": true
+    },
+    "value": "-10:00"
+  },
+  {
+    "text": {
+      "type": "plain_text",
+      "text": "UTC -09:30",
+      "emoji": true
+    },
+    "value": "-09:30"
+  },
+  {
+    "text": {
+      "type": "plain_text",
+      "text": "UTC -09:00",
+      "emoji": true
+    },
+    "value": "-09:00"
+  },
+  {
+    "text": {
+      "type": "plain_text",
+      "text": "UTC -08:00",
+      "emoji": true
+    },
+    "value": "-08:00"
+  },
+  {
+    "text": {
+      "type": "plain_text",
+      "text": "UTC -07:00",
+      "emoji": true
+    },
+    "value": "-07:00"
+  },
+  {
+    "text": {
+      "type": "plain_text",
+      "text": "UTC -06:00",
+      "emoji": true
+    },
+    "value": "-06:00"
+  },
+  {
+    "text": {
+      "type": "plain_text",
+      "text": "UTC -05:00",
+      "emoji": true
+    },
+    "value": "-05:00"
+  },
+  {
+    "text": {
+      "type": "plain_text",
+      "text": "UTC -04:00",
+      "emoji": true
+    },
+    "value": "-04:00"
+  },
+  {
+    "text": {
+      "type": "plain_text",
+      "text": "UTC -03:30",
+      "emoji": true
+    },
+    "value": "-03:30"
+  },
+  {
+    "text": {
+      "type": "plain_text",
+      "text": "UTC -03:00",
+      "emoji": true
+    },
+    "value": "-03:00"
+  },
+  {
+    "text": {
+      "type": "plain_text",
+      "text": "UTC -02:00",
+      "emoji": true
+    },
+    "value": "-02:00"
+  },
+  {
+    "text": {
+      "type": "plain_text",
+      "text": "UTC -01:00",
+      "emoji": true
+    },
+    "value": "-01:00"
+  },
+  {
+    "text": {
+      "type": "plain_text",
+      "text": "UTC 00:00",
+      "emoji": true
+    },
+    "value": "00:00"
+  },
+  {
+    "text": {
+      "type": "plain_text",
+      "text": "UTC -12:00",
+      "emoji": true
+    },
+    "value": "-12:00"
+  },
+  {
+    "text": {
+      "type": "plain_text",
+      "text": "UTC -12:00",
+      "emoji": true
+    },
+    "value": "-12:00"
+  },
+  {
+    "text": {
+      "type": "plain_text",
+      "text": "UTC +01:00",
+      "emoji": true
+    },
+    "value": "+01:00"
+  },
+  {
+    "text": {
+      "type": "plain_text",
+      "text": "UTC +02:00",
+      "emoji": true
+    },
+    "value": "+02:00"
+  },
+  {
+    "text": {
+      "type": "plain_text",
+      "text": "UTC +03:00",
+      "emoji": true
+    },
+    "value": "+03:00"
+  },
+  {
+    "text": {
+      "type": "plain_text",
+      "text": "UTC +03:30",
+      "emoji": true
+    },
+    "value": "+03:30"
+  },
+  {
+    "text": {
+      "type": "plain_text",
+      "text": "UTC +04:00",
+      "emoji": true
+    },
+    "value": "+04:00"
+  },
+  {
+    "text": {
+      "type": "plain_text",
+      "text": "UTC +04:30",
+      "emoji": true
+    },
+    "value": "+04:30"
+  },
+  {
+    "text": {
+      "type": "plain_text",
+      "text": "UTC +05:00",
+      "emoji": true
+    },
+    "value": "+05:00"
+  },
+  {
+    "text": {
+      "type": "plain_text",
+      "text": "UTC +05:30",
+      "emoji": true
+    },
+    "value": "+05:30"
+  },
+  {
+    "text": {
+      "type": "plain_text",
+      "text": "UTC +05:45",
+      "emoji": true
+    },
+    "value": "+05:45"
+  },
+  {
+    "text": {
+      "type": "plain_text",
+      "text": "UTC +06:00",
+      "emoji": true
+    },
+    "value": "+06:00"
+  },
+  {
+    "text": {
+      "type": "plain_text",
+      "text": "UTC +06:30",
+      "emoji": true
+    },
+    "value": "+06:30"
+  },
+  {
+    "text": {
+      "type": "plain_text",
+      "text": "UTC +07:00",
+      "emoji": true
+    },
+    "value": "+07:00"
+  },
+  {
+    "text": {
+      "type": "plain_text",
+      "text": "UTC +08:00",
+      "emoji": true
+    },
+    "value": "+08:00"
+  },
+  {
+    "text": {
+      "type": "plain_text",
+      "text": "UTC +08:45",
+      "emoji": true
+    },
+    "value": "+08:45"
+  },
+  {
+    "text": {
+      "type": "plain_text",
+      "text": "UTC +09:00",
+      "emoji": true
+    },
+    "value": "+09:00"
+  },
+  {
+    "text": {
+      "type": "plain_text",
+      "text": "UTC +09:30",
+      "emoji": true
+    },
+    "value": "+09:30"
+  },
+  {
+    "text": {
+      "type": "plain_text",
+      "text": "UTC +10:00",
+      "emoji": true
+    },
+    "value": "+10:00"
+  },
+  {
+    "text": {
+      "type": "plain_text",
+      "text": "UTC +10:30",
+      "emoji": true
+    },
+    "value": "+10:30"
+  },
+  {
+    "text": {
+      "type": "plain_text",
+      "text": "UTC +11:00",
+      "emoji": true
+    },
+    "value": "+11:00"
+  },
+  {
+    "text": {
+      "type": "plain_text",
+      "text": "UTC +12:00",
+      "emoji": true
+    },
+    "value": "+12:00"
+  },
+  {
+    "text": {
+      "type": "plain_text",
+      "text": "UTC +12:45",
+      "emoji": true
+    },
+    "value": "+12:45"
+  },
+  {
+    "text": {
+      "type": "plain_text",
+      "text": "UTC +13:00",
+      "emoji": true
+    },
+    "value": "+13:00"
+  },
+  {
+    "text": {
+      "type": "plain_text",
+      "text": "UTC +14:00",
+      "emoji": true
+    },
+    "value": "+14:00"
+  }
+];
 
 monday_custom_block = 
 {
@@ -525,12 +850,20 @@ var modal =
   },
   "blocks": [
     {
+      "type": "context",
+      "elements": [
+				{
+					"type": "mrkdwn",
+					"text": "Please click set to set each individual day's work period. Notice this will override your daily warm-up and cooldown times if you have any."
+				}
+			]
+    },
+    {
       "type": "section",
       "text": {
         "type": "mrkdwn",
         "text": "Monday"
       },
-      
     },
     monday_custom_block,
     {
@@ -580,6 +913,7 @@ var modal =
 
 exports.times = times;
 exports.ampm = ampm;
+exports.time_zones = time_zones;
 exports.monday_custom_block = this.monday_custom_block;
 exports.tuesday_custom_block = this.tuesday_custom_block;
 exports.wednesday_custom_block = this.wednesday_custom_block;

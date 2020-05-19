@@ -1,25 +1,10 @@
-/* TODO 
-Send calls to database updating what the current pairing channel is */
+/* This file handles the /setup command as well as designation of the active pairing channel
+*/
+
 const firestoreFuncs = require('./firestore');
 const index = require('./index');
 const {app, token} = index.getBolt();
-/*
-// Listen to channel dropdown select menu for new pairing channel
-app.action('pairing_channel_selected', async({payload, ack, say}) => {
-    ack();
-    console.log("Select");
-    console.log(payload);
-    // block action payload type
-    var team_info = await app.client.team.info({
-        token: token
-    }).catch((error) => {
-        console.log(error);
-    });
-    console.log(team_info);
-    var team_id = team_info.team.id;
-    boardExistingChannel(app, bot_token, team_id, payload.selected_channel);
-});
-*/
+
 
 // Listen for slash command /setup which creates new channel alti-pairing, 
 // invites all users in workspace, and designate as active pairing channel
@@ -30,6 +15,23 @@ app.command('/setup', async ({payload, body, ack, say }) => {
     createOnBoardingChannel(app, token, payload.team_id, "alti-pairing");
   
 });
+
+
+// Listen to channel dropdown select menu for new pairing channel
+app.action('pairing_channel_selected', async({body, ack, say}) => {
+    ack();
+    console.log("Select");
+    console.log(body);
+    // block action payload type
+    var team_info = await app.client.team.info({
+        token: token
+    }).catch((error) => {
+        console.log(error);
+    });
+    var team_id = body.team.id;
+    boardExistingChannel(app, token, team_id, body.actions[0].selected_channel);
+});
+
 
 // Create a channel with all the users in the workspace and set as active pairing channel
 exports.onBoard = createOnBoardingChannel;
@@ -106,6 +108,7 @@ async function createOnBoardingChannel(app, token, team_id, channelName) {
     }
 }
 
+// Set an existing channel as the active pairing channel
 exports.onBoardExisting = boardExistingChannel;
 async function boardExistingChannel(app, token, team_id, channelId) {
     try {
@@ -137,6 +140,7 @@ async function boardExistingChannel(app, token, team_id, channelId) {
 
 }
 
+// Find the users within a workspace and return it as a dict of userId: userName
 async function findUsersWorkSpace(app, token) {
     // find users in server
     var userMembers = await app.client.users.list({
@@ -157,7 +161,7 @@ async function findUsersWorkSpace(app, token) {
     return usersDict;
 }
 
-
+// Find the users within a channel and return it as a dict of userId: userName
 async function findUsersChannel(app, token, channelId) {
     var users = await app.client.conversations.members({
         token: token,

@@ -190,20 +190,3 @@ app.action('warmup_quote_select', async ({ ack, body, context }) => {
  });
  
 
-
-// Listen to channel dropdown select menu for new pairing channel
-app.action('pairing_channel_selected', async({payload, ack, say}) => {
-    ack();
-    console.log("Select");
-    console.log(payload);
-    // block action payload type
-    var team_info = await app.client.team.info({
-        token: token
-    }).catch((error) => {
-        console.log(error);
-    });
-    console.log(team_info);
-    var team_id = team_info.team.id;
-    onBoard.onBoardExisting(app, bot_token, team_id, payload.selected_channel);
-});
-
