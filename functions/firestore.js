@@ -135,7 +135,6 @@ function deleteQueryBatch(query, resolve, reject) {
 exports.getPairingChannel = async function getPairingChannel(workspaceID) {
     const snapshot = await db.collection('workspaces').doc(workspaceID).collection('activeChannels').get();
     let allChannels = await snapshot.docs.map(doc => doc.id);
-    console.log(allChannels)
     return allChannels[0];
 }
 

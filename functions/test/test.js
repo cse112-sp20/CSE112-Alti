@@ -55,7 +55,7 @@ describe('Pairup', function() {
         token: token
       })
       workspaceId = workspaceInfo.team.id;
-      console.log(workspaceId);
+      console.log(workspaceInfo);
     });
 
     it('Test Pairup with alti-pairing channel', async function() {
@@ -63,10 +63,10 @@ describe('Pairup', function() {
       try {
         // this will take long time. Testing with get ParingChannel first
         // await pairUp.pairUp("alti-pairing");
-        var channelId = await firestoreFuncs.getPairingChannel("T0137P851BJ");
-        console.log(channelId);
-        // var pairs = await firestoreFuncs.getPairedUsers(workspaceId);
-        // console.log(pairs);
+        //var channelId = await firestoreFuncs.getPairingChannel("T0137P851BJ");
+        //console.log(channelId);
+        var pairs = await firestoreFuncs.getPairedUsers(workspaceId);
+        console.log(pairs);
 
         // //console.log(slackResponse.channels[0]);
         // var members = await app.client.conversations.members({
