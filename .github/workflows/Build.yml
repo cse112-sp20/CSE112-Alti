@@ -23,4 +23,6 @@ jobs:
     - name: Run Tests
       working-directory: ./functions
       run: npm test
+	  env:
+        GOOGLE_APPLICATION_CREDENTIALS: ./serviceAccountKey.json
     
