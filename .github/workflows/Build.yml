@@ -12,6 +12,7 @@ jobs:
     name: Update runtimeconfig.json
     runs-on: ubuntu-latest
 
+    steps:
     - name: Modify .runtimeconfig.json
       working-directory: ./functions
       run: cp -f ./test/.runtimeconfig.json ./runtimeconfig.json
