@@ -57,10 +57,10 @@ describe('Pairup', function() {
         token: token
       })
       workspaceId = workspaceInfo.team.id;
-      await firestoreFuncs.getPairingChannel(workspaceId).then( channel => {
-        if(channel == undefined)
-          firestoreFuncs.storeNewPairingChannel(workspaceId, testChannelId);
-      });
+      // await firestoreFuncs.getPairingChannel(workspaceId).then( channel => {
+      //   if(channel == undefined)
+      //     firestoreFuncs.storeNewPairingChannel(workspaceId, testChannelId);
+      // });
       
     });
 
@@ -96,7 +96,7 @@ describe('Pairup', function() {
     });
     
     it('Test with channel general', async function() {
-      await pairUp.getChannelIdByName(app, token, "general");
+      var channelId = await pairUp.getChannelIdByName(app, token, "general");
       assert.equal(channelId, "C012WGXPYC9"); //hardcoded it with console.log
     });
 
