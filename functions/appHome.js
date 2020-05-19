@@ -12,13 +12,13 @@ app.event("app_home_opened", async ({ body, context }) => {
   appHome(app, body);
 });
 
-app.action("selectTimeZone", async({payload, ack, context}) => {
+app.action("selectTimeZone", async({body, ack, context}) => {
   ack();
-  setTimeZone(app, payload, context);
+  setTimeZone(app, body, context);
 });
-app.action("selectOwner", async({payload, ack, context}) => {
+app.action("selectOwner", async({body, ack, context}) => {
   ack();
-  setOwner(app, payload, context);
+  setOwner(app, body, context);
 });
 
 async function updateAppHome(userId, team_id) {
@@ -603,23 +603,13 @@ async function loadHomeTabUI(app, workspaceID, userId) {
 	return view;
 }
 
-async function setTimeZone(app, payload, context){
-	var team_info = await app.client.team.info({
-        token: context.botToken
-    }).catch((error) => {
-        console.log(error);
-	});
-	var teamID = team_info.team.id;
-	firestoreFuncs.setTimeZone(teamID, payload.selected_option.value);
+async function setTimeZone(app, body, context){
+  firestoreFuncs.setTimeZone(body.team.id, body.actions[0].selected_option.value);
+  updateAppHome(body.user.id, body.team.id);
 }
-async function setOwner(app, payload, context){
-	var team_info = await app.client.team.info({
-        token: context.botToken
-    }).catch((error) => {
-        console.log(error);
-	});
-	var teamID = team_info.team.id;
-	firestoreFuncs.setOwner(teamID, payload.selected_user);
+async function setOwner(app, body, context){
+  firestoreFuncs.setOwner(body.team.id, body.actions[0].selected_option.value);
+  updateAppHome(body.user.id, body.team.id);
 }
 exports.setTimeZone = setTimeZone;
 exports.setOwner = setOwner;

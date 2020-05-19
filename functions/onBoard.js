@@ -14,7 +14,7 @@ app.command('/setup', async ({payload, body, ack, say }) => {
     ack();
     say("Trying to set up");
     createOnBoardingChannel(app, token, payload.team_id, "alti-pairing");
-    //appHome.updateAppHome(body.user.id, body.team.id);
+    appHome.updateAppHome(body.user.id, body.team.id);
 });
 
 
@@ -29,7 +29,7 @@ app.action('pairing_channel_selected', async({body, ack, say}) => {
     });
     var team_id = body.team.id;
     boardExistingChannel(app, token, team_id, body.actions[0].selected_channel);
-    //appHome.updateAppHome(body.user.id, body.team.id);
+    appHome.updateAppHome(body.user.id, body.team.id);
 });
 
 
@@ -124,9 +124,10 @@ async function boardExistingChannel(app, token, team_id, channelId) {
             channel: channelId,
             text: `Hey I've just been added to this channel! Everyone here will participate in quick 
                     and fun warm up and cool down activities :)
-                    (To opt out, just leave the channel.)`
+                    `
             
         });
+        // TODO (To opt out, just leave the channel.)
         firestoreFuncs.storeNewPairingChannel(team_id, channelId);
         for (userId of userList) {
             for (day of days) {
