@@ -9,7 +9,7 @@ var days = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"];
 // Listen to the app_home_opened Events API event to hear when a user opens your app from the sidebar
 app.event("app_home_opened", async ({ body, context }) => {
   console.log("It's running");
-  appHome(app, body, context);
+  appHome(app, body);
 });
 
 app.action("selectTimeZone", async({payload, ack, context}) => {
@@ -21,14 +21,22 @@ app.action("selectOwner", async({payload, ack, context}) => {
   setOwner(app, payload, context);
 });
 
+async function updateAppHome(userId, team_id) {
+  var payload = {};
+  payload.event = {};
+  payload.event.user = userId;
+  payload.team_id = team_id;
+  appHome(app, payload);
+}
+
 // appHome return the json object creating the application's home page
 exports.appHome = appHome;
-async function appHome(app, payload, context) {
+async function appHome(app, payload) {
   console.log("appHome triggered");
   try {
 		const userId = payload.event.user;
 		const workspaceID = payload.team_id;
-		var view = await loadHomeTabUI(app, workspaceID, userId, context);
+		var view = await loadHomeTabUI(app, workspaceID, userId);
     // Call the views.publish method using the built-in WebClient
     const result = await app.client.views.publish({
       // The token you used to initialize your app is stored in the `context` object
@@ -77,7 +85,6 @@ function getAllTimes(workspaceId, userId) {
 // returns a dictionary of section blocks containing mon-fri schedule
 async function createScheduleDisplay(workspaceId, userId) {
   var res = await getAllTimes(workspaceId, userId);  
-  console.log(res);
   var sched = {};
   var index = 0;
   for (day of days) {
@@ -96,7 +103,7 @@ async function createScheduleDisplay(workspaceId, userId) {
 
 /* Checks if user is owner or not and loads up either owner home tab or non-owner home tab
 */
-async function loadHomeTabUI(app, workspaceID, userId, context) {
+async function loadHomeTabUI(app, workspaceID, userId) {
 	var view;
 
 	var ownerId = await firestoreFuncs.getOwner(workspaceID).then((obj)=>{
@@ -120,7 +127,7 @@ async function loadHomeTabUI(app, workspaceID, userId, context) {
   var channelName;
   if (typeof(channelId) !== "undefined") {
     channelName = await app.client.channels.info({
-      token: context.botToken,
+      token: token,
       channel: channelId
     }).then((obj)=>{
       return obj.channel.name;
@@ -133,7 +140,7 @@ async function loadHomeTabUI(app, workspaceID, userId, context) {
   }
 
   var sched = await createScheduleDisplay(workspaceID, userId);
-  console.log(sched);
+  //console.log(sched);
 
 	if(await checkOwner(workspaceID, userId)){
 		view = {
@@ -616,4 +623,4 @@ async function setOwner(app, payload, context){
 }
 exports.setTimeZone = setTimeZone;
 exports.setOwner = setOwner;
-
+exports.updateAppHome = updateAppHome;

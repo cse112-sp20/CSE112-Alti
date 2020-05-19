@@ -1,6 +1,7 @@
 /* This file handles the /setup command as well as designation of the active pairing channel
 */
 
+const appHome = require('./appHome');
 const firestoreFuncs = require('./firestore');
 const index = require('./index');
 const {app, token} = index.getBolt();
@@ -13,7 +14,7 @@ app.command('/setup', async ({payload, body, ack, say }) => {
     ack();
     say("Trying to set up");
     createOnBoardingChannel(app, token, payload.team_id, "alti-pairing");
-  
+    //appHome.updateAppHome(body.user.id, body.team.id);
 });
 
 
@@ -28,6 +29,7 @@ app.action('pairing_channel_selected', async({body, ack, say}) => {
     });
     var team_id = body.team.id;
     boardExistingChannel(app, token, team_id, body.actions[0].selected_channel);
+    //appHome.updateAppHome(body.user.id, body.team.id);
 });
 
 

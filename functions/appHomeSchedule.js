@@ -1,6 +1,7 @@
 const index = require('./index');
 const {app, token} = index.getBolt();
 
+const appHome = require('./appHome');
 const appHomeObjects = require('./appHomeObjects');
 const firestoreFuncs = require('./firestore');
 
@@ -58,6 +59,7 @@ app.action('warmup_time2_selected', async({payload, ack}) => {
 });
 app.action('warmup_time_set_button', async({ack, body, context}) => {
     ack();
+    console.log(body);
     if (warmupTime1 !== null && warmupTime2 !== null) {
         var t = warmupTime1 + " " + warmupTime2;
         console.log(t);
@@ -65,6 +67,7 @@ app.action('warmup_time_set_button', async({ack, body, context}) => {
             firestoreFuncs.setWarmupTime(body.team.id, body.user.id, t, i);
         }
     }
+    appHome.updateAppHome(body.user.id, body.team.id);
 
 });
 
@@ -90,7 +93,7 @@ app.action('cooldown_time_set_button', async({ack, body, context}) => {
             firestoreFuncs.setCooldownTime(body.team.id, body.user.id, t, i);
         }
     }
-
+    appHome.updateAppHome(body.user.id, body.team.id);
 });
 
 // Extra listener for app home event to reset time variables
@@ -163,6 +166,7 @@ app.action('monday_set_button', async({body, ack}) => {
         var t2 = cooldownTimes.monTime + " " + cooldownTimes.monAMPM;
         firestoreFuncs.setWarmupTime(body.team.id, body.user.id, t1, "Monday");
         firestoreFuncs.setCooldownTime(body.team.id, body.user.id, t2, "Monday");
+        appHome.updateAppHome(body.user.id, body.team.id);
     }
     else {
         console.log("Nope");
@@ -203,6 +207,7 @@ app.action('tuesday_set_button', async({body, ack}) => {
         var t2 = cooldownTimes.tuesTime + " " + cooldownTimes.tuesAMPM;
         firestoreFuncs.setWarmupTime(body.team.id, body.user.id, t1, "Tuesday");
         firestoreFuncs.setCooldownTime(body.team.id, body.user.id, t2, "Tuesday");
+        appHome.updateAppHome(body.user.id, body.team.id);
     }
     else {
         console.log("Nope");
@@ -242,6 +247,7 @@ app.action('wednesday_set_button', async({body, ack}) => {
         var t2 = cooldownTimes.wedTime + " " + cooldownTimes.wedAMPM;
         firestoreFuncs.setWarmupTime(body.team.id, body.user.id, t1, "Wednesday");
         firestoreFuncs.setCooldownTime(body.team.id, body.user.id, t2, "Wednesday");
+        appHome.updateAppHome(body.user.id, body.team.id);
     }
     else {
         console.log("Nope");
@@ -281,6 +287,7 @@ app.action('thursday_set_button', async({body, ack}) => {
         var t2 = cooldownTimes.thursTime + " " + cooldownTimes.thursAMPM;
         firestoreFuncs.setWarmupTime(body.team.id, body.user.id, t1, "Thursday");
         firestoreFuncs.setCooldownTime(body.team.id, body.user.id, t2, "Thursday");
+        appHome.updateAppHome(body.user.id, body.team.id);
     }
     else {
         console.log("Nope");
@@ -320,6 +327,7 @@ app.action('friday_set_button', async({body, ack}) => {
         var t2 = cooldownTimes.friTime + " " + cooldownTimes.friAMPM;
         firestoreFuncs.setWarmupTime(body.team.id, body.user.id, t1, "Friday");
         firestoreFuncs.setCooldownTime(body.team.id, body.user.id, t2, "Friday");
+        appHome.updateAppHome(body.user.id, body.team.id);
     }
     else {
         console.log("Nope");
