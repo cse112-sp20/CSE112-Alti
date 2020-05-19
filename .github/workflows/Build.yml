@@ -19,9 +19,11 @@ jobs:
     - name: Install Dependencys 
       working-directory: ./functions
       run: npm install
-    - name: Modify .runtimeconfig.json
+    - name: add .runtimeconfig.json
       working-directory: ./functions
-      run: cp -f ./test/.runtimeconfig.json ./.runtimeconfig.json
+      env:
+        RUNTIME_CONFIG: ${{ secrets.RUNTIME_CONFIG }}
+      run: echo $RUNTIME_CONFIG > ./.runtimeconfig.json
     - name: Add serviceAccountKey
       working-directory: ./functions
       env:
