@@ -6,14 +6,12 @@ on:
     - '*/*'
     - '!master'
 jobs:
-  main:
+  
+  RuntimeUpdate:
 
-    name: Build non-master branches
+    name: Update runtimeconfig.json
     runs-on: ubuntu-latest
 
-    steps:
-    - name: Check out code
-      uses: actions/checkout@master
     - name: Modify .runtimeconfig.json
       working-directory: ./functions
       run: cp -f ./test/.runtimeconfig.json ./runtimeconfig.json
@@ -23,6 +21,26 @@ jobs:
     - name: Cat ./runtimeconfig.json
       working-directory: ./functions
       run: cat ./runtimeconfig.json
+    - name: Git add/commit
+      working-directory: ./functions
+      uses: EndBug/add-and-commit@v4
+      with:
+        add: '.'
+      env: 
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+
+
+    
+  
+  main:
+
+    name: Build non-master branches
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Check out code
+      uses: actions/checkout@master
     - name: Install Dependencys 
       working-directory: ./functions
       run: npm install
