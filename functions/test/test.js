@@ -69,6 +69,7 @@ describe('Pairup', function() {
       await pairUp.pairUp("testing", undefined, token);
       var pairs = await firestoreFuncs.getPairedUsers(workspaceId);
 
+      /* eslint-disable no-await-in-loop */
       for(var i = 0; i < pairs.length; i++)
       {
         var pair = pairs[i];
@@ -82,6 +83,7 @@ describe('Pairup', function() {
         (((m.members).should).have).lengthOf(3);
         expect(m.members).to.include.members(pair["users"]);
       }
+      /* eslint-enable no-await-in-loop */
     });  
   });
 });
