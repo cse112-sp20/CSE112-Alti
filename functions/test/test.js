@@ -60,22 +60,24 @@ describe('Pairup', function() {
 
     it('Test Pairup with alti-pairing channel', async function(done) {
       this.timeout(180000)
-      //await pairUp.pairUp("alti-pairing");
-      let channelId = await firestoreFuncs.getPairingChannel(workspaceId);
-      //var pairs = await firestoreFuncs.getPairedUsers(workspaceId, channelId);
-      console.log(channelId);
-      var slackResponse = await app.client.conversations.list({
-        token: token,
-        types: "mpim"
-      })
+      try {
+        
+        // this will take long time. Testing with get ParingChannel first
+        //await pairUp.pairUp("alti-pairing");
+        var channelId = await firestoreFuncs.getPairingChannel(workspaceId);
+        console.log(channelId);
+        var pairs = await firestoreFuncs.getPairedUsers(workspaceId);
+        console.log(pairs);
 
-      //console.log(slackResponse.channels[0]);
-      var members = await app.client.conversations.members({
-        token:token, 
-        channel: slackResponse.channels[0].id
-      });
-      //done();
-      //console.log(members);
+        //console.log(slackResponse.channels[0]);
+        var members = await app.client.conversations.members({
+          token:token, 
+          channel: slackResponse.channels[0].id
+        });
+
+      } catch(error) {
+        console.log(error);
+      }
     });  
   });
   
