@@ -28,8 +28,9 @@ let db = admin.firestore();
         dmThreadID - a singular DM thread id of a new pairing
         pairedUsers - the user IDs of the newly paired teammates: format [u1, u2]
 */
-exports.storeNewPairing = function storeNewPairing(workspace, dmThreadID, pairedUsers) {
-    let channelID = this.getPairingChannel(workspace);
+exports.storeNewPairing = async function storeNewPairing(workspace, dmThreadID, pairedUsers) {
+    let channelID = await this.getPairingChannel(workspace);
+
     let usersRef = db.collection('workspaces').doc(workspace)
                            .collection('activeChannels').doc(channelID)
                            .collection('pairedUsers');

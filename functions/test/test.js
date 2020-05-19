@@ -35,7 +35,7 @@ describe('Scheduler', function() {
     //console.log(response);
     assert.equal(response.ok, false);
   });
-  
+
 });
 
 describe('Pairup', function() {
@@ -49,6 +49,7 @@ describe('Pairup', function() {
     let firestoreFuncs;
     let workspaceInfo;
     let workspaceId;
+    let testChannelId = "C012B6BTVDL" // got that from the console.
 
     before(async function () {
       firestoreFuncs = require('../firestore');
@@ -56,16 +57,17 @@ describe('Pairup', function() {
         token: token
       })
       workspaceId = workspaceInfo.team.id;
-      console.log(workspaceInfo);
+      await firestoreFuncs.getPairingChannel(workspaceId).then( channel => {
+        if(channel == undefined)
+          firestoreFuncs.storeNewPairingChannel(workspaceId, testChannelId);
+      });
+      
     });
 
-    it('Test Pairup with alti-pairing channel', async function() {
-      //his.timeout(60000) // 3 min
+    it('Test Pairup with testing channel', async function() {
+     this.timeout(180000) // 1 min
       try {
-        // this will take long time. Testing with get ParingChannel first
-        // await pairUp.pairUp("alti-pairing");
-        //var channelId = await firestoreFuncs.getPairingChannel("T0137P851BJ");
-        //console.log(channelId);
+        const response = await pairUp.pairUp("testing");
         var pairs = await firestoreFuncs.getPairedUsers(workspaceId);
         console.log(pairs);
 
@@ -76,6 +78,7 @@ describe('Pairup', function() {
         // });
 
       } catch(error) {
+        console.log("----------- ERROR ------------")
         console.log(error);
       }
     });  
@@ -93,7 +96,7 @@ describe('Pairup', function() {
     });
     
     it('Test with channel general', async function() {
-      var channelId = await pairUp.getChannelIdByName(app, token, "general");
+      await pairUp.getChannelIdByName(app, token, "general");
       assert.equal(channelId, "C012WGXPYC9"); //hardcoded it with console.log
     });
 
