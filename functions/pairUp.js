@@ -85,7 +85,27 @@ async function handlePairingResponse(response, app, token, workspaceInfo, pairin
         channel: response.channel.id,
         text: "You ppl just got paired!"
     });
-    return firestoreFuncs.storeNewPairings(workspaceInfo.team.id, pairingChannelIdVal, response.channel.id);
+
+    let users = await app.client.conversations.members({
+        token: token,
+        channel: response.channel.id
+    });
+
+    let pairedUsers = [];
+    /* eslint-disable no-await-in-loop */
+    for (var i = 0; i < users.members.length; i++) {
+        let profile = await app.client.users.profile.get({
+            token: token,
+            user: users.members[i]
+        });
+        if (!profile.profile.bot_id) {
+            console.log('bot id: ', profile.bot_id);
+            pairedUsers.push(users.members[i]);
+        }
+    }
+    /* eslint-enable no-await-in-loop */
+
+    return firestoreFuncs.storeNewPairing(workspaceInfo.team.id, pairingChannelIdVal, response.channel.id, pairedUsers);
 }
 
 
