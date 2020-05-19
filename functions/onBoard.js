@@ -11,7 +11,6 @@ const {app, token} = index.getBolt();
 app.command('/setup', async ({payload, body, ack, say }) => {
     ack();
     say("Trying to set up");
-    console.log(payload);
     createOnBoardingChannel(app, token, payload.team_id, "alti-pairing");
   
 });
@@ -21,7 +20,6 @@ app.command('/setup', async ({payload, body, ack, say }) => {
 app.action('pairing_channel_selected', async({body, ack, say}) => {
     ack();
     console.log("Select");
-    console.log(body);
     // block action payload type
     var team_info = await app.client.team.info({
         token: token
