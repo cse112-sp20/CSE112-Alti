@@ -18,23 +18,22 @@ else{
 let db = admin.firestore();
 
 /* 
-    Stores the new pairings (DM thread ids?) in the corresponding place (with the corresponding
+    Stores the new pairings (DM thread ids + partnerIDs) in the corresponding place (with the corresponding
     workspace and channel) in cloud firestore.
 
     ASSUMPTION: pairedUsers length is always 2
 
     Inputs:
         workspace - workspace id where the new pairings were made
-        channel - channel name/id that the pairings were made based off of
         dmThreadID - a singular DM thread id of a new pairing
-        pairedUsers - the user IDs of the newly paired teammates
+        pairedUsers - the user IDs of the newly paired teammates: format [u1, u2]
 */
-exports.storeNewPairing = function storeNewPairings(workspace, channel, dmThreadID, pairedUsers) {
+exports.storeNewPairing = function storeNewPairing(workspace, dmThreadID, pairedUsers) {
+    let channelID = this.getPairingChannel(workspace);
     let usersRef = db.collection('workspaces').doc(workspace)
-                           .collection('activeChannels').doc(channel)
+                           .collection('activeChannels').doc(channelID)
                            .collection('pairedUsers');
     
-    console.log("HERE@");
     usersRef.doc(pairedUsers[0]).set({
         dmThreadID: dmThreadID,
         partnerID: pairedUsers[1],
@@ -63,6 +62,14 @@ exports.writeMsgToDB = function writeMsgToDB(teamId, userID, channelID,msgToSend
         channelID - channel id of the new channel designated as the pairing channel
 */
 exports.storeNewPairingChannel = function storeNewPairingChannel(workspaceID, newChannel) {
+    let currChannel = this.getPairingChannel(workspaceID);
+    if (currChannel === newChannel) {
+        return;
+    }
+
+    // To avoid the "ghost document" problem on the workspace
+    db.collection('workspaces').doc(workspaceID).set({}, {merge: true});
+
     deleteCollection('workspaces/'+ workspaceID + '/activeChannels', 100);
     db.collection("workspaces").doc(workspaceID).collection('activeChannels').doc(newChannel).set({}, {merge: true});
 }
@@ -92,7 +99,6 @@ function deleteQueryBatch(query, resolve, reject) {
     query.get()
       .then((snapshot) => {
         // When there are no documents left, we are done
-        console.log("SNAPSHOT: ", snapshot);
         if (snapshot.size === 0) {
             return 0;
         }
@@ -133,6 +139,8 @@ function deleteQueryBatch(query, resolve, reject) {
         workspaceID: workspace id you're trying to get the pairing channel for.
 */
 exports.getPairingChannel = async function getPairingChannel(workspaceID) {
+    // Avoid "ghost document" problem on workspace document
+    db.collection('workspaces').doc(workspaceID).set({}, {merge: true});
     const snapshot = await db.collection('workspaces').doc(workspaceID).collection('activeChannels').get();
     let allChannels = await snapshot.docs.map(doc => doc.id);
     return allChannels[0];

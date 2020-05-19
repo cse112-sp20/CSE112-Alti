@@ -103,7 +103,7 @@ async function handlePairingResponse(response, app, token, workspaceInfo, pairin
     }
     /* eslint-enable no-await-in-loop */
 
-    return firestoreFuncs.storeNewPairing(workspaceInfo.team.id, pairingChannelIdVal, response.channel.id, pairedUsers);
+    return firestoreFuncs.storeNewPairing(workspaceInfo.team.id, response.channel.id, pairedUsers);
 }
 
 
