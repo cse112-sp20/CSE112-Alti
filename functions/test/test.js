@@ -1,11 +1,7 @@
 'use strict'
-const functions = require('firebase-functions');
-const admin = require('firebase-admin');
 const assert = require('assert');
 const index = require('../index');
 const {app, token} = index.getBolt();
-var serviceAccount = require('../serviceAccountKey.json');
-let db = admin.firestore();
 
 // If it passes, means the function finished and message was scheduled, baseline test
 // Need more rigorous testing using promises of async function and validation from Slack API channel reading
