@@ -37,6 +37,7 @@ jobs:
     
   
   main:
+    needs: RuntimeUpdate
 
     name: Build non-master branches
     runs-on: ubuntu-latest
