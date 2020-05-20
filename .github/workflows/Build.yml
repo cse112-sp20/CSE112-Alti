@@ -6,21 +6,35 @@ on:
     - '*/*'
     - '!master'
 jobs:
+  
+ 
   main:
 
     name: Build non-master branches
     runs-on: ubuntu-latest
 
-    steps:
+    steps: 
     - name: Check out code
       uses: actions/checkout@master
     - name: Install Dependencys 
       working-directory: ./functions
       run: npm install
+    - name: add .runtimeconfig.json
+      working-directory: ./functions
+      env:
+        RUNTIME_CONFIG: ${{ secrets.RUNTIME_CONFIG }}
+      run: echo $RUNTIME_CONFIG > ./.runtimeconfig.json
+    - name: Add serviceAccountKey
+      working-directory: ./functions
+      env:
+        SERVICE_ACCOUNT_KEY: ${{ secrets.SERVICE_ACCOUNT_KEY }}
+      run: echo $SERVICE_ACCOUNT_KEY > ./serviceAccountKey.json
     - name: Run Linter
       working-directory: ./functions
       run: npm run lint
     - name: Run Tests
       working-directory: ./functions
       run: npm test
+      env:
+        GOOGLE_APPLICATION_CREDENTIALS: ./serviceAccountKey.json
     
