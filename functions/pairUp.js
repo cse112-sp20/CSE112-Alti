@@ -23,8 +23,8 @@ exports.pairUp = async function pairUp(channelName, context=undefined, botToken=
         const allUsers = app.client.users.list({
             token: token
         });
-
-        const channelId = util.getChannelIdByName(app, token, channelName)
+        
+        const channelId = this.getChannelIdByName(app, token, channelName);
         var pairingChannelIdVal;
         // const workspaceInfo = await workspaceInfoPromise.then(result => result.data);
 
@@ -109,7 +109,7 @@ async function handlePairingResponse(response, app, token, workspaceInfo, pairin
             user: users.members[i]
         });
         if (!profile.profile.bot_id) {
-            // console.log('bot id: ', profile.bot_id);
+            //console.log('bot id: ', profile.bot_id);
             pairedUsers.push(users.members[i]);
         }
     }
@@ -140,8 +140,8 @@ exports.getChannelIdByName = async function getChannelIdByName(app, token, chann
             console.error("Multiple channels found");
             return undefined;
         }
-        return undefined;
-    })   
+        return undefined
+    })
 };
 app.command('/pairup', ({ command, ack, say, context }) => {
     // Acknowledge command request
