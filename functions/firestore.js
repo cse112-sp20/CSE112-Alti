@@ -61,8 +61,8 @@ exports.writeMsgToDB = function writeMsgToDB(teamId, userID, channelID,msgToSend
         workspaceID - workspace id
         channelID - channel id of the new channel designated as the pairing channel
 */
-exports.storeNewPairingChannel = function storeNewPairingChannel(workspaceID, newChannel) {
-    let currChannel = this.getPairingChannel(workspaceID);
+exports.storeNewPairingChannel = async function storeNewPairingChannel(workspaceID, newChannel) {
+    let currChannel = await this.getPairingChannel(workspaceID);
     if (currChannel === newChannel) {
         return;
     }

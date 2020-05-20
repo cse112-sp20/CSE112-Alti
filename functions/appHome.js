@@ -21,6 +21,8 @@ app.action("selectOwner", async({body, ack, context}) => {
   setOwner(app, body, context);
 });
 
+// Update the app home 
+// TODO make this a proper func and not a hack, maybe refactor appHome parameters
 async function updateAppHome(userId, team_id) {
   var payload = {};
   payload.event = {};
@@ -54,6 +56,9 @@ async function appHome(app, payload) {
 */
 async function checkOwner(workspaceID, userId) {
 	//console.log(workspaceID);
+	if (userId === undefined) {
+		return true;
+	}
 	var ownerID = await firestoreFuncs.getOwner(workspaceID).then((obj)=>{
 		return obj;
 	}).catch((error) => {
@@ -111,6 +116,8 @@ async function loadHomeTabUI(app, workspaceID, userId) {
 	}).catch((error) => {
         console.log(error);
 	});
+	console.log("Owner id: " + ownerId);
+	
 
 	var channelId = await firestoreFuncs.getPairingChannel(workspaceID).then((obj)=>{
 		return obj;
@@ -123,6 +130,7 @@ async function loadHomeTabUI(app, workspaceID, userId) {
 	}).catch((error) => {
         console.log(error);
 	});
+	// TODO store default LA timezome in on board file
 
   var channelName;
   if (typeof(channelId) !== "undefined") {
@@ -608,7 +616,7 @@ async function setTimeZone(app, body, context){
   updateAppHome(body.user.id, body.team.id);
 }
 async function setOwner(app, body, context){
-  firestoreFuncs.setOwner(body.team.id, body.actions[0].selected_option.value);
+  firestoreFuncs.setOwner(body.team.id, body.actions[0].selected_user);
   updateAppHome(body.user.id, body.team.id);
 }
 exports.setTimeZone = setTimeZone;
