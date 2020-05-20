@@ -19,8 +19,13 @@
     "@slack/bolt": "^2.0.1",
     "firebase-admin": "^8.12.1",
     "firebase-functions": "^3.6.1",
+<<<<<<< HEAD
     "shuffle-array": "^1.0.1",
     "request": "^2.88.2"
+=======
+    "request": "^2.88.2",
+    "shuffle-array": "^1.0.1"
+>>>>>>> cd358cfd461b7cb40dd038f7f80492b0cfc4a63c
   },
   "devDependencies": {
     "body-parser": "^1.15.2",
@@ -48,4 +53,3 @@
   },
   "private": true
 }
-

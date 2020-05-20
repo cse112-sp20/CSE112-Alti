@@ -4,8 +4,14 @@ const should = require('chai').should();
 const expect = require('chai').expect;
 const index = require('../index');
 const {app, token} = index.getBolt();
+<<<<<<< HEAD
 var generateTaskData = require('../generateTaskData');
 
+=======
+
+var schedule = require('../schedule');
+var generateTaskData = require('../generateTaskData');
+>>>>>>> cd358cfd461b7cb40dd038f7f80492b0cfc4a63c
 // If it passes, means the function finished and message was scheduled, baseline test
 // Need more rigorous testing using promises of async function and validation from Slack API channel reading
 describe('Scheduler', function() {
@@ -85,6 +91,11 @@ describe('Pairup', function() {
       }
       /* eslint-enable no-await-in-loop */
     });  
+<<<<<<< HEAD
+=======
+
+
+>>>>>>> cd358cfd461b7cb40dd038f7f80492b0cfc4a63c
   });
 });
 
