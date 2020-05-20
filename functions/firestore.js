@@ -72,7 +72,7 @@ exports.storeNewPairingChannel = function storeNewPairingChannel(workspaceID, ne
     deleteCollection('workspaces/'+ workspaceID + '/activeChannels', 100);
     db.collection("workspaces").doc(workspaceID).collection('activeChannels').doc(newChannel).set({}, {merge: true});
 }
-
+ 
 /*
     Description:
         Recursively deletes a specified collection from the db.
