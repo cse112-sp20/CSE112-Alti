@@ -1,10 +1,21 @@
 const shuffle = require('shuffle-array');
 const firestoreFuncs = require('./firestore');
 const index = require('./index');
-const {app, token} = index.getBolt();
+const { app } = index.getBolt();
+const util = require('./util');
 // Triggers the pairing up of all people in a given channel.
-exports.pairUp = async function pairUp(channelName){
+exports.pairUp = async function pairUp(channelName, context=undefined, botToken=undefined){
+    
+    if(context === undefined && botToken === undefined){
+        throw new Exception("Both the context and bot token is undefined. Cannot pair up.")
+    }
     try{
+        if(context !== undefined){
+            token = context.botToken;
+        }
+        else{
+            token = botToken;
+        }
         // TODO: Take this out of this function and pass it in as a parameter ideally
         const workspaceInfo = await app.client.team.info({
             token: token
@@ -12,8 +23,8 @@ exports.pairUp = async function pairUp(channelName){
         const allUsers = app.client.users.list({
             token: token
         });
-        
-        const channelId = this.getChannelIdByName(app, token, channelName);
+
+        const channelId = util.getChannelIdByName(app, token, channelName)
         var pairingChannelIdVal;
         // const workspaceInfo = await workspaceInfoPromise.then(result => result.data);
 
@@ -98,7 +109,7 @@ async function handlePairingResponse(response, app, token, workspaceInfo, pairin
             user: users.members[i]
         });
         if (!profile.profile.bot_id) {
-            //console.log('bot id: ', profile.bot_id);
+            // console.log('bot id: ', profile.bot_id);
             pairedUsers.push(users.members[i]);
         }
     }
@@ -130,7 +141,5 @@ exports.getChannelIdByName = async function getChannelIdByName(app, token, chann
             return undefined;
         }
 
-        return filteredChannels[0].id;
-    });
-    return channelId;
-}
+    })
+};
