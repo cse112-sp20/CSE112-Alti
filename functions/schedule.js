@@ -1,7 +1,7 @@
 //working
 const index = require('./index')
 const functions = require('firebase-functions');
-const {app, token} = index.getBolt();
+const app = index.getBolt();
 
   /*
     Description:
@@ -15,7 +15,7 @@ const {app, token} = index.getBolt();
     Return:
         the response coming back from slack. 
   */
-  exports.scheduleMsg = async function scheduleMsg(hour, minute, text, id) {
+  exports.scheduleMsg = async function scheduleMsg(hour, minute, text, id, token) {
     // set up the time
     reminder = new Date();
     reminder.setHours(hour);

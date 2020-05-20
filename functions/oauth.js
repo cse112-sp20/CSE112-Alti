@@ -1,6 +1,9 @@
 const functions = require('firebase-functions');
 const request = require('request')
 const firestore = require('./firestore')
+const config = functions.config();
+const client_id = config.slack.client_id;
+const client_secret = config.slack.client_secret;
 
 //OAUTH API URL 
 let apiUrl = "https://slack.com/api";
@@ -17,8 +20,8 @@ exports.oAuthFunction = functions.https.onRequest(async (req, res) => {
     var options = {
       uri: 'https://slack.com/api/oauth.v2.access?code='
           +req.query.code+
-          '&client_id=1134945307380.1134945713316'+
-          '&client_secret=b86c7910e8e7425750eda25438c7356a',//+
+          '&client_id='+  client_id + 
+          '&client_secret=' + client_secret,//+
           //'&redirect_uri='+REDIRECT_URI,
       method: 'GET'
     }
