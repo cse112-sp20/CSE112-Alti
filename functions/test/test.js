@@ -68,7 +68,7 @@ describe('Pairup', function() {
 
       await pairUp.pairUp("testing", undefined, token);
       var pairs = await firestoreFuncs.getPairedUsers(workspaceId);
-
+      //console.log(pairs);
       /* eslint-disable no-await-in-loop */
       for(var i = 0; i < pairs.length; i++)
       {
