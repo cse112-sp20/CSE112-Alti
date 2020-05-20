@@ -9,7 +9,7 @@ describe('Scheduler', function() {
 
   it('schedule for 1 min after', async function() {
     let now = new Date();
-    now.setTime(now.getTime() + 60000);
+    now.setTime(now.getTime() + 120000);
     let response = await schedule.scheduleMsg(now.getHours(), now.getMinutes(),
                                                     "A reminder", "#general");
     //console.log(response);
