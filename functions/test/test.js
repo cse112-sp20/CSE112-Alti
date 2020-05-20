@@ -17,7 +17,6 @@ describe('Scheduler', function() {
 
   it('schedule for 2 min after', async function() {
     let now = new Date();
-<<<<<<< HEAD
     now.setTime(now.getTime() + 120000); 
     var response = await schedule.scheduleMsg(now.getHours(), now.getMinutes(), 
                                                     "A reminder", "#testing");
@@ -27,11 +26,6 @@ describe('Scheduler', function() {
       scheduled_message_id: response.scheduled_message_id
     });
                                                     
-=======
-    now.setTime(now.getTime() + 120000);
-    let response = await schedule.scheduleMsg(now.getHours(), now.getMinutes(),
-                                                    "A reminder", "#general");
->>>>>>> ad41f3c583c64957c770c6423b0e850f72e59492
     //console.log(response);
     assert.equal(response.ok, true);
   });
@@ -44,12 +38,7 @@ describe('Scheduler', function() {
     //console.log(response);
     assert.equal(response.ok, false);
   });
-<<<<<<< HEAD
-
-});
-=======
 }); 
->>>>>>> ad41f3c583c64957c770c6423b0e850f72e59492
 
 describe('Pairup', function() {
   let pairUp;
