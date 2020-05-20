@@ -140,8 +140,8 @@ exports.getChannelIdByName = async function getChannelIdByName(app, token, chann
             console.error("Multiple channels found");
             return undefined;
         }
-    })
-    return undefined;
+        return undefined;
+    })   
 };
 app.command('/pairup', ({ command, ack, say, context }) => {
     // Acknowledge command request
