@@ -608,7 +608,7 @@ async function setTimeZone(app, body, context){
   updateAppHome(body.user.id, body.team.id);
 }
 async function setOwner(app, body, context){
-  firestoreFuncs.setOwner(body.team.id, body.actions[0].selected_option.value);
+  firestoreFuncs.setOwner(body.team.id, body.actions[0].selected_user);
   updateAppHome(body.user.id, body.team.id);
 }
 exports.setTimeZone = setTimeZone;
