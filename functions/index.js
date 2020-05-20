@@ -29,6 +29,7 @@ exports.getBolt = function getBolt(){
     }
 };
 
+const generateTaskData = require('./generateTaskData');
 const warmupMessage = require('./warmupMessage');
 const pubsubScheduler = require('./pubsubScheduler')
 const pairUp = require('./pairUp');
@@ -40,16 +41,6 @@ exports.scheduleWarmup = pubsubScheduler.scheduleWarmup;
 
 // Global error handler
 app.error(console.log);
-
-
-app.command('/pairup', async ({ command, ack, say }) => {
-    // Acknowledge command request
-
-    ack();
-    say(`Trying to pair up.`);
-    pairUp.pairUp("general");
-
-});
 
 // app.command('/warmup', async({command, ack, say}) => {
 //     ack();
