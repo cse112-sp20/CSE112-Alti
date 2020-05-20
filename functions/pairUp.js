@@ -141,6 +141,7 @@ exports.getChannelIdByName = async function getChannelIdByName(app, token, chann
             return undefined;
         }
     })
+    return undefined;
 };
 app.command('/pairup', ({ command, ack, say, context }) => {
     // Acknowledge command request
