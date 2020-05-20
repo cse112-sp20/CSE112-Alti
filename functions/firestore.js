@@ -421,3 +421,59 @@ exports.setTimeZone = function updateTimeZone(workspaceID, timeZone) {
         timezone: timeZone
     }, {merge: true})
 }
+
+/*
+    Description:
+        Sets the workspace token for distribution in the corresponding workspace document.
+    
+    Inputs:
+        workspaceID - workspace id 
+        token - the workspace botToken that you are associating with the workspace
+*/
+exports.setWorkspaceToken = function setWorkspaceToken(workspaceID, token) {
+    let workspaceDocRef = db.collection('workspaces').doc(workspaceID);
+
+    workspaceDocRef.set({
+        botToken: token
+    }, {merge: true});
+}
+
+/*
+    Description:
+        Gets the workspace token for distribution in the corresponding workspace document.
+    
+    Inputs:
+        workspaceID - workspace id 
+*/
+exports.getWorkspaceToken = function getWorkspaceToken(workspaceID) {
+    let workspaceDocRef = db.collection('workspaces').doc(workspaceID);
+
+    return workspaceDocRef.get()
+        .then(doc => {
+            if (!doc.exists) {
+                console.log('No such document!');
+                return undefined;
+            }
+            else {
+                return doc.data().botToken;
+            }
+        })
+        .catch(err => {
+            console.log('Error getting workspace document: ', err);
+            return undefined;
+        }); 
+}
+
+/*
+    Description:
+        Retrieves all workspace ids
+
+    Returns: 
+        list of workspace ids, for ex: ['T123452324', 'T62345234', 'T6762342342']
+*/
+exports.getAllWorkspaces = async function getAllWorkspaces() {
+    const snapshot = await db.collection('workspaces').get();
+    let allWorkspaces = await snapshot.docs.map(doc => doc.id);
+
+    return allWorkspaces;
+}
