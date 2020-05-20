@@ -15,6 +15,8 @@ const expressReceiver = new ExpressReceiver({
     endpoints: '/events',
 });
 
+
+
 const app = new App({
     receiver: expressReceiver,
     token: bot_token

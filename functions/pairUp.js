@@ -35,7 +35,7 @@ exports.pairUp = async function pairUp(channelName, context=undefined, botToken=
                     channel:id
             });
         });
-
+        
         const usersInfo = await Promise.all([allUsers, members]).then(data => {
             const allUsers = data[0];
             const members = data[1];
@@ -43,7 +43,7 @@ exports.pairUp = async function pairUp(channelName, context=undefined, botToken=
             const selectedUsers = allUsers.members.filter( user => membersList.includes(user.id));
             return Promise.resolve(selectedUsers);
         });
-        
+
         // Get all the necessary user ids
         const ids = await Promise.all(usersInfo).then( users => {
             // console.log(usersInfo)
@@ -78,11 +78,10 @@ exports.pairUp = async function pairUp(channelName, context=undefined, botToken=
         conversationInfos.map( conversationInfo => {
             return conversationInfo.then( response => handlePairingResponse(response, app, token, workspaceInfo, pairingChannelIdVal));
         });    
-
-
     }
     catch(error){
-        console.error(error);
+        console.log(error);
+        return error.data;
     }
 }
 

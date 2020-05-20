@@ -27,8 +27,9 @@ let db = admin.firestore();
         dmThreadID - a singular DM thread id of a new pairing
         pairedUsers - the user IDs of the newly paired teammates: format [u1, u2]
 */
-exports.storeNewPairing = function storeNewPairing(workspace, dmThreadID, pairedUsers) {
-    let channelID = this.getPairingChannel(workspace);
+exports.storeNewPairing = async function storeNewPairing(workspace, dmThreadID, pairedUsers) {
+    let channelID = await this.getPairingChannel(workspace);
+
     let usersRef = db.collection('workspaces').doc(workspace)
                            .collection('activeChannels').doc(channelID)
                            .collection('pairedUsers');
@@ -71,7 +72,7 @@ exports.storeNewPairingChannel = function storeNewPairingChannel(workspaceID, ne
     deleteCollection('workspaces/'+ workspaceID + '/activeChannels', 100);
     db.collection("workspaces").doc(workspaceID).collection('activeChannels').doc(newChannel).set({}, {merge: true});
 }
- 
+
 /*
     Description:
         Recursively deletes a specified collection from the db.
@@ -141,7 +142,6 @@ exports.getPairingChannel = async function getPairingChannel(workspaceID) {
     db.collection('workspaces').doc(workspaceID).set({}, {merge: true});
     const snapshot = await db.collection('workspaces').doc(workspaceID).collection('activeChannels').get();
     let allChannels = await snapshot.docs.map(doc => doc.id);
-
     return allChannels[0];
 }
 
