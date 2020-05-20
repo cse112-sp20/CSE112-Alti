@@ -19,8 +19,8 @@
     "@slack/bolt": "^2.0.1",
     "firebase-admin": "^8.12.1",
     "firebase-functions": "^3.6.1",
-    "request": "^2.88.2",
-    "shuffle-array": "^1.0.1"
+    "shuffle-array": "^1.0.1",
+    "request": "^2.88.2"
   },
   "devDependencies": {
     "body-parser": "^1.15.2",

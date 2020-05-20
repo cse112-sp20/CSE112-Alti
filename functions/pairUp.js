@@ -23,8 +23,8 @@ exports.pairUp = async function pairUp(channelName, context=undefined, botToken=
         const allUsers = app.client.users.list({
             token: token
         });
-        
-        const channelId = this.getChannelIdByName(app, token, channelName);
+
+        const channelId = util.getChannelIdByName(app, token, channelName)
         var pairingChannelIdVal;
         // const workspaceInfo = await workspaceInfoPromise.then(result => result.data);
 
@@ -109,7 +109,7 @@ async function handlePairingResponse(response, app, token, workspaceInfo, pairin
             user: users.members[i]
         });
         if (!profile.profile.bot_id) {
-            //console.log('bot id: ', profile.bot_id);
+            // console.log('bot id: ', profile.bot_id);
             pairedUsers.push(users.members[i]);
         }
     }
@@ -119,30 +119,6 @@ async function handlePairingResponse(response, app, token, workspaceInfo, pairin
 }
 
 
-// Given a channel name, returns the channel ID.
-exports.getChannelIdByName = async function getChannelIdByName(app, token, channelName){
-    const conversations = app.client.conversations.list({
-        token:token
-    });
-    const channelId = conversations.then( conversations => {
-        const filteredChannels = conversations.channels.filter( channel => {
-            if(channel.name === channelName){
-                return true;
-            }
-            else return false;
-        })
-
-        if (filteredChannels.length === 0){
-            console.error("Target channel not found");
-            return undefined;
-        }
-        if (filteredChannels.length > 1){
-            console.error("Multiple channels found");
-            return undefined;
-        }
-        return undefined
-    })
-};
 app.command('/pairup', ({ command, ack, say, context }) => {
     // Acknowledge command request
     ack();
