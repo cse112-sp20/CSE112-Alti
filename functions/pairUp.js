@@ -4,7 +4,7 @@ const index = require('./index');
 const app = index.getBolt();
 const util = require('./util');
 // Triggers the pairing up of all people in a given channel.
-exports.pairUp = async function pairUp(channelName, context=undefined, botToken=undefined){
+exports.pairUp = async function pairUp(context=undefined, botToken=undefined){
     
     if(context === undefined && botToken === undefined){
         throw new Exception("Both the context and bot token is undefined. Cannot pair up.")
@@ -24,7 +24,7 @@ exports.pairUp = async function pairUp(channelName, context=undefined, botToken=
             token: token
         });
 
-        const channelId = util.getChannelIdByName(app, token, channelName)
+        const channelId = firestoreFuncs.getPairingChannel(workspaceInfo.team.id);
         var pairingChannelIdVal;
         // const workspaceInfo = await workspaceInfoPromise.then(result => result.data);
 
@@ -75,7 +75,7 @@ exports.pairUp = async function pairUp(channelName, context=undefined, botToken=
         }
         // Going through the paired channels and post messages to them.
         // also store the pairing info on the firebase
-        conversationInfos.map( conversationInfo => {
+        return conversationInfos.map( conversationInfo => {
             return conversationInfo.then( response => handlePairingResponse(response, app, token, workspaceInfo, pairingChannelIdVal));
         });    
     }
@@ -123,6 +123,6 @@ app.command('/pairup', ({ command, ack, say, context }) => {
     // Acknowledge command request
     ack();
     say(`Trying to pair up.`);
-    exports.pairUp("general", context);
+    exports.pairUp(context);
 
 });
