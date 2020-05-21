@@ -24,7 +24,7 @@ exports.pairUp = async function pairUp(channelName, context=undefined, botToken=
             token: token
         });
 
-        const channelId = util.getChannelIdByName(app, token, channelName)
+        const channelId = firestoreFuncs.getPairingChannel(workspaceInfo.team.id);
         var pairingChannelIdVal;
         // const workspaceInfo = await workspaceInfoPromise.then(result => result.data);
 
