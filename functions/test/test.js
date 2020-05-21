@@ -73,7 +73,7 @@ describe('Pairup', () => {
     it('Test Pairup with testing channel', async function() {
       this.timeout(180000) // 3 min
 
-      await pairUp.pairUp("testing", undefined, token);
+      await pairUp.pairUp(undefined, token);
       var pairs = await firestoreFuncs.getPairedUsers(workspaceId);
       //console.log(pairs);
       /* eslint-disable no-await-in-loop */
