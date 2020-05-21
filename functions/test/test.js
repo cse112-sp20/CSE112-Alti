@@ -14,7 +14,7 @@ let token = "xoxb-1109790171392-1110712837169-OxF8igcVuxkFUhbZVuoXxypj";
 // If it passes, means the function finished and message was scheduled, baseline test
 // Need more rigorous testing using promises of async function and validation from Slack API channel reading
 describe('Scheduler', () => {
-
+ 
   let schedule;
   before(() => {
     schedule = require('../schedule');
