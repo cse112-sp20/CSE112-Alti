@@ -123,6 +123,6 @@ app.command('/pairup', ({ command, ack, say, context }) => {
     // Acknowledge command request
     ack();
     say(`Trying to pair up.`);
-    exports.pairUp("general", context);
+    exports.pairUp(context);
 
 });
