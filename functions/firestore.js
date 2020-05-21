@@ -1,6 +1,8 @@
 const functions = require('firebase-functions');
 const admin = require('firebase-admin');
 const request = require('request');
+const dotenv = require('dotenv');
+dotenv.config();
 
 // console.log(typeof(process.env.FUNCTIONS_EMULATOR));
 if(process.env.FUNCTIONS_EMULATOR === "true"){
@@ -63,25 +65,14 @@ exports.storeAPIPair = (team_id, api_key) => {
         })
  */
 exports.getAPIPair = (team_id) => { 
-    //default workspace (uncomment for testing)
 
-    // if (team_id === "T013FNS5Z4L"){ //if you know your team id, put it here
-    //     return ({ 
-    //         //put your bot token here 
-    //         botToken: "xoxb-1117774203156-1096971735751-K68wuukcXq9unFnIBKJbjbue",
-    //         botId: "B0132UUQFCN",
-    //         botUserId: "U012UUKMMN3"
-    //     });
-    // }
-    if (team_id === "T013YTT91B6"){ //if you know your team id, put it here
-        return ({ 
-            //put your bot token here 
-            botToken: "xoxb-1134945307380-1141390769793-KgoTvOT5Y4jwEDk4nOU1XrTO",
-            botId: "B013C0RV06T",
-            botUserId: "U0145BGNMPB"
-        });
-    }
-    else {
+    if (team_id === process.env.teamId){ //if you know your team id, put it here
+         return ({ 
+             botToken: process.env.botToken,
+             botId: process.env.botId,
+             botUserId: process.env.botUserId
+         });
+    } else {
         return db.collection('api_keys').doc(team_id).get().then((doc) => {
             if (!(doc && doc.exists)) {	
 

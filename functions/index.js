@@ -18,13 +18,7 @@ const expressReceiver = new ExpressReceiver({
 });
 
 
-const authorizeFunction = async ({ teamId }) => {
-    
-    console.log(teamId);
-    // eslint-disable-next-line promise/catch-or-return
-    return firestoreFuncs.getAPIPair(teamId);
-
-};
+const authorizeFunction = async ({ teamId }) => firestoreFuncs.getAPIPair(teamId);
 
 const app = new App({
     receiver: expressReceiver,
