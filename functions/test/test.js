@@ -26,11 +26,7 @@ describe('Scheduler', () => {
     var response = await schedule.scheduleMsg(now.getHours(), now.getMinutes(), 
                                                     "A reminder", "#testing", token);
     
-<<<<<<< HEAD
-    //console.log("RESPONSE: ", response);
-=======
     // console.log("RESPONSE: ", response);
->>>>>>> bb0700dd4c513bd5c3154ed377301fcbf2c9daf7
     app.client.chat.deleteScheduledMessage({
       token: token,
       channel: "testing",
