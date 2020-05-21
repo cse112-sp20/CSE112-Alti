@@ -69,10 +69,15 @@ exports.getAPIPair = (team_id) => {
             if (!(doc && doc.exists)) {	
 
                 //verbose debug message
-                console.log("Your API_Key is not in the firestore db. " + 
-                "\nIf you are using the Firestore emulator, remember that data does not save after restart."+
-                "\n You may have to reinstall your app again if you are using the emulator.");
+                
+                if(process.env.FUNCTIONS_EMULATOR === "true") {
+                    console.log(" Your API_Key is not in the firestore db. " + 
+                    "\nRemember that data does not save after restart."+
+                    "\n You may have to reinstall your app again if you are using the emulator.");
 
+                } else { 
+                    console.log("Your API_Key is not in the firestore db. "); 
+                }
                 return null;	
             }
             
