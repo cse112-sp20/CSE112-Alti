@@ -36,7 +36,7 @@ async function appHome(app, payload, context) {
   try {
 		const userId = payload.event.user;
 		const workspaceID = payload.team_id;
-		var view = await loadHomeTabUI(app, workspaceID, userId);
+		var view = await loadHomeTabUI(app, workspaceID, userId, context);
     // Call the views.publish method using the built-in WebClient
     const result = await app.client.views.publish({
       // The token you used to initialize your app is stored in the `context` object
@@ -103,7 +103,7 @@ async function createScheduleDisplay(workspaceId, userId) {
 
 /* Checks if user is owner or not and loads up either owner home tab or non-owner home tab
 */
-async function loadHomeTabUI(app, workspaceID, userId) {
+async function loadHomeTabUI(app, workspaceID, userId, context) {
 	var view;
 
 	var ownerId = await firestoreFuncs.getOwner(workspaceID).then((obj)=>{
@@ -127,7 +127,7 @@ async function loadHomeTabUI(app, workspaceID, userId) {
   var channelName;
   if (typeof(channelId) !== "undefined") {
     channelName = await app.client.channels.info({
-      token: token,
+      token: context.botToken,
       channel: channelId
     }).then((obj)=>{
       return obj.channel.name;
