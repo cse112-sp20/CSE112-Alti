@@ -1,6 +1,6 @@
 const index = require('./index');
 const quotes = require('./quotes');
-const { app } = index.getBolt();
+const app = index.getBolt();
 const firestoreFuncs = require('./firestore');
 const motivationalQuotes = quotes.getQuotesObj();
 const generateData = require('./generateTaskData');
