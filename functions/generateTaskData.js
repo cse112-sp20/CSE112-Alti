@@ -219,13 +219,13 @@ exports.generateMessageToSend = function generateMessageToSend(exerciseType, arg
       break;
 
     case "typing":
-      url = generateCodingChallenge(arg);
+      url = exports.generateCodingChallenge(arg);
       message = "Your partner sent you this cool speed coding challenge in " + arg +
                 " to get your mind and fingers ready for the day!\nComplete it here: " + url;
       break;
 
     case "quote":
-      var author, quote = arg; // generated quote and its author
+      var { author, quote } = arg; // generated quote and its author
       message = `Your partner sent you a motivational quote to help you start your day right! ${author} says: ${quote}`;
       break;
 
