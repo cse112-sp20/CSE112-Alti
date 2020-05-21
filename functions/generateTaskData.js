@@ -109,7 +109,7 @@ function generateHitoriParameters(difficulty){
 }
 
 
-exports.generateCodingChallenge = function (codingLanguage,time=1)
+exports.generateCodingChallenge = function generateCodingChallenge(codingLanguage,time=1)
 {
   exercises = [];
   url  = `http://www.speedcoder.net/lessons/`;
