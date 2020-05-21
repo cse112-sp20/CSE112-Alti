@@ -9,3 +9,4 @@ AltiTest-234ac26149af.json
 .DS_Store
 ngrok
 firebase.json
+functions/tokens.env
