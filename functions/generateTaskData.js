@@ -109,7 +109,7 @@ function generateHitoriParameters(difficulty){
 }
 
 
-exports.generateCodingChallenge = function (codingLanguage,time=1)
+exports.generateCodingChallenge = function generateCodingChallenge(codingLanguage,time=1)
 {
   exercises = [];
   url  = `http://www.speedcoder.net/lessons/`;
@@ -219,14 +219,20 @@ exports.generateMessageToSend = function generateMessageToSend(exerciseType, arg
       break;
 
     case "typing":
-      url = generateCodingChallenge(arg);
+      url = exports.generateCodingChallenge(arg);
       message = "Your partner sent you this cool speed coding challenge in " + arg +
                 " to get your mind and fingers ready for the day!\nComplete it here: " + url;
       break;
 
     case "quote":
-      var author, quote = arg; // generated quote and its author
-      message = `Your partner sent you a motivational quote to help you start your day right! ${author} says: ${quote}`;
+      var author = arg[0]; // generated quote and its author
+      var quote = arg[1]; 
+      if(author === 'Unknown'){
+        message = `Your partner sent you a motivational quote to help you start your day right! ${quote}`;
+      }
+      else{
+        message = `Your partner sent you a motivational quote to help you start your day right! ${author} says: ${quote}`;
+      }
       break;
 
     default:
