@@ -170,7 +170,7 @@ async function findUsersChannel(app, token, channelId) {
         token: token,
         channel: channelId
     }).then((obj) => {
-        console.log(obj);
+        // console.log(obj);
         return obj.members;
     }).catch((error) => {
         console.log(error);

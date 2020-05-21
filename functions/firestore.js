@@ -98,18 +98,25 @@ exports.writeMsgToDB = function writeMsgToDB(teamId, userID, channelID,msgToSend
         workspaceID - workspace id
         channelID - channel id of the new channel designated as the pairing channel
 */
-exports.storeNewPairingChannel = function storeNewPairingChannel(workspaceID, newChannel) {
-    let currChannel = this.getPairingChannel(workspaceID);
+exports.storeNewPairingChannel = async function storeNewPairingChannel(workspaceID, newChannel) {
+    let currChannel = await this.getPairingChannel(workspaceID);
     if (currChannel === newChannel) {
         return;
     }
 
-    // To avoid the "ghost document" problem on the workspace
-    db.collection('workspaces').doc(workspaceID).set({}, {merge: true});
+    if (currChannel === undefined) {
+        db.collection('workspaces').doc(workspaceID).set({}, {merge: true});
+        db.collection("workspaces").doc(workspaceID).collection('activeChannels').doc(newChannel).set({}, {merge: true}); 
+    }
+    else {
+        // To avoid the "ghost document" problem on the workspace
+        db.collection('workspaces').doc(workspaceID).set({}, {merge: true});
 
-    deleteCollection('workspaces/'+ workspaceID + '/activeChannels', 100);
-    db.collection("workspaces").doc(workspaceID).collection('activeChannels').doc(newChannel).set({}, {merge: true});
+        deleteCollection('workspaces/'+ workspaceID + '/activeChannels', 100);
+        db.collection("workspaces").doc(workspaceID).collection('activeChannels').doc(newChannel).set({}, {merge: true});
+    }
 }
+
 
 /*
     Description:
@@ -160,7 +167,7 @@ function deleteQueryBatch(query, resolve, reject) {
         // Recurse on the next process tick, to avoid
         // exploding the stack.
         process.nextTick(() => {
-          deleteQueryBatch(db, query, resolve, reject);
+          deleteQueryBatch(query, resolve, reject);
         });
         // eslint-disable-next-line consistent-return
         return null;
