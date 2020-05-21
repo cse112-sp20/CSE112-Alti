@@ -18,12 +18,6 @@
     },
     "pubsub": {
       "port": 8085
-    },
-    "database": {
-      "port": 9000
-    },
-    "hosting": {
-      "port": 5000
     }
   }
 }

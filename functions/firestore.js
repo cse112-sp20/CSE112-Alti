@@ -31,23 +31,17 @@ exports.storeAPIPair = (team_id, api_key) => {
 
 /* Gets the API keys from the database by team_id */ 
 exports.getAPIPair = (team_id) => { 
-
- 
     //default workspace (uncomment for testing)
 
-    /*
-    if (team_id === "T013YTT91B6"){ //if you know your team id, put it here
-        return ({ 
-            //put your bot token here 
-            botToken: "xoxb-1134945307380-1141390769793-fiMOhaTu74UVw4Dc2fAVQHVJ",
-            botId: "B013C0RV06T",
-            botUserId: "U0145BGNMPB"
-        });
-    } else 
-    {
-    
-*/
-    
+    // if (team_id === "T013FNS5Z4L"){ //if you know your team id, put it here
+    //     return ({ 
+    //         //put your bot token here 
+    //         botToken: "xoxb-1117774203156-1096971735751-K68wuukcXq9unFnIBKJbjbue",
+    //         botId: "B0132UUQFCN",
+    //         botUserId: "U012UUKMMN3"
+    //     });
+    // }
+    // else {
         return db.collection('api_keys').doc(team_id).get().then((doc) => {
             if (!(doc && doc.exists)) {	
                 console.log("doc does not exist");
@@ -58,11 +52,7 @@ exports.getAPIPair = (team_id) => {
         }).catch(() => {	
             return null;
         });
-
-
-   // }
-
-
+    // }
 }
 
 

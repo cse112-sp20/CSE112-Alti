@@ -9,7 +9,7 @@ var days = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"];
 // Listen to the app_home_opened Events API event to hear when a user opens your app from the sidebar
 app.event("app_home_opened", async ({ body, context }) => {
   console.log("It's running");
-  appHome(app, body);
+  appHome(app, body, context);
 });
 
 app.action("selectTimeZone", async({body, ack, context}) => {
