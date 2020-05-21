@@ -218,6 +218,44 @@ exports.storeTypeOfExercise = async function storeTypeOfExercise(workspaceID, us
 
 /*
     Description:
+        Gets the exercise prompt for a particular user, for warmup or cooldown
+
+    Inputs:
+        workspaceID - workspace id that you are getting prompt for
+        userID - user id for which that prompt is going to be sent to
+        isWarmup - is this prompt for a warmup or cooldown (boolean), true for warmup, false for cooldown
+
+    Returns:
+        Promise that you have to await -> str that contains the prompt
+*/
+exports.getExercisePrompt = async function getExercisePrompt(workspaceID, userID, isWarmup) {
+    let channelID = await this.getPairingChannel(workspaceID);
+    let userRef = db.collection("workspaces").doc(workspaceID).collection("activeChannels")
+                    .doc(channelID).collection('pairedUsers').doc(userID);
+    
+    return userRef.get()
+        .then(doc => {
+            if (!doc.exists) {
+                console.log('No such document!');
+                return undefined;
+            }
+            else {
+                if (isWarmup) {
+                    return doc.data().warmupTask;
+                }
+                else {
+                    return doc.data().cooldownTask;
+                }
+            }
+        })
+        .catch(err => {
+            console.log('Error getting user document: ', err);
+            return undefined;
+        });
+}
+
+/*
+    Description:
         Given a user within a pairing channel, return its partner's userID.
     
     Input:
