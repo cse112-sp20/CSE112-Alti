@@ -102,6 +102,14 @@ app.command('/setupwarmup', async ({ command, ack, say, context}) => {
     warmupMessage.sendSelectChoice(command.channel_id,app, context.botToken);
 });
 
+// Handle '/getwarmup' command invocations
+app.command('/getwarmup', async ({ command, ack, say, context }) => {
+    // Acknowledge command request
+    ack();
+
+    warmupMessage.sendExercisePrompt(command.team_id, command.user_id, command.channel_id, true, context);
+});
+
 
 /*
 generic_button Action Listener
@@ -196,4 +204,6 @@ app.action('warmup_quote_select', async ({ ack, body, context }) => {
     ack();
  });
  
-
+exports.testFirestore = functions.https.onRequest(async (req, res) => {
+    console.log(await  firestoreFuncs.getExercisePrompt('T011H6FAPV4', 'U011C8CCYDV', true))
+});
