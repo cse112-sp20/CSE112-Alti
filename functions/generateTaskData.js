@@ -225,8 +225,14 @@ exports.generateMessageToSend = function generateMessageToSend(exerciseType, arg
       break;
 
     case "quote":
-      var { author, quote } = arg; // generated quote and its author
-      message = `Your partner sent you a motivational quote to help you start your day right! ${author} says: ${quote}`;
+      var author = arg[0]; // generated quote and its author
+      var quote = arg[1]; 
+      if(author === 'Unknown'){
+        message = `Your partner sent you a motivational quote to help you start your day right! ${quote}`;
+      }
+      else{
+        message = `Your partner sent you a motivational quote to help you start your day right! ${author} says: ${quote}`;
+      }
       break;
 
     default:
