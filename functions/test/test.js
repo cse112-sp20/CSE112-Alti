@@ -24,7 +24,9 @@ describe('Scheduler', () => {
     let now = new Date();
     now.setTime(now.getTime() + 120000); 
     var response = await schedule.scheduleMsg(now.getHours(), now.getMinutes(), 
-                                                    "A reminder", "#testing");
+                                                    "A reminder", "#testing", token);
+    
+    console.log("RESPONSE: ", response);
     app.client.chat.deleteScheduledMessage({
       token: token,
       channel: "testing",
