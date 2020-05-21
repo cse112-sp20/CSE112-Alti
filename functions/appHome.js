@@ -1,5 +1,5 @@
 const index = require('./index');
-const {app, token} = index.getBolt();
+const app = index.getBolt();
 
 const appHomeObjects = require('./appHomeObjects');
 const firestoreFuncs = require('./firestore');
@@ -9,7 +9,7 @@ var days = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"];
 // Listen to the app_home_opened Events API event to hear when a user opens your app from the sidebar
 app.event("app_home_opened", async ({ body, context }) => {
   console.log("It's running");
-  appHome(app, body);
+  appHome(app, body, context);
 });
 
 app.action("selectTimeZone", async({body, ack, context}) => {
@@ -21,17 +21,17 @@ app.action("selectOwner", async({body, ack, context}) => {
   setOwner(app, body, context);
 });
 
-async function updateAppHome(userId, team_id) {
+async function updateAppHome(userId, team_id, context) {
   var payload = {};
   payload.event = {};
   payload.event.user = userId;
   payload.team_id = team_id;
-  appHome(app, payload);
+  appHome(app, payload, context);
 }
 
 // appHome return the json object creating the application's home page
 exports.appHome = appHome;
-async function appHome(app, payload) {
+async function appHome(app, payload, context) {
   console.log("appHome triggered");
   try {
 		const userId = payload.event.user;
@@ -40,7 +40,7 @@ async function appHome(app, payload) {
     // Call the views.publish method using the built-in WebClient
     const result = await app.client.views.publish({
       // The token you used to initialize your app is stored in the `context` object
-      token: token,
+      token: context.botToken,
       user_id: userId,
       view: view
     });
@@ -605,11 +605,11 @@ async function loadHomeTabUI(app, workspaceID, userId) {
 
 async function setTimeZone(app, body, context){
   firestoreFuncs.setTimeZone(body.team.id, body.actions[0].selected_option.value);
-  updateAppHome(body.user.id, body.team.id);
+  updateAppHome(body.user.id, body.team.id, context);
 }
 async function setOwner(app, body, context){
   firestoreFuncs.setOwner(body.team.id, body.actions[0].selected_user);
-  updateAppHome(body.user.id, body.team.id);
+  updateAppHome(body.user.id, body.team.id, context);
 }
 exports.setTimeZone = setTimeZone;
 exports.setOwner = setOwner;

@@ -18,6 +18,44 @@ else{
 
 let db = admin.firestore();
 
+exports.storeAPIPair = (team_id, api_key) => { 
+
+    let setValue = {
+        botToken: api_key.botToken,
+        botId: api_key.botId,
+        botUserId: api_key.botUserId
+    }; 
+    console.log("SETVALUE : @@@@@@@: " + JSON.stringify(setValue)); 
+    db.collection('api_keys').doc(team_id).set(setValue);
+};
+
+/* Gets the API keys from the database by team_id */ 
+exports.getAPIPair = (team_id) => { 
+    //default workspace (uncomment for testing)
+
+    // if (team_id === "T013FNS5Z4L"){ //if you know your team id, put it here
+    //     return ({ 
+    //         //put your bot token here 
+    //         botToken: "xoxb-1117774203156-1096971735751-K68wuukcXq9unFnIBKJbjbue",
+    //         botId: "B0132UUQFCN",
+    //         botUserId: "U012UUKMMN3"
+    //     });
+    // }
+    // else {
+        return db.collection('api_keys').doc(team_id).get().then((doc) => {
+            if (!(doc && doc.exists)) {	
+                console.log("doc does not exist");
+                return null;	
+            }
+            //console.log("JSON - data: " + JSON.stringify(doc.data()));
+            return doc.data();
+        }).catch(() => {	
+            return null;
+        });
+    // }
+}
+
+
 /* 
     Stores the new pairings (DM thread ids + partnerIDs) in the corresponding place (with the corresponding
     workspace and channel) in cloud firestore.
