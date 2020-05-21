@@ -1,8 +1,8 @@
 const functions = require('firebase-functions');
 const admin = require('firebase-admin');
 const request = require('request');
-const dotenv = require('dotenv');
-dotenv.config();
+//const dotenv = require('dotenv');
+//dotenv.config();
 
 // console.log(typeof(process.env.FUNCTIONS_EMULATOR));
 if(process.env.FUNCTIONS_EMULATOR === "true"){
@@ -65,14 +65,6 @@ exports.storeAPIPair = (team_id, api_key) => {
         })
  */
 exports.getAPIPair = (team_id) => { 
-
-    if (team_id === process.env.teamId){ //if you know your team id, put it here
-         return ({ 
-             botToken: process.env.botToken,
-             botId: process.env.botId,
-             botUserId: process.env.botUserId
-         });
-    } else {
         return db.collection('api_keys').doc(team_id).get().then((doc) => {
             if (!(doc && doc.exists)) {	
 
@@ -90,7 +82,6 @@ exports.getAPIPair = (team_id) => {
             //return null if there was an error in fetching the data
             return null;
         });
-    }
 }
 
 
