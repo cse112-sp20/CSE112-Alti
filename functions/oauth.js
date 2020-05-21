@@ -44,7 +44,7 @@ exports.oAuthFunction = functions.https.onRequest(async (req, res) => {
           let getBotID = (callback)=> { 
             request.get(options, (e, res, bd) => {
               if (!e && res.statusCode === 200) {
-                console.log(JSON.parse(bd));
+                // console.log(JSON.parse(bd));
                 botID = JSON.parse(bd).bot_id;
                 return callback(true, botID);
               } else {
@@ -61,8 +61,8 @@ exports.oAuthFunction = functions.https.onRequest(async (req, res) => {
                 botUserId: api_keys.bot_user_id
               }
     
-              console.log(api_keys.team.id); 
-              console.log(auth_info);
+              // console.log(api_keys.team.id); 
+              // console.log(auth_info);
     
     
               firestore.storeAPIPair(api_keys.team.id,

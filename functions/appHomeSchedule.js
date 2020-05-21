@@ -59,10 +59,10 @@ app.action('warmup_time2_selected', async({payload, ack}) => {
 });
 app.action('warmup_time_set_button', async({ack, body, context}) => {
     ack();
-    console.log(body);
+    // console.log(body);
     if (warmupTime1 !== null && warmupTime2 !== null) {
         var t = warmupTime1 + " " + warmupTime2;
-        console.log(t);
+        // console.log(t);
         for (i of days) {
             firestoreFuncs.setWarmupTime(body.team.id, body.user.id, t, i);
         }
@@ -88,7 +88,7 @@ app.action('cooldown_time_set_button', async({ack, body, context}) => {
     ack();
     if (cooldownTime1 !== null && cooldownTime2 !== null) {
         var t = cooldownTime1 + " " + cooldownTime2;
-        console.log(t);
+        // console.log(t);
         for (i of days) {
             firestoreFuncs.setCooldownTime(body.team.id, body.user.id, t, i);
         }
@@ -160,8 +160,8 @@ app.action('monday_set_button', async({body, ack, context}) => {
         warmupTimes.monAMPM !== null &&
         cooldownTimes.monTime !== null && 
         cooldownTimes.monAMPM !== null) {
-        console.log(warmupTimes.monTime + " " + warmupTimes.monAMPM);
-        console.log(cooldownTimes.monTime + " " + cooldownTimes.monAMPM);
+        // console.log(warmupTimes.monTime + " " + warmupTimes.monAMPM);
+        // console.log(cooldownTimes.monTime + " " + cooldownTimes.monAMPM);
         var t1 = warmupTimes.monTime + " " + warmupTimes.monAMPM;
         var t2 = cooldownTimes.monTime + " " + cooldownTimes.monAMPM;
         firestoreFuncs.setWarmupTime(body.team.id, body.user.id, t1, "Monday");
@@ -201,8 +201,8 @@ app.action('tuesday_set_button', async({body, ack, context}) => {
         warmupTimes.tuesAMPM !== null &&
         cooldownTimes.tuesTime !== null && 
         cooldownTimes.tuesAMPM !== null) {
-        console.log(warmupTimes.tuesTime + " " + warmupTimes.tuesAMPM);
-        console.log(cooldownTimes.tuesTime + " " + cooldownTimes.tuesAMPM);
+        // console.log(warmupTimes.tuesTime + " " + warmupTimes.tuesAMPM);
+        // console.log(cooldownTimes.tuesTime + " " + cooldownTimes.tuesAMPM);
         var t1 = warmupTimes.tuesTime + " " + warmupTimes.tuesAMPM;
         var t2 = cooldownTimes.tuesTime + " " + cooldownTimes.tuesAMPM;
         firestoreFuncs.setWarmupTime(body.team.id, body.user.id, t1, "Tuesday");
@@ -241,8 +241,8 @@ app.action('wednesday_set_button', async({body, ack, context}) => {
         warmupTimes.wedAMPM !== null &&
         cooldownTimes.wedTime !== null && 
         cooldownTimes.wedAMPM !== null) {
-        console.log(warmupTimes.wedTime + " " + warmupTimes.wedAMPM);
-        console.log(cooldownTimes.wedTime + " " + cooldownTimes.wedAMPM);
+        // console.log(warmupTimes.wedTime + " " + warmupTimes.wedAMPM);
+        // console.log(cooldownTimes.wedTime + " " + cooldownTimes.wedAMPM);
         var t1 = warmupTimes.wedTime + " " + warmupTimes.wedAMPM;
         var t2 = cooldownTimes.wedTime + " " + cooldownTimes.wedAMPM;
         firestoreFuncs.setWarmupTime(body.team.id, body.user.id, t1, "Wednesday");

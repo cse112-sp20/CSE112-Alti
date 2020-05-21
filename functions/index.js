@@ -20,10 +20,10 @@ const expressReceiver = new ExpressReceiver({
 
 const authorizeFunction = async ({ teamId }) => {
     
-    console.log(teamId);
+    // console.log(teamId);
     // eslint-disable-next-line promise/catch-or-return
     return firestoreFuncs.getAPIPair(teamId).then((result) => {
-        console.log(result); // "Some User token"
+        // console.log(result); // "Some User token"
         return result;
      });
 
@@ -64,8 +64,8 @@ app.error(console.log);
 app.message(async ({ message, context }) => {
     try{
         if(message.channel_type === 'im'){
-            console.log("Message object: ");
-            console.log(message);
+            // console.log("Message object: ");
+            // console.log(message);
             app.client.chat.postMessage({
                 token: context.botToken,
                 channel: '#general',
