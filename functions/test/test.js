@@ -2,6 +2,10 @@
 
 var assert = require('assert');
 var schedule = require('../schedule');
+const quotes = require('./quotes');
+const motivationalQuotes = quotes.getQuotesObj();
+
+var generateTaskData = require('../generateTaskData');
 // If it passes, means the function finished and message was scheduled, baseline test
 // Need more rigorous testing using promises of async function and validation from Slack API channel reading
 describe('Scheduler', function() {
@@ -40,3 +44,24 @@ describe('Array', function() {
   });
 });
 
+
+describe('generateQuote', () => {
+  it('Testing random quote', () => {
+    //generateCodingChallenge();
+    resultantString = generateTaskData.generateQuote();
+	for (var quoteIterator = 0; quoteIterator < motivationalQuotes.length; quoteIterator++) { 
+		let quoteText = motivationalQuotes[quoteIterator].text;
+		let quoteAuthor =  motivationalQuotes[quoteIterator].author;
+		if (quoteAuthor === null) {
+			quoteAuthor = "Unknown";
+		}
+		potentialString = quoteIterator+"-"+quoteText+" - "+ quoteAuthor;
+		if (resultantString === potentialString) {
+			assert.equal(resultantString,potentialString);
+		}
+		else if (quoteIterator === motivationalQuotes.length-1) {
+			assert.equal(resultantString,"No matching strings in quote db");
+		}
+	}
+  });
+});
