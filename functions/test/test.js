@@ -192,8 +192,8 @@ describe('App Home', () => {
     });
     assert.equal(timeZone, "LA");
 
-    await firestoreFuncs.setTimeZone(workspaceId, 'Space');
-    timeZone = await firestoreFuncs.getTimeZone(workspaceId).then((obj)=>{
+    await firestoreFuncs.setTimeZone(workspaceId, "Space");
+    timeZone = await firestoreFuncs.getTimeZome(workspaceId).then((obj)=>{
       return obj;
     }).catch((error) => {
           console.log(error);
