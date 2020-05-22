@@ -167,7 +167,7 @@ describe('generateCodingChallenge', () => {
 });
 
 
-describe('App Home', () => {
+describe('App Home tests', () => {
   let appHome;
   let onBoard;
   let workspaceId;
