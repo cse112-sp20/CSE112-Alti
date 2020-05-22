@@ -240,15 +240,16 @@ exports.getPairingChannel = async function getPairingChannel(workspaceID) {
 exports.storeTypeOfExercise = async function storeTypeOfExercise(workspaceID, userID, isWarmup, exercisePrompt) {
     let channelID = await this.getPairingChannel(workspaceID);
     let partnerID = await this.getPartner(workspaceID, channelID, userID);
-    let partnerRef = db.collection("workspaces").doc(workspaceID).collection("activeChannels").doc(channelID).collection('pairedUsers').doc(partnerID);
-
+    let partnerRef = db.collection("workspaces").doc(workspaceID).collection("activeChannels").doc(channelID).collection('pairedUsers').doc(partnerID)
+    let setResult;
     if (isWarmup) {
-        partnerRef.set({'warmupTask': exercisePrompt}, {merge: true});
+        setResult = await partnerRef.set({'warmupTask': exercisePrompt}, {merge: true});
     }
     else {
-        partnerRef.set({'cooldownTask': exercisePrompt}, {merge: true});
+        setResult = await partnerRef.set({'cooldownTask': exercisePrompt}, {merge: true});
     }
-};
+    return setResult;
+}
 
 /*
     Description:
