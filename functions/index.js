@@ -4,12 +4,10 @@ const admin = require('firebase-admin');
 
 const config = functions.config();
 const signingSecret = config.slack.signing_secret;
-const user_token = config.slack.user_token;
-const onBoard = require('./onBoard');
-const appHome = require('./appHome');
-const bot_token = config.slack.bot_token;
 
 const firestoreFuncs = require('./firestore');
+//OAuth Endpoint for Authentication
+const oauthEndpoint = require('./oauth');
 
 
 const expressReceiver = new ExpressReceiver({
@@ -17,22 +15,26 @@ const expressReceiver = new ExpressReceiver({
     endpoints: '/events',
 });
 
+
+const authorizeFunction = async ({ teamId }) => firestoreFuncs.getAPIPair(teamId);
+
 const app = new App({
     receiver: expressReceiver,
-    token: bot_token
+    authorize: authorizeFunction,
 });
 
-exports.getBolt = function getBolt(){
-    return {
-        app:app,
-        token:bot_token
-    }
-};
+
+//arrow function for simplicity 
+exports.getBolt = () => app;
+
 
 const generateTaskData = require('./generateTaskData');
 const warmupMessage = require('./warmupMessage');
 const pubsubScheduler = require('./pubsubScheduler')
 const pairUp = require('./pairUp');
+const onBoard = require('./onBoard');
+const appHome = require('./appHome');
+const appHomeSchedule = require('./appHomeSchedule');
 exports.scheduledPairUp = pubsubScheduler.scheduledPairUp;
 exports.scheduleWarmup = pubsubScheduler.scheduleWarmup;
 
@@ -54,7 +56,7 @@ app.message(async ({ message, context }) => {
             console.log("Message object: ");
             console.log(message);
             app.client.chat.postMessage({
-                token: bot_token,
+                token: context.botToken,
                 channel: '#general',
                 text: `<@${message.user}> just DMd me. What a creep?! Other people should also know that "${message.text}"`
             });
@@ -68,7 +70,11 @@ app.message(async ({ message, context }) => {
 });
 exports.slack = functions.https.onRequest(expressReceiver.app);
 
-app.command('/firestore', async ({ command, ack, say }) => {	
+
+//export this to separate file 
+exports.oauth = oauthEndpoint.oAuthFunction; 
+
+app.command('/firestore', async ({ command, ack, say}) => {	
     // Acknowledge command request	 
     ack();	
     firestoreFuncs.firestoreTest();
@@ -78,11 +84,19 @@ app.command('/firestore', async ({ command, ack, say }) => {
 
 
 // Handle '/setupWarmup` command invocations
-app.command('/setupwarmup', async ({ command, ack, say }) => {
+app.command('/setupwarmup', async ({ command, ack, say, context}) => {
     // Acknowledge command request
     ack();
 	//send Warmup prompts to the channel that this command was called from
-    warmupMessage.sendSelectChoice(command.channel_id,app,bot_token);
+    warmupMessage.sendSelectChoice(command.channel_id,app, context.botToken);
+});
+
+// Handle '/getwarmup' command invocations
+app.command('/getwarmup', async ({ command, ack, say, context }) => {
+    // Acknowledge command request
+    ack();
+
+    warmupMessage.sendExercisePrompt(command.team_id, command.user_id, command.channel_id, true, context);
 });
 
 
@@ -122,36 +136,12 @@ app.view('custom_msg_view', async ({ ack, body, view, context }) => {
 });
 
 
-// Listen to the app_home_opened Events API event to hear when a user opens your app from the sidebar
-app.event("app_home_opened", async ({ payload, context }) => {
-    appHome.appHome(app, payload, context);
-});
-
-app.command('/setup', async ({payload, ack, say }) => {
-    ack();
-    say("Trying to set up");
-    onBoard.onBoard(app, bot_token, payload.team_id, "alti-pairing");
-
-});
-
-app.action('select', async({payload, ack, say}) => {
-    ack();
-    // block action payload type
-    var team_info = await app.client.team.info({
-        token: bot_token
-    }).catch((error) => {
-        console.log(error);
-    });
-    var team_id = team_info.team.id;
-    onBoard.onBoardExisting(app, bot_token, team_id, payload.selected_channel);
-});
-
 // Handle '/setupWarmup` command invocations
-app.command('/setupcooldown', async ({ command, ack, say }) => {
+app.command('/setupcooldown', async ({ command, ack, say, context }) => {
     // Acknowledge command request
     ack();
 	//send Warmup prompts to the channel that this command was called from
-    warmupMessage.sendSelectCooldownChoice(command.channel_id,app,bot_token);
+    warmupMessage.sendSelectCooldownChoice(command.channel_id,app, context.botToken);
 });
 
 app.action('cooldown_video_select', async ({ ack, body, context }) => {
@@ -203,4 +193,6 @@ app.action('warmup_quote_select', async ({ ack, body, context }) => {
     ack();
  });
  
- 
+exports.testFirestore = functions.https.onRequest(async (req, res) => {
+    console.log(await  firestoreFuncs.getExercisePrompt('T011H6FAPV4', 'U011C8CCYDV', true))
+});

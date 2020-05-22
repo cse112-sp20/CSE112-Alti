@@ -6,5 +6,8 @@ firebase-debug.log
 firestore-debug.log
 pubsub-debug.log
 AltiTest-234ac26149af.json
-ngrok
 .DS_Store
+ngrok
+firebase.json
+functions/tokens.env
+functions/.env
