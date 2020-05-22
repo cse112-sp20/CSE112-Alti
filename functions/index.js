@@ -4,10 +4,12 @@ const admin = require('firebase-admin');
 
 const config = functions.config();
 const signingSecret = config.slack.signing_secret;
-const user_token = config.slack.user_token;
+//const user_token = config.slack.user_token;
 const bot_token = config.slack.bot_token;
 
 const firestoreFuncs = require('./firestore');
+//OAuth Endpoint for Authentication
+const oauthEndpoint = require('./oauth');
 
 
 const expressReceiver = new ExpressReceiver({
@@ -15,17 +17,27 @@ const expressReceiver = new ExpressReceiver({
     endpoints: '/events',
 });
 
+
+const authorizeFunction = async ({ teamId }) => {
+    
+    // console.log(teamId);
+    // eslint-disable-next-line promise/catch-or-return
+    return firestoreFuncs.getAPIPair(teamId).then((result) => {
+        // console.log(result); // "Some User token"
+        return result;
+     });
+
+};
+
 const app = new App({
     receiver: expressReceiver,
-    token: bot_token
+    authorize: authorizeFunction,
 });
 
-exports.getBolt = function getBolt(){
-    return {
-        app:app,
-        token:bot_token
-    };
-};
+
+//arrow function for simplicity 
+exports.getBolt = () => app;
+
 
 const generateTaskData = require('./generateTaskData');
 const warmupMessage = require('./warmupMessage');
@@ -52,10 +64,10 @@ app.error(console.log);
 app.message(async ({ message, context }) => {
     try{
         if(message.channel_type === 'im'){
-            console.log("Message object: ");
-            console.log(message);
+            // console.log("Message object: ");
+            // console.log(message);
             app.client.chat.postMessage({
-                token: bot_token,
+                token: context.botToken,
                 channel: '#general',
                 text: `<@${message.user}> just DMd me. What a creep?! Other people should also know that "${message.text}"`
             });
@@ -69,7 +81,11 @@ app.message(async ({ message, context }) => {
 });
 exports.slack = functions.https.onRequest(expressReceiver.app);
 
-app.command('/firestore', async ({ command, ack, say }) => {	
+
+//export this to separate file 
+exports.oauth = oauthEndpoint.oAuthFunction; 
+
+app.command('/firestore', async ({ command, ack, say}) => {	
     // Acknowledge command request	 
     ack();	
     firestoreFuncs.firestoreTest();
@@ -79,11 +95,19 @@ app.command('/firestore', async ({ command, ack, say }) => {
 
 
 // Handle '/setupWarmup` command invocations
-app.command('/setupwarmup', async ({ command, ack, say }) => {
+app.command('/setupwarmup', async ({ command, ack, say, context}) => {
     // Acknowledge command request
     ack();
 	//send Warmup prompts to the channel that this command was called from
-    warmupMessage.sendSelectChoice(command.channel_id,app,bot_token);
+    warmupMessage.sendSelectChoice(command.channel_id,app, context.botToken);
+});
+
+// Handle '/getwarmup' command invocations
+app.command('/getwarmup', async ({ command, ack, say, context }) => {
+    // Acknowledge command request
+    ack();
+
+    warmupMessage.sendExercisePrompt(command.team_id, command.user_id, command.channel_id, true, context);
 });
 
 
@@ -124,11 +148,11 @@ app.view('custom_msg_view', async ({ ack, body, view, context }) => {
 
 
 // Handle '/setupWarmup` command invocations
-app.command('/setupcooldown', async ({ command, ack, say }) => {
+app.command('/setupcooldown', async ({ command, ack, say, context }) => {
     // Acknowledge command request
     ack();
 	//send Warmup prompts to the channel that this command was called from
-    warmupMessage.sendSelectCooldownChoice(command.channel_id,app,bot_token);
+    warmupMessage.sendSelectCooldownChoice(command.channel_id,app, context.botToken);
 });
 
 app.action('cooldown_video_select', async ({ ack, body, context }) => {
@@ -180,4 +204,6 @@ app.action('warmup_quote_select', async ({ ack, body, context }) => {
     ack();
  });
  
-
+exports.testFirestore = functions.https.onRequest(async (req, res) => {
+    console.log(await  firestoreFuncs.getExercisePrompt('T011H6FAPV4', 'U011C8CCYDV', true))
+});

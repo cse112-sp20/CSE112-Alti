@@ -1,6 +1,6 @@
 const index = require('./index');
 const quotes = require('./quotes');
-const { app } = index.getBolt();
+const app = index.getBolt();
 const firestoreFuncs = require('./firestore');
 const motivationalQuotes = quotes.getQuotesObj();
 const generateData = require('./generateTaskData');
@@ -475,6 +475,25 @@ exports.warmupQuoteSelect = async function(ack,body,context) {
     catch (error) {
       console.error(error);
     }
+}
+
+exports.sendExercisePrompt = async function(workspaceId, userId, dmThreadID, isWarmup, context) {
+	// retrieves warmup prompt for the user that called this slash command, and sends in the DM thread
+	let prompt = await firestoreFuncs.getExercisePrompt(workspaceId, userId, isWarmup);
+
+	try {
+		//make a call to the web api to post message in targ channel
+		const result = await app.client.chat.postMessage({
+			// The token you used to initialize your app is stored in the `context` object
+			token: context.botToken,
+			channel: dmThreadID,
+			text: prompt
+		});
+	}
+	//catch any errors
+	catch(error) {
+		console.log(error);
+	}
 }
 
 /*

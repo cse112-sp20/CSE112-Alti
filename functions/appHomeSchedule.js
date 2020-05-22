@@ -1,5 +1,5 @@
 const index = require('./index');
-const {app, token} = index.getBolt();
+const app = index.getBolt();
 
 const appHome = require('./appHome');
 const appHomeObjects = require('./appHomeObjects');
@@ -59,15 +59,15 @@ app.action('warmup_time2_selected', async({payload, ack}) => {
 });
 app.action('warmup_time_set_button', async({ack, body, context}) => {
     ack();
-    console.log(body);
+    // console.log(body);
     if (warmupTime1 !== null && warmupTime2 !== null) {
         var t = warmupTime1 + " " + warmupTime2;
-        console.log(t);
-        for (var i of days) {
+        // console.log(t);
+        for (vari of days) {
             firestoreFuncs.setWarmupTime(body.team.id, body.user.id, t, i);
         }
     }
-    appHome.updateAppHome(body.user.id, body.team.id);
+    appHome.updateAppHome(body.user.id, body.team.id, context);
 
 });
 
@@ -88,12 +88,12 @@ app.action('cooldown_time_set_button', async({ack, body, context}) => {
     ack();
     if (cooldownTime1 !== null && cooldownTime2 !== null) {
         var t = cooldownTime1 + " " + cooldownTime2;
-        console.log(t);
+        // console.log(t);
         for (var i of days) {
             firestoreFuncs.setCooldownTime(body.team.id, body.user.id, t, i);
         }
     }
-    appHome.updateAppHome(body.user.id, body.team.id);
+    appHome.updateAppHome(body.user.id, body.team.id, context);
 });
 
 // Extra listener for app home event to reset time variables
@@ -154,19 +154,19 @@ app.action('monday_cooldown_time2_selected', async({payload, ack}) => {
     cooldownTimes.monAMPM = payload.selected_option.text.text;
 
 });
-app.action('monday_set_button', async({body, ack}) => {
+app.action('monday_set_button', async({body, ack, context}) => {
     ack();
     if (warmupTimes.monTime !== null && 
         warmupTimes.monAMPM !== null &&
         cooldownTimes.monTime !== null && 
         cooldownTimes.monAMPM !== null) {
-        console.log(warmupTimes.monTime + " " + warmupTimes.monAMPM);
-        console.log(cooldownTimes.monTime + " " + cooldownTimes.monAMPM);
+        // console.log(warmupTimes.monTime + " " + warmupTimes.monAMPM);
+        // console.log(cooldownTimes.monTime + " " + cooldownTimes.monAMPM);
         var t1 = warmupTimes.monTime + " " + warmupTimes.monAMPM;
         var t2 = cooldownTimes.monTime + " " + cooldownTimes.monAMPM;
         firestoreFuncs.setWarmupTime(body.team.id, body.user.id, t1, "Monday");
         firestoreFuncs.setCooldownTime(body.team.id, body.user.id, t2, "Monday");
-        appHome.updateAppHome(body.user.id, body.team.id);
+        appHome.updateAppHome(body.user.id, body.team.id, context);
     }
     else {
         console.log("Nope");
@@ -195,19 +195,19 @@ app.action('tuesday_cooldown_time2_selected', async({payload, ack}) => {
     cooldownTimes.tuesAMPM = payload.selected_option.text.text;
 
 });
-app.action('tuesday_set_button', async({body, ack}) => {
+app.action('tuesday_set_button', async({body, ack, context}) => {
     ack();
     if (warmupTimes.tuesTime !== null && 
         warmupTimes.tuesAMPM !== null &&
         cooldownTimes.tuesTime !== null && 
         cooldownTimes.tuesAMPM !== null) {
-        console.log(warmupTimes.tuesTime + " " + warmupTimes.tuesAMPM);
-        console.log(cooldownTimes.tuesTime + " " + cooldownTimes.tuesAMPM);
+        // console.log(warmupTimes.tuesTime + " " + warmupTimes.tuesAMPM);
+        // console.log(cooldownTimes.tuesTime + " " + cooldownTimes.tuesAMPM);
         var t1 = warmupTimes.tuesTime + " " + warmupTimes.tuesAMPM;
         var t2 = cooldownTimes.tuesTime + " " + cooldownTimes.tuesAMPM;
         firestoreFuncs.setWarmupTime(body.team.id, body.user.id, t1, "Tuesday");
         firestoreFuncs.setCooldownTime(body.team.id, body.user.id, t2, "Tuesday");
-        appHome.updateAppHome(body.user.id, body.team.id);
+        appHome.updateAppHome(body.user.id, body.team.id, context);
     }
     else {
         console.log("Nope");
@@ -235,19 +235,19 @@ app.action('wednesday_cooldown_time2_selected', async({payload, ack}) => {
     cooldownTimes.wedAMPM = payload.selected_option.text.text;
 
 });
-app.action('wednesday_set_button', async({body, ack}) => {
+app.action('wednesday_set_button', async({body, ack, context}) => {
     ack();
     if (warmupTimes.wedTime !== null && 
         warmupTimes.wedAMPM !== null &&
         cooldownTimes.wedTime !== null && 
         cooldownTimes.wedAMPM !== null) {
-        console.log(warmupTimes.wedTime + " " + warmupTimes.wedAMPM);
-        console.log(cooldownTimes.wedTime + " " + cooldownTimes.wedAMPM);
+        // console.log(warmupTimes.wedTime + " " + warmupTimes.wedAMPM);
+        // console.log(cooldownTimes.wedTime + " " + cooldownTimes.wedAMPM);
         var t1 = warmupTimes.wedTime + " " + warmupTimes.wedAMPM;
         var t2 = cooldownTimes.wedTime + " " + cooldownTimes.wedAMPM;
         firestoreFuncs.setWarmupTime(body.team.id, body.user.id, t1, "Wednesday");
         firestoreFuncs.setCooldownTime(body.team.id, body.user.id, t2, "Wednesday");
-        appHome.updateAppHome(body.user.id, body.team.id);
+        appHome.updateAppHome(body.user.id, body.team.id, context);
     }
     else {
         console.log("Nope");
@@ -275,7 +275,7 @@ app.action('thursday_cooldown_time2_selected', async({payload, ack}) => {
     cooldownTimes.thursAMPM = payload.selected_option.text.text;
 
 });
-app.action('thursday_set_button', async({body, ack}) => {
+app.action('thursday_set_button', async({body, ack, context}) => {
     ack();
     if (warmupTimes.thursTime !== null && 
         warmupTimes.thursAMPM !== null &&
@@ -287,7 +287,7 @@ app.action('thursday_set_button', async({body, ack}) => {
         var t2 = cooldownTimes.thursTime + " " + cooldownTimes.thursAMPM;
         firestoreFuncs.setWarmupTime(body.team.id, body.user.id, t1, "Thursday");
         firestoreFuncs.setCooldownTime(body.team.id, body.user.id, t2, "Thursday");
-        appHome.updateAppHome(body.user.id, body.team.id);
+        appHome.updateAppHome(body.user.id, body.team.id, context);
     }
     else {
         console.log("Nope");
@@ -315,7 +315,7 @@ app.action('friday_cooldown_time2_selected', async({payload, ack}) => {
     cooldownTimes.friAMPM = payload.selected_option.text.text;
 
 });
-app.action('friday_set_button', async({body, ack}) => {
+app.action('friday_set_button', async({body, ack, context}) => {
     ack();
     if (warmupTimes.friTime !== null && 
         warmupTimes.friAMPM !== null &&
@@ -327,7 +327,7 @@ app.action('friday_set_button', async({body, ack}) => {
         var t2 = cooldownTimes.friTime + " " + cooldownTimes.friAMPM;
         firestoreFuncs.setWarmupTime(body.team.id, body.user.id, t1, "Friday");
         firestoreFuncs.setCooldownTime(body.team.id, body.user.id, t2, "Friday");
-        appHome.updateAppHome(body.user.id, body.team.id);
+        appHome.updateAppHome(body.user.id, body.team.id, context);
     }
     else {
         console.log("Nope");

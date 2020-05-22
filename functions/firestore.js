@@ -18,6 +18,44 @@ else{
 
 let db = admin.firestore();
 
+exports.storeAPIPair = (team_id, api_key) => { 
+
+    let setValue = {
+        botToken: api_key.botToken,
+        botId: api_key.botId,
+        botUserId: api_key.botUserId
+    }; 
+    console.log("SETVALUE : @@@@@@@: " + JSON.stringify(setValue)); 
+    db.collection('api_keys').doc(team_id).set(setValue);
+};
+
+/* Gets the API keys from the database by team_id */ 
+exports.getAPIPair = (team_id) => { 
+    //default workspace (uncomment for testing)
+
+    // if (team_id === "T013FNS5Z4L"){ //if you know your team id, put it here
+    //     return ({ 
+    //         //put your bot token here 
+    //         botToken: "xoxb-1117774203156-1096971735751-K68wuukcXq9unFnIBKJbjbue",
+    //         botId: "B0132UUQFCN",
+    //         botUserId: "U012UUKMMN3"
+    //     });
+    // }
+    // else {
+        return db.collection('api_keys').doc(team_id).get().then((doc) => {
+            if (!(doc && doc.exists)) {	
+                console.log("doc does not exist");
+                return null;	
+            }
+            //console.log("JSON - data: " + JSON.stringify(doc.data()));
+            return doc.data();
+        }).catch(() => {	
+            return null;
+        });
+    // }
+}
+
+
 /* 
     Stores the new pairings (DM thread ids + partnerIDs) in the corresponding place (with the corresponding
     workspace and channel) in cloud firestore.
@@ -27,8 +65,9 @@ let db = admin.firestore();
         dmThreadID - a singular DM thread id of a new pairing
         pairedUsers - the user IDs of the newly paired teammates: format [u1, u2]
 */
-exports.storeNewPairing = function storeNewPairing(workspace, dmThreadID, pairedUsers) {
-    let channelID = this.getPairingChannel(workspace);
+exports.storeNewPairing = async function storeNewPairing(workspace, dmThreadID, pairedUsers) {
+    let channelID = await this.getPairingChannel(workspace);
+
     let usersRef = db.collection('workspaces').doc(workspace)
                            .collection('activeChannels').doc(channelID)
                            .collection('pairedUsers');
@@ -65,13 +104,20 @@ exports.storeNewPairingChannel = async function storeNewPairingChannel(workspace
         return;
     }
 
-    // To avoid the "ghost document" problem on the workspace
-    db.collection('workspaces').doc(workspaceID).set({}, {merge: true});
+    if (currChannel === undefined) {
+        db.collection('workspaces').doc(workspaceID).set({}, {merge: true});
+        db.collection("workspaces").doc(workspaceID).collection('activeChannels').doc(newChannel).set({}, {merge: true}); 
+    }
+    else {
+        // To avoid the "ghost document" problem on the workspace
+        db.collection('workspaces').doc(workspaceID).set({}, {merge: true});
 
-    deleteCollection('workspaces/'+ workspaceID + '/activeChannels', 100);
-    db.collection("workspaces").doc(workspaceID).collection('activeChannels').doc(newChannel).set({}, {merge: true});
+        deleteCollection('workspaces/'+ workspaceID + '/activeChannels', 100);
+        db.collection("workspaces").doc(workspaceID).collection('activeChannels').doc(newChannel).set({}, {merge: true});
+    }
 };
- 
+
+
 /*
     Description:
         Recursively deletes a specified collection from the db.
@@ -121,7 +167,7 @@ function deleteQueryBatch(query, resolve, reject) {
         // Recurse on the next process tick, to avoid
         // exploding the stack.
         process.nextTick(() => {
-          deleteQueryBatch(db, query, resolve, reject);
+          deleteQueryBatch(query, resolve, reject);
         });
         // eslint-disable-next-line consistent-return
         return null;
@@ -141,7 +187,6 @@ exports.getPairingChannel = async function getPairingChannel(workspaceID) {
     db.collection('workspaces').doc(workspaceID).set({}, {merge: true});
     const snapshot = await db.collection('workspaces').doc(workspaceID).collection('activeChannels').get();
     let allChannels = await snapshot.docs.map(doc => doc.id);
-
     return allChannels[0];
 };
 
@@ -170,6 +215,44 @@ exports.storeTypeOfExercise = async function storeTypeOfExercise(workspaceID, us
         partnerRef.set({'cooldownTask': exercisePrompt}, {merge: true});
     }
 };
+
+/*
+    Description:
+        Gets the exercise prompt for a particular user, for warmup or cooldown
+
+    Inputs:
+        workspaceID - workspace id that you are getting prompt for
+        userID - user id for which that prompt is going to be sent to
+        isWarmup - is this prompt for a warmup or cooldown (boolean), true for warmup, false for cooldown
+
+    Returns:
+        Promise that you have to await -> str that contains the prompt
+*/
+exports.getExercisePrompt = async function getExercisePrompt(workspaceID, userID, isWarmup) {
+    let channelID = await this.getPairingChannel(workspaceID);
+    let userRef = db.collection("workspaces").doc(workspaceID).collection("activeChannels")
+                    .doc(channelID).collection('pairedUsers').doc(userID);
+    
+    return userRef.get()
+        .then(doc => {
+            if (!doc.exists) {
+                console.log('No such document!');
+                return undefined;
+            }
+            else {
+                if (isWarmup) {
+                    return doc.data().warmupTask;
+                }
+                else {
+                    return doc.data().cooldownTask;
+                }
+            }
+        })
+        .catch(err => {
+            console.log('Error getting user document: ', err);
+            return undefined;
+        });
+}
 
 /*
     Description:
