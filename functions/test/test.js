@@ -193,7 +193,7 @@ describe('App Home', () => {
     assert.equal(timeZone, "LA");
 
     await firestoreFuncs.setTimeZone(workspaceId, "Space");
-    timeZone = await firestoreFuncs.getTimeZome(workspaceId).then((obj)=>{
+    timeZone = await firestoreFuncs.getTimeZone(workspaceId).then((obj)=>{
       return obj;
     }).catch((error) => {
           console.log(error);
@@ -215,7 +215,7 @@ describe('App Home', () => {
     assert.equal(t, true);
 
     await firestoreFuncs.setOwner(workspaceId, "Doctor who");
-    t = await appHome.checkOwner(workspaceId, userId);
+    t = await appHome.checkOwner(workspaceId, "user1");
     assert.equal(t, false);
 
     var ownerID = await firestoreFuncs.getOwner(workspaceId).then((obj)=>{
