@@ -653,12 +653,14 @@ handleQuoteSelect = async function(ack,body,context) {
 	
 	let confirmationJSON = createConfirmationView("Alti-Confirmation","*Your buddy will receive the motiviational quote for warmup tomorrow!*");
     try {
-		//push new view above old
-      const result = await app.client.views.update({
-		token: context.botToken,
-		view_id: body.view.id,
-        view: JSON.stringify(confirmationJSON)
-      });
+		if(body.view.id !== undefined){
+			//push new view above old
+			const result = await app.client.views.update({
+				token: context.botToken,
+				view_id: body.view.id,
+				view: JSON.stringify(confirmationJSON)
+			});
+		}
     }
     catch (error) {
       console.error(error);
@@ -674,19 +676,22 @@ handlePuzzleSelect = async function(ack,body,context) {
 	// console.log(text);
 	var workspaceId = body.team.id;
 	var userId = body.user.id;
-	firestoreFuncs.storeTypeOfExercise(workspaceId, userId, true, text);
+	var storeReturn = firestoreFuncs.storeTypeOfExercise(workspaceId, userId, true, text);
 		let confirmationJSON = createConfirmationView("Alti-Confirmation","*Your buddy will receive the motiviational quote for warmup tomorrow!*");
     try {
+		if(body.view.id !== undefined){
 		//push new view above old
-      const result = await app.client.views.update({
-		token: context.botToken,
-		view_id: body.view.id,
-        view: JSON.stringify(confirmationJSON)
-      });
+			const result = await app.client.views.update({
+				token: context.botToken,
+				view_id: body.view.id,
+				view: JSON.stringify(confirmationJSON)
+			});
+		}
     }
     catch (error) {
       console.error(error);
-    }
+	}
+	return storeReturn;
 }
 handleTypingSelect = async function(ack,body,context) {
 	await ack();
@@ -697,19 +702,22 @@ handleTypingSelect = async function(ack,body,context) {
 
 	var workspaceId = body.team.id;
 	var userId = body.user.id;
-	firestoreFuncs.storeTypeOfExercise(workspaceId, userId, true, text);
+	var storeReturn = firestoreFuncs.storeTypeOfExercise(workspaceId, userId, true, text);
 	let confirmationJSON = createConfirmationView("Alti-Confirmation","*Your buddy will receive the typing challenge for warmup tomorrow!*");
     try {
 		//push new view above old
-      const result = await app.client.views.update({
-		token: context.botToken,
-		view_id: body.view.id,
-        view: JSON.stringify(confirmationJSON)
-      });
+		if(body.view.id !== undefined){
+			const result = await app.client.views.update({
+				token: context.botToken,
+				view_id: body.view.id,
+				view: JSON.stringify(confirmationJSON)
+			});
+		}
     }
     catch (error) {
       console.error(error);
-    }
+	}
+	return storeReturn;
 }
 app.action('warmup_quote_selected_ack', ({ ack, body, context }) => {
 	handleQuoteSelect(ack,body,context);
