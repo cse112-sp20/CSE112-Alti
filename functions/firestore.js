@@ -160,7 +160,7 @@ exports.getPairingChannel = async function getPairingChannel(workspaceID) {
 */
 exports.storeTypeOfExercise = async function storeTypeOfExercise(workspaceID, userID, isWarmup, exercisePrompt) {
     let channelID = await this.getPairingChannel(workspaceID);
-    let partnerID = await this.getPartner(workspaceID, channelID, userID);
+    let partnerID = await this.getPartner(workspaceID, userID);
     let partnerRef = db.collection("workspaces").doc(workspaceID).collection("activeChannels").doc(channelID).collection('pairedUsers').doc(partnerID)
 
     if (isWarmup) {
@@ -177,13 +177,13 @@ exports.storeTypeOfExercise = async function storeTypeOfExercise(workspaceID, us
     
     Input:
         workspaceID - workspace id
-        channelID - channel id over channel from which pairing was created
         userID - user id of user who you want to find their respective partner
     
     Returns:
         partner's userID, or undefined if error or cannot find the user passed in
 */
-exports.getPartner = function getPartner(workspaceID, channelID, userID) {
+exports.getPartner = async function getPartner(workspaceID, userID) {
+    let channelID = await this.getPairingChannel(workspaceID);
     let userRef = db.collection("workspaces").doc(workspaceID).collection("activeChannels")
                     .doc(channelID).collection('pairedUsers').doc(userID);
     
