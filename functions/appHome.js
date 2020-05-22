@@ -62,7 +62,7 @@ async function checkOwner(workspaceID, userId) {
 	}).catch((error) => {
         console.log(error);
 	});
-	console.log("Inside checkOwner: " + ownerID);
+	
 	if(typeof(ownerID) === "undefined") {
 		return true;
 	}

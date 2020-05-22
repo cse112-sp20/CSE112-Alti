@@ -213,21 +213,15 @@ describe('App Home', () => {
     var t = await appHome.checkOwner(workspaceId, userId);
     assert.equal(t, true);
 
-    await firestoreFuncs.setOwner(workspaceId, "Doctor who");
-    t = await appHome.checkOwner(workspaceId, "user1");
-    assert.equal(t, false);
-
-    var ownerID = await firestoreFuncs.getOwner(workspaceId).then((obj)=>{
-      return obj;
-    }).catch((error) => {
-          console.log(error);
+    describe('Set Owner', async() => {
+      before(async() => {
+        await firestoreFuncs.setOwner(workspaceId, "Doctor who");
+      });
+      it('Set Owner', async () => {
+        var t = await appHome.checkOwner(workspaceId, "user1");
+        assert.equal(t, false);
+      });
     });
-    assert.equal(ownerID, "Doctor who");
-
-    await firestoreFuncs.setOwner(workspaceId, userId);
-    t = await appHome.checkOwner(workspaceId, userId);
-    assert.equal(t, true);
-
   });
 
   it('Get and Set Pairing Channel', async () => {
@@ -238,21 +232,20 @@ describe('App Home', () => {
       });
     assert.equal(channelId, "Channel1");
     
-    await firestoreFuncs.storeNewPairingChannel(workspaceId, "Channel2");
-    channelId = await firestoreFuncs.getPairingChannel(workspaceId).then((obj)=>{
-      return obj;
-    }).catch((error) => {
-          console.log(error);
+    describe('Set Pairing Channel', () => {
+      before(() => async () => {
+        await firestoreFuncs.storeNewPairingChannel(workspaceId, "Channel2");
       });
-    assert.equal(channelId, "Channel2");
-
-    await firestoreFuncs.storeNewPairingChannel(workspaceId, "Channel1");
-    channelId = await firestoreFuncs.getPairingChannel(workspaceId).then((obj)=>{
-      return obj;
-    }).catch((error) => {
-          console.log(error);
+      it('Check Set Pairing Channel', async () => {
+        var channelId = await firestoreFuncs.getPairingChannel(workspaceId).then((obj)=>{
+          return obj;
+        }).catch((error) => {
+              console.log(error);
+          });
+        assert.equal(channelId, "Channel2");
       });
-    assert.equal(channelId, "Channel1");
+    });
+    
   });
 
   it('Test getAllTimes function', async () => {
