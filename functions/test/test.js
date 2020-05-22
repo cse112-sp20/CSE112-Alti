@@ -173,12 +173,15 @@ describe('App Home', () => {
   let workspaceId;
   let firestoreFuncs;
   let userId;
-  before(() => {
+  before(async () => {
     appHome = require('../appHome'); 
     onBoard = require('../onBoard');
     firestoreFuncs = require('../firestore');
     workspaceId = "TestWorkspace";
     userId = "user1";
+    await firestoreFuncs.setTimeZone(workspaceId, 'LA');
+    await firestoreFuncs.setOwner(workspaceId, userId);
+    await firestoreFuncs.storeNewPairingChannel(workspaceId, "Channel1");
   });
 
   it('Get and Set time zone', async () => {
