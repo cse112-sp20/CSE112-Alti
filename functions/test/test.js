@@ -192,22 +192,21 @@ describe('App Home', () => {
     });
     assert.equal(timeZone, "LA");
 
-    await firestoreFuncs.setTimeZone(workspaceId, "Space");
-    timeZone = await firestoreFuncs.getTimeZone(workspaceId).then((obj)=>{
-      return obj;
-    }).catch((error) => {
-          console.log(error);
-    });
-    assert.equal(timeZone, "Space");
+  });
 
-    await firestoreFuncs.setTimeZone(workspaceId, 'LA');
-    timeZone = await firestoreFuncs.getTimeZone(workspaceID).then((obj)=>{
-      return obj;
-    }).catch((error) => {
-          console.log(error);
+  describe('Set Time Zone', () => {
+    before(async() => {
+      await firestoreFuncs.setTimeZone(workspaceId, "Space");
     });
-    assert.equal(timeZone, "LA");
 
+    it('Set Time Zone', async () => {
+      timeZone = await firestoreFuncs.getTimeZone(workspaceId).then((obj)=>{
+        return obj;
+      }).catch((error) => {
+            console.log(error);
+      });
+      assert.equal(timeZone, "Space");
+    })
   });
 
   it('Set and Check Owner', async () => {

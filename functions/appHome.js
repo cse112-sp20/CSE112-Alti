@@ -107,6 +107,7 @@ async function createScheduleDisplay(workspaceId, userId) {
 /* Checks if user is owner or not and loads up either owner home tab or non-owner home tab
 */
 async function loadHomeTabUI(app, workspaceID, userId, context) {
+
 	var view;
 
 	var ownerId = await firestoreFuncs.getOwner(workspaceID).then((obj)=>{
