@@ -24,12 +24,12 @@ exports.getBolt = function getBolt(){
     return {
         app:app,
         token:bot_token
-    }
+    };
 };
 
 const generateTaskData = require('./generateTaskData');
 const warmupMessage = require('./warmupMessage');
-const pubsubScheduler = require('./pubsubScheduler')
+const pubsubScheduler = require('./pubsubScheduler');
 const pairUp = require('./pairUp');
 const onBoard = require('./onBoard');
 const appHome = require('./appHome');

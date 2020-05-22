@@ -80,7 +80,7 @@ async function checkOwner(workspaceID, userId) {
 
 function getAllTimes(workspaceId, userId) {
   var results = [];
-  for (day of days) {
+  for (var day of days) {
     results.push(firestoreFuncs.getWarmupTime(workspaceId, userId, day));
     results.push(firestoreFuncs.getCooldownTime(workspaceId, userId, day));
   }
@@ -92,14 +92,14 @@ async function createScheduleDisplay(workspaceId, userId) {
   var res = await getAllTimes(workspaceId, userId);  
   var sched = {};
   var index = 0;
-  for (day of days) {
+  for (var day of days) {
     var block = {
       "type": "section",
       "text": {
         "type": "mrkdwn",
         "text": day + ": " + res[index] + "-" + res[index+1]
       }
-    }
+    };
     sched[day] = block;
     index += 2;
   }
@@ -118,6 +118,9 @@ async function loadHomeTabUI(app, workspaceID, userId) {
 	});
 	console.log("Owner id: " + ownerId);
 	
+	if (ownerId === undefined) {
+		firestoreFuncs.setOwner(workspaceID, userId);
+	}
 
 	var channelId = await firestoreFuncs.getPairingChannel(workspaceID).then((obj)=>{
 		return obj;
@@ -131,6 +134,9 @@ async function loadHomeTabUI(app, workspaceID, userId) {
         console.log(error);
 	});
 	// TODO store default LA timezome in on board file
+	if (timeZone === undefined) {
+		timeZone = "None";
+	}
 
   var channelName;
   if (typeof(channelId) !== "undefined") {

@@ -38,7 +38,7 @@ app.action('pairing_channel_selected', async({body, ack, say}) => {
     */
     try {
         await boardExistingChannel(app, token, team_id, body.actions[0].selected_channel);
-        await appHome.updateAppHome(body.user.id, body.team.id);
+        appHome.updateAppHome(body.user.id, body.team.id);
     }
     catch (e) {
         console.log(e);
@@ -51,7 +51,8 @@ app.action('pairing_channel_selected', async({body, ack, say}) => {
 exports.onBoard = createOnBoardingChannel;
 async function createOnBoardingChannel(app, token, team_id, channelName) {
     try {
-
+        var promises = [];
+        
         var channels = await app.client.conversations.list({
             token: token
         }).catch((error) => {
@@ -106,14 +107,17 @@ async function createOnBoardingChannel(app, token, team_id, channelName) {
                         (To opt out, just leave the channel.)`
             });
             
-            firestoreFuncs.storeNewPairingChannel(team_id, conversationObj.channel.id);
+            promises.push(firestoreFuncs.storeNewPairingChannel(team_id, conversationObj.channel.id));
 
-            for (userId in usersDict) {
-                for (day of days) {
-                    firestoreFuncs.setWarmupTime(team_id, userId, "9:00 AM", day);
-                    firestoreFuncs.setCooldownTime(team_id, userId, "5:00 PM", day);
+            for (var userId in usersDict) {
+                for (var day of days) {
+                    promises.push(firestoreFuncs.setWarmupTime(team_id, userId, "9:00 AM", day));
+                    promises.push(firestoreFuncs.setCooldownTime(team_id, userId, "5:00 PM", day));
                 }
             }
+            Promise.all(promises).catch((error) => {
+                console.log(error);
+            });
 
         }
         else {
@@ -130,6 +134,7 @@ async function createOnBoardingChannel(app, token, team_id, channelName) {
 exports.onBoardExisting = boardExistingChannel;
 async function boardExistingChannel(app, token, team_id, channelId) {
     try {
+        var promises = [];
         var userList = await findUsersChannel(app, token, channelId);
 
         // send welcome message
@@ -142,13 +147,16 @@ async function boardExistingChannel(app, token, team_id, channelId) {
             
         });
         // TODO (To opt out, just leave the channel.)
-        firestoreFuncs.storeNewPairingChannel(team_id, channelId);
-        for (userId of userList) {
-            for (day of days) {
-                firestoreFuncs.setWarmupTime(team_id, userId, "9:00 AM", day);
-                firestoreFuncs.setCooldownTime(team_id, userId, "5:00 PM", day);
+        await firestoreFuncs.storeNewPairingChannel(team_id, channelId);
+        for (var userId of userList) {
+            for (var day of days) {
+                promises.push(firestoreFuncs.setWarmupTime(team_id, userId, "9:00 AM", day));
+                promises.push(firestoreFuncs.setCooldownTime(team_id, userId, "5:00 PM", day));
             }
         }
+        Promise.all(promises).catch((error) => {
+            console.log(error);
+        });
     }
     catch (error) {
         console.log(error);

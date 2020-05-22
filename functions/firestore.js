@@ -41,14 +41,14 @@ exports.storeNewPairing = function storeNewPairing(workspace, dmThreadID, paired
     usersRef.doc(pairedUsers[1]).set({
         dmThreadID: dmThreadID,
         partnerID: pairedUsers[0],
-    }, {merge: true})
-}
+    }, {merge: true});
+};
 
 exports.writeMsgToDB = function writeMsgToDB(teamId, userID, channelID,msgToSend,isWarmup) {
 	db.collection("workspaces").doc(teamId+"/activeChannels/"+channelID+"/teammatePairings/"+userID).set({
 		warmupMessage: msgToSend
 	});
-}
+};
 
 /*
     Description:
@@ -70,7 +70,7 @@ exports.storeNewPairingChannel = async function storeNewPairingChannel(workspace
 
     deleteCollection('workspaces/'+ workspaceID + '/activeChannels', 100);
     db.collection("workspaces").doc(workspaceID).collection('activeChannels').doc(newChannel).set({}, {merge: true});
-}
+};
  
 /*
     Description:
@@ -143,7 +143,7 @@ exports.getPairingChannel = async function getPairingChannel(workspaceID) {
     let allChannels = await snapshot.docs.map(doc => doc.id);
 
     return allChannels[0];
-}
+};
 
 /* 
     Description:
@@ -161,7 +161,7 @@ exports.getPairingChannel = async function getPairingChannel(workspaceID) {
 exports.storeTypeOfExercise = async function storeTypeOfExercise(workspaceID, userID, isWarmup, exercisePrompt) {
     let channelID = await this.getPairingChannel(workspaceID);
     let partnerID = await this.getPartner(workspaceID, channelID, userID);
-    let partnerRef = db.collection("workspaces").doc(workspaceID).collection("activeChannels").doc(channelID).collection('pairedUsers').doc(partnerID)
+    let partnerRef = db.collection("workspaces").doc(workspaceID).collection("activeChannels").doc(channelID).collection('pairedUsers').doc(partnerID);
 
     if (isWarmup) {
         partnerRef.set({'warmupTask': exercisePrompt}, {merge: true});
@@ -169,7 +169,7 @@ exports.storeTypeOfExercise = async function storeTypeOfExercise(workspaceID, us
     else {
         partnerRef.set({'cooldownTask': exercisePrompt}, {merge: true});
     }
-}
+};
 
 /*
     Description:
@@ -201,7 +201,7 @@ exports.getPartner = function getPartner(workspaceID, channelID, userID) {
             console.log('Error getting user document: ', err);
             return undefined;
         });
-}
+};
 
 /*
     Description:
@@ -228,12 +228,12 @@ exports.getPairedUsers = async function getPairedUsers(workspaceID) {
             let partner = doc.data().partnerID;
             if (!partnerIDs.includes(doc.id)) {
                 pairings.push({users: [doc.id, partner], dmThreadID: doc.data().dmThreadID});
-                partnerIDs.push(partner)
+                partnerIDs.push(partner);
             }
         });
         return pairings;
     });
-}
+};
  
 /*
     Description:
@@ -254,7 +254,7 @@ exports.setWarmupTime = function setWarmupTime(workspaceID, userID, time, day) {
     let data = {};
     data[day + 'Start'] = time;
     userDocRef.set(data, {merge: true});
-}
+};
 
 /*
     Description:
@@ -283,7 +283,7 @@ exports.getWarmupTime = function getWarmupTime(workspaceID, userID, day) {
             console.log('Error getting user document: ', err);
             return undefined;
         });
-}
+};
 
 /*
     Description:
@@ -304,7 +304,7 @@ exports.setCooldownTime = function setWarmupTime(workspaceID, userID, time, day)
     let data = {};
     data[day + 'End'] = time;
     userDocRef.set(data, {merge: true});
-}
+};
 
 /*
     Description:
@@ -333,7 +333,7 @@ exports.getCooldownTime = function getWarmupTime(workspaceID, userID, day) {
             console.log('Error getting user document: ', err);
             return undefined;
         });
-}
+};
 
 /*
     Description:
@@ -360,7 +360,7 @@ exports.getOwner = function getOwner(workspaceID) {
             console.log('Error getting workspace document: ', err);
             return undefined;
         });
-}
+};
 
 /*
     Description:
@@ -376,7 +376,7 @@ exports.setOwner = function updateOwner(workspaceID, userID) {
     workspaceDocRef.set({
         owner: userID
     }, {merge: true});
-}
+};
 
 /*
     Description:
@@ -404,7 +404,7 @@ exports.getTimeZone = function getTimezone(workspaceID) {
             console.log('Error getting workspace document: ', err);
             return undefined;
         });
-}
+};
 
 /*
     Description:
@@ -419,5 +419,5 @@ exports.setTimeZone = function updateTimeZone(workspaceID, timeZone) {
 
     workspaceDocRef.set({
         timezone: timeZone
-    }, {merge: true})
-}
+    }, {merge: true});
+};
