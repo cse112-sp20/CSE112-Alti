@@ -1,2 +1,13 @@
-node_modules/
+node_modules
+functions/.runtimeconfig.json
+functions/serviceAccountKey.json
 .runtimeconfig.json
+firebase-debug.log
+firestore-debug.log
+pubsub-debug.log
+AltiTest-234ac26149af.json
+.DS_Store
+ngrok
+firebase.json
+functions/tokens.env
+functions/.env

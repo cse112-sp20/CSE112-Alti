@@ -8,7 +8,7 @@ var generateTaskData = require('../generateTaskData');
 
 //hardcode the token 
 
-let token = "xoxb-1109790171392-1110712837169-OxF8igcVuxkFUhbZVuoXxypj";
+let token = "xoxb-1098390403719-1098476773287-xu1aYxCSVRW6zo1hbdJsYTuj";
 
 
 
@@ -167,7 +167,51 @@ describe('generateCodingChallenge', () => {
   });
 });
 
-
+// Checks if generated puzzle URLs are working (don't result in a 404)
+describe('generatePuzzle', () => {
+  it('Generate Random Sudoku 1', () => {
+    url = generateTaskData.generatePuzzle("sudoku");
+    assert.notEqual(404, httpGetStatus(url));
+  });
+  it('Generate Random Sudoku 2', () => {
+    url = generateTaskData.generatePuzzle("sudoku");
+    assert.notEqual(404, httpGetStatus(url));
+  });
+  it('Generate Random Sudoku 3', () => {
+    url = generateTaskData.generatePuzzle("sudoku");
+    assert.notEqual(404, httpGetStatus(url));
+  });
+  it('Generate Random Sudoku 4', () => {
+    url = generateTaskData.generatePuzzle("sudoku");
+    assert.notEqual(404, httpGetStatus(url));
+  });
+  it('Generate Random Sudoku 5', () => {
+    url = generateTaskData.generatePuzzle("sudoku");
+    assert.notEqual(404, httpGetStatus(url));
+  });
+  it('Generate 3inarow', () => {
+    url = generateTaskData.generatePuzzle("3inarow");
+    assert.notEqual(404, httpGetStatus(url));
+  });
+  it('Generate Calcudoku', () => {
+    url = generateTaskData.generatePuzzle("calcudoku");
+    assert.notEqual(404, httpGetStatus(url));
+  });
+  it('Generate Hitori', () => {
+    url = generateTaskData.generatePuzzle("hitori");
+    assert.notEqual(404, httpGetStatus(url));
+  });
+  it('Throw error if asking for an unavailable game', async function(){
+    this.timeout(5 * 1000);
+    try {
+      var url = await generateTaskData.generatePuzzle("badgame");
+      throw new Error("Error not thrown!");
+    } catch(err) {
+      var expected = "Parameter does not match any available games";
+      assert.equal(err.message, expected);
+    }
+  });
+});
 
 // This functions assumes that the HandleQuoteSelect function
 // only sets warmups. Needs to be changed when cooldowns are added
@@ -255,3 +299,12 @@ describe('Setup Warmup Callbacks', () => {
     });
   });
 });
+
+// Opens a GET request, given a URL, and returns its status code (as an int)
+function httpGetStatus(url) {
+    var XMLHttpRequest = require("xmlhttprequest").XMLHttpRequest;
+    var xmlHttp = new XMLHttpRequest();
+    xmlHttp.open("GET", url, false); // false for synchronous request
+    xmlHttp.send(null);
+    return xmlHttp.status;
+}
