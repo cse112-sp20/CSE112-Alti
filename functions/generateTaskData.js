@@ -32,7 +32,7 @@ exports.generateQuote = function() {
 	if (quoteAuthor === null) {
 		quoteAuthor = "Unknown";
 	}
-    return randomQuoteIndex+"-"+quoteText+" - "+ quoteAuthor ;
+    return randomQuoteIndex+"-"+quoteText+" - "+ quoteAuthor;
 }
 
 // TODO
