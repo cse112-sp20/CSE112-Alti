@@ -4,8 +4,6 @@ const admin = require('firebase-admin');
 
 const config = functions.config();
 const signingSecret = config.slack.signing_secret;
-//const user_token = config.slack.user_token;
-const bot_token = config.slack.bot_token;
 
 const firestoreFuncs = require('./firestore');
 //OAuth Endpoint for Authentication
@@ -18,16 +16,7 @@ const expressReceiver = new ExpressReceiver({
 });
 
 
-const authorizeFunction = async ({ teamId }) => {
-    
-    // console.log(teamId);
-    // eslint-disable-next-line promise/catch-or-return
-    return firestoreFuncs.getAPIPair(teamId).then((result) => {
-        // console.log(result); // "Some User token"
-        return result;
-     });
-
-};
+const authorizeFunction = async ({ teamId }) => firestoreFuncs.getAPIPair(teamId);
 
 const app = new App({
     receiver: expressReceiver,
@@ -64,8 +53,8 @@ app.error(console.log);
 app.message(async ({ message, context }) => {
     try{
         if(message.channel_type === 'im'){
-            // console.log("Message object: ");
-            // console.log(message);
+            console.log("Message object: ");
+            console.log(message);
             app.client.chat.postMessage({
                 token: context.botToken,
                 channel: '#general',
