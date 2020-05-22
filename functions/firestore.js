@@ -1,6 +1,8 @@
 const functions = require('firebase-functions');
 const admin = require('firebase-admin');
 const request = require('request');
+//const dotenv = require('dotenv');
+//dotenv.config();
 
 // console.log(typeof(process.env.FUNCTIONS_EMULATOR));
 if(process.env.FUNCTIONS_EMULATOR === "true"){
@@ -18,6 +20,22 @@ else{
 
 let db = admin.firestore();
 
+
+/* 
+    storeAPIPair(team_id, api_key): 
+
+    Stores the API keys from the database by team_id. 
+
+    @@PARAMS 
+    team_id: same thing as workspace id 
+
+    store the API-tokens/id's in the format: 
+        { 
+            botToken: "xxxxxxxxxxxxx",
+            botId: "Bxxxxxxxxx",
+            botUserId: "Uxxxxxxxxx"
+        })
+ */
 exports.storeAPIPair = (team_id, api_key) => { 
 
     let setValue = {
@@ -25,34 +43,50 @@ exports.storeAPIPair = (team_id, api_key) => {
         botId: api_key.botId,
         botUserId: api_key.botUserId
     }; 
-    console.log("SETVALUE : @@@@@@@: " + JSON.stringify(setValue)); 
+
+    console.log("Team ID: " + team_id) 
+    console.log("API Keys: Copy/Paste this" + JSON.stringify(setValue, null, 1)); 
     db.collection('api_keys').doc(team_id).set(setValue);
 };
 
-/* Gets the API keys from the database by team_id */ 
-exports.getAPIPair = (team_id) => { 
-    //default workspace (uncomment for testing)
+/* 
+    getAPIPair(team_id):
 
-    // if (team_id === "T013FNS5Z4L"){ //if you know your team id, put it here
-    //     return ({ 
-    //         //put your bot token here 
-    //         botToken: "xoxb-1117774203156-1096971735751-K68wuukcXq9unFnIBKJbjbue",
-    //         botId: "B0132UUQFCN",
-    //         botUserId: "U012UUKMMN3"
-    //     });
-    // }
-    // else {
+    Gets the API keys from the database by team_id. 
+
+    @@PARAMS 
+    team_id: same thing as workspace id 
+
+    return the API-tokens/id's in the format: 
+        { 
+            botToken: "xxxxxxxxxxxxx",
+            botId: "Bxxxxxxxxx",
+            botUserId: "Uxxxxxxxxx"
+        })
+ */
+exports.getAPIPair = (team_id) => { 
         return db.collection('api_keys').doc(team_id).get().then((doc) => {
             if (!(doc && doc.exists)) {	
-                console.log("doc does not exist");
+
+                //verbose debug message
+                
+                if(process.env.FUNCTIONS_EMULATOR === "true") {
+                    console.log(" Your API_Key is not in the firestore db. " + 
+                    "\nRemember that data does not save after restart."+
+                    "\n You may have to reinstall your app again if you are using the emulator.");
+
+                } else { 
+                    console.log("Your API_Key is not in the firestore db. "); 
+                }
                 return null;	
             }
-            //console.log("JSON - data: " + JSON.stringify(doc.data()));
+            
+            //returns the fetched value here 
             return doc.data();
         }).catch(() => {	
+            //return null if there was an error in fetching the data
             return null;
         });
-    // }
 }
 
 
