@@ -186,7 +186,7 @@ exports.getPartner = async function getPartner(workspaceID, userID) {
     let channelID = await this.getPairingChannel(workspaceID);
     let userRef = db.collection("workspaces").doc(workspaceID).collection("activeChannels")
                     .doc(channelID).collection('pairedUsers').doc(userID);
-     
+    
     return userRef.get()
         .then(doc => {
             if (!doc.exists) {
