@@ -200,7 +200,7 @@ describe('App Home', () => {
     });
 
     it('Set Time Zone', async () => {
-      timeZone = await firestoreFuncs.getTimeZone(workspaceId).then((obj)=>{
+      var timeZone = await firestoreFuncs.getTimeZone(workspaceId).then((obj)=>{
         return obj;
       }).catch((error) => {
             console.log(error);
