@@ -193,7 +193,7 @@ describe('App Home', () => {
     assert.equal(timeZone, "LA");
 
     await firestoreFuncs.setTimeZone(workspaceId, 'Space');
-    timeZone = await firestoreFuncs.getTimeZone(workspaceID).then((obj)=>{
+    timeZone = await firestoreFuncs.getTimeZone(workspaceId).then((obj)=>{
       return obj;
     }).catch((error) => {
           console.log(error);
@@ -259,8 +259,8 @@ describe('App Home', () => {
   it('Test getAllTimes function', async () => {
     var res = await appHome.getAllTimes(workspaceId, userId);  
     console.log(res);
-    for (var i = 1; i <= 10; i++) {
-      assert.equal(res[i], i);
+    for (var i = 0; i < 10; i++) {
+      assert.equal(res[i], i+1);
     }
   });
 
