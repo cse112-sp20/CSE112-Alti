@@ -184,7 +184,7 @@ describe('App Home', () => {
     await firestoreFuncs.storeNewPairingChannel(workspaceId, "Channel1");
   });
 
-  it('Get and Set time zone', async () => {
+  it('Get time zone', async () => {
     var timeZone = await firestoreFuncs.getTimeZone(workspaceId).then((obj)=>{
       return obj;
     }).catch((error) => {
@@ -194,63 +194,25 @@ describe('App Home', () => {
 
   });
 
-  describe('Set Time Zone', () => {
-    before(async() => {
-      await firestoreFuncs.setTimeZone(workspaceId, "Space");
-    });
 
-    it('Set Time Zone', async () => {
-      var timeZone = await firestoreFuncs.getTimeZone(workspaceId).then((obj)=>{
-        return obj;
-      }).catch((error) => {
-            console.log(error);
-      });
-      assert.equal(timeZone, "Space");
-    })
-  });
-
-  it('Set and Check Owner', async () => {
+  it('Check Owner', async () => {
     var t = await appHome.checkOwner(workspaceId, userId);
     assert.equal(t, true);
 
-    describe('Set Owner', async() => {
-      before(async() => {
-        await firestoreFuncs.setOwner(workspaceId, "Doctor who");
-      });
-      it('Set Owner', async () => {
-        var t = await appHome.checkOwner(workspaceId, "user1");
-        assert.equal(t, false);
-      });
-    });
   });
 
-  it('Get and Set Pairing Channel', async () => {
+  it('Get Pairing Channel', async () => {
     var channelId = await firestoreFuncs.getPairingChannel(workspaceId).then((obj)=>{
       return obj;
     }).catch((error) => {
           console.log(error);
       });
     assert.equal(channelId, "Channel1");
-    
-    describe('Set Pairing Channel', () => {
-      before(() => async () => {
-        await firestoreFuncs.storeNewPairingChannel(workspaceId, "Channel2");
-      });
-      it('Check Set Pairing Channel', async () => {
-        var channelId = await firestoreFuncs.getPairingChannel(workspaceId).then((obj)=>{
-          return obj;
-        }).catch((error) => {
-              console.log(error);
-          });
-        assert.equal(channelId, "Channel2");
-      });
-    });
-    
+
   });
 
   it('Test getAllTimes function', async () => {
     var res = await appHome.getAllTimes(workspaceId, userId);  
-    console.log(res);
     for (var i = 0; i < 10; i++) {
       assert.equal(res[i], i+1);
     }
