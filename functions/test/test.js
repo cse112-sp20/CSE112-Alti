@@ -9,7 +9,6 @@ var generateTaskData = require('../generateTaskData');
 //hardcode the token 
 
 let token = "xoxb-1109790171392-1110712837169-OxF8igcVuxkFUhbZVuoXxypj";
-let it, describe, before;
 
 // If it passes, means the function finished and message was scheduled, baseline test
 // Need more rigorous testing using promises of async function and validation from Slack API channel reading
