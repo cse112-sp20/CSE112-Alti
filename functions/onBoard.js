@@ -4,32 +4,32 @@
 const appHome = require('./appHome');
 const firestoreFuncs = require('./firestore');
 const index = require('./index');
-const {app, token} = index.getBolt();
+const app = index.getBolt();
 
 var days = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"];
 
 // Listen for slash command /setup which creates new channel alti-pairing, 
 // invites all users in workspace, and designate as active pairing channel
-app.command('/setup', async ({payload, body, ack, say }) => {
+app.command('/setup', async ({payload, body, ack, say, context}) => {
     ack();
     say("Trying to set up");
-    createOnBoardingChannel(app, token, payload.team_id, "alti-pairing");
-    appHome.updateAppHome(body.user.id, body.team.id);
+    createOnBoardingChannel(app, context.botToken, payload.team_id, "alti-pairing");
+    appHome.updateAppHome(body.user.id, body.team.id, context);
 });
 
 
 // Listen to channel dropdown select menu for new pairing channel
-app.action('pairing_channel_selected', async({body, ack, say}) => {
+app.action('pairing_channel_selected', async({body, ack, say, context}) => {
     ack();
     // block action payload type
     var team_info = await app.client.team.info({
-        token: token
+        token: context.botToken
     }).catch((error) => {
         console.log(error);
     });
     var team_id = body.team.id;
-    boardExistingChannel(app, token, team_id, body.actions[0].selected_channel);
-    appHome.updateAppHome(body.user.id, body.team.id);
+    boardExistingChannel(app, context.botToken, team_id, body.actions[0].selected_channel);
+    appHome.updateAppHome(body.user.id, body.team.id, context);
 });
 
 
@@ -170,7 +170,7 @@ async function findUsersChannel(app, token, channelId) {
         token: token,
         channel: channelId
     }).then((obj) => {
-        console.log(obj);
+        // console.log(obj);
         return obj.members;
     }).catch((error) => {
         console.log(error);

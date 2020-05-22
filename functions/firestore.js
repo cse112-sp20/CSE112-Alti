@@ -1,6 +1,8 @@
 const functions = require('firebase-functions');
 const admin = require('firebase-admin');
 const request = require('request');
+//const dotenv = require('dotenv');
+//dotenv.config();
 
 // console.log(typeof(process.env.FUNCTIONS_EMULATOR));
 if(process.env.FUNCTIONS_EMULATOR === "true"){
@@ -18,6 +20,76 @@ else{
 
 let db = admin.firestore();
 
+
+/* 
+    storeAPIPair(team_id, api_key): 
+
+    Stores the API keys from the database by team_id. 
+
+    @@PARAMS 
+    team_id: same thing as workspace id 
+
+    store the API-tokens/id's in the format: 
+        { 
+            botToken: "xxxxxxxxxxxxx",
+            botId: "Bxxxxxxxxx",
+            botUserId: "Uxxxxxxxxx"
+        })
+ */
+exports.storeAPIPair = (team_id, api_key) => { 
+
+    let setValue = {
+        botToken: api_key.botToken,
+        botId: api_key.botId,
+        botUserId: api_key.botUserId
+    }; 
+
+    console.log("Team ID: " + team_id) 
+    console.log("API Keys: Copy/Paste this" + JSON.stringify(setValue, null, 1)); 
+    db.collection('api_keys').doc(team_id).set(setValue);
+};
+
+/* 
+    getAPIPair(team_id):
+
+    Gets the API keys from the database by team_id. 
+
+    @@PARAMS 
+    team_id: same thing as workspace id 
+
+    return the API-tokens/id's in the format: 
+        { 
+            botToken: "xxxxxxxxxxxxx",
+            botId: "Bxxxxxxxxx",
+            botUserId: "Uxxxxxxxxx"
+        })
+ */
+exports.getAPIPair = (team_id) => { 
+        return db.collection('api_keys').doc(team_id).get().then((doc) => {
+            if (!(doc && doc.exists)) {	
+
+                //verbose debug message
+                
+                if(process.env.FUNCTIONS_EMULATOR === "true") {
+                    console.log(" Your API_Key is not in the firestore db. " + 
+                    "\nRemember that data does not save after restart."+
+                    "\n You may have to reinstall your app again if you are using the emulator.");
+
+                } else { 
+                    console.log("Your API_Key is not in the firestore db. "); 
+                }
+                return null;	
+            }
+            
+            //returns the fetched value here 
+            return doc.data();
+        }).catch(() => {	
+            //return null if there was an error in fetching the data
+            return null;
+        });
+}
+
+
 /* 
     Stores the new pairings (DM thread ids + partnerIDs) in the corresponding place (with the corresponding
     workspace and channel) in cloud firestore.
@@ -27,8 +99,9 @@ let db = admin.firestore();
         dmThreadID - a singular DM thread id of a new pairing
         pairedUsers - the user IDs of the newly paired teammates: format [u1, u2]
 */
-exports.storeNewPairing = function storeNewPairing(workspace, dmThreadID, pairedUsers) {
-    let channelID = this.getPairingChannel(workspace);
+exports.storeNewPairing = async function storeNewPairing(workspace, dmThreadID, pairedUsers) {
+    let channelID = await this.getPairingChannel(workspace);
+
     let usersRef = db.collection('workspaces').doc(workspace)
                            .collection('activeChannels').doc(channelID)
                            .collection('pairedUsers');
@@ -65,12 +138,19 @@ exports.storeNewPairingChannel = async function storeNewPairingChannel(workspace
         return;
     }
 
-    // To avoid the "ghost document" problem on the workspace
-    db.collection('workspaces').doc(workspaceID).set({}, {merge: true});
+    if (currChannel === undefined) {
+        db.collection('workspaces').doc(workspaceID).set({}, {merge: true});
+        db.collection("workspaces").doc(workspaceID).collection('activeChannels').doc(newChannel).set({}, {merge: true}); 
+    }
+    else {
+        // To avoid the "ghost document" problem on the workspace
+        db.collection('workspaces').doc(workspaceID).set({}, {merge: true});
 
-    deleteCollection('workspaces/'+ workspaceID + '/activeChannels', 100);
-    db.collection("workspaces").doc(workspaceID).collection('activeChannels').doc(newChannel).set({}, {merge: true});
+        deleteCollection('workspaces/'+ workspaceID + '/activeChannels', 100);
+        db.collection("workspaces").doc(workspaceID).collection('activeChannels').doc(newChannel).set({}, {merge: true});
+    }
 }
+
 
 /*
     Description:
@@ -121,7 +201,7 @@ function deleteQueryBatch(query, resolve, reject) {
         // Recurse on the next process tick, to avoid
         // exploding the stack.
         process.nextTick(() => {
-          deleteQueryBatch(db, query, resolve, reject);
+          deleteQueryBatch(query, resolve, reject);
         });
         // eslint-disable-next-line consistent-return
         return null;
@@ -141,7 +221,6 @@ exports.getPairingChannel = async function getPairingChannel(workspaceID) {
     db.collection('workspaces').doc(workspaceID).set({}, {merge: true});
     const snapshot = await db.collection('workspaces').doc(workspaceID).collection('activeChannels').get();
     let allChannels = await snapshot.docs.map(doc => doc.id);
-
     return allChannels[0];
 }
 
@@ -162,13 +241,52 @@ exports.storeTypeOfExercise = async function storeTypeOfExercise(workspaceID, us
     let channelID = await this.getPairingChannel(workspaceID);
     let partnerID = await this.getPartner(workspaceID, userID);
     let partnerRef = db.collection("workspaces").doc(workspaceID).collection("activeChannels").doc(channelID).collection('pairedUsers').doc(partnerID)
-
+    let setResult;
     if (isWarmup) {
-        partnerRef.set({'warmupTask': exercisePrompt}, {merge: true});
+        setResult = await partnerRef.set({'warmupTask': exercisePrompt}, {merge: true});
     }
     else {
-        partnerRef.set({'cooldownTask': exercisePrompt}, {merge: true});
+        setResult = await partnerRef.set({'cooldownTask': exercisePrompt}, {merge: true});
     }
+    return setResult;
+}
+
+/*
+    Description:
+        Gets the exercise prompt for a particular user, for warmup or cooldown
+
+    Inputs:
+        workspaceID - workspace id that you are getting prompt for
+        userID - user id for which that prompt is going to be sent to
+        isWarmup - is this prompt for a warmup or cooldown (boolean), true for warmup, false for cooldown
+
+    Returns:
+        Promise that you have to await -> str that contains the prompt
+*/
+exports.getExercisePrompt = async function getExercisePrompt(workspaceID, userID, isWarmup) {
+    let channelID = await this.getPairingChannel(workspaceID);
+    let userRef = db.collection("workspaces").doc(workspaceID).collection("activeChannels")
+                    .doc(channelID).collection('pairedUsers').doc(userID);
+    
+    return userRef.get()
+        .then(doc => {
+            if (!doc.exists) {
+                console.log('No such document!');
+                return undefined;
+            }
+            else {
+                if (isWarmup) {
+                    return doc.data().warmupTask;
+                }
+                else {
+                    return doc.data().cooldownTask;
+                }
+            }
+        })
+        .catch(err => {
+            console.log('Error getting user document: ', err);
+            return undefined;
+        });
 }
 
 /*

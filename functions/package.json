@@ -17,8 +17,10 @@
     "@google-cloud/firestore": "3.7.5",
     "@google-cloud/pubsub": "^1.7.3",
     "@slack/bolt": "^2.0.1",
+    "dotenv": "^8.2.0",
     "firebase-admin": "^8.12.1",
     "firebase-functions": "^3.6.1",
+    "request": "^2.88.2",
     "shuffle-array": "^1.0.1"
   },
   "devDependencies": {
@@ -31,7 +33,6 @@
     "istanbul": "^0.4.5",
     "mocha": "^7.1.2",
     "proxyquire": "^1.7.10",
-    "request": "^2.88.2",
     "sinon": "^1.17.6",
     "sinon-chai": "^2.8.0",
     "standard": "^8.5.0"
