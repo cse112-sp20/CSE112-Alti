@@ -9,7 +9,7 @@ var generateTaskData = require('../generateTaskData');
 //hardcode the token 
 
 let token = "xoxb-1109790171392-1110712837169-OxF8igcVuxkFUhbZVuoXxypj";
-
+let it, describe, before;
 
 // If it passes, means the function finished and message was scheduled, baseline test
 // Need more rigorous testing using promises of async function and validation from Slack API channel reading
@@ -65,7 +65,7 @@ describe('Pairup', () => {
       firestoreFuncs = require('../firestore');
       workspaceInfo = await app.client.team.info({
         token: token
-      })
+      });
       workspaceId = workspaceInfo.team.id;
       
     });
@@ -128,6 +128,7 @@ describe('util', () => {
 
 
 describe('generateCodingChallenge', () => {
+  var url;
   it('Testing english', () => {
     //generateCodingChallenge();
     url = generateTaskData.generateCodingChallenge('english');
@@ -164,4 +165,100 @@ describe('generateCodingChallenge', () => {
     url = generateTaskData.generateCodingChallenge('c++',5);
     assert.equal(url.substring(0, 37),'http://www.speedcoder.net/lessons/cpp');
   });
+});
+
+
+describe('App Home', () => {
+  let appHome;
+  let onBoard;
+  let workspaceId;
+  let firestoreFuncs;
+  let userId;
+  before(() => {
+    appHome = require('../appHome'); 
+    onBoard = require('../onBoard');
+    firestoreFuncs = require('../firestore');
+    workspaceId = "TestWorkspace";
+    userId = "user1";
+  });
+
+  it('Get and Set time zone', async () => {
+    var timeZone = await firestoreFuncs.getTimeZone(workspaceID).then((obj)=>{
+      return obj;
+    }).catch((error) => {
+          console.log(error);
+    });
+    assert.equal(timeZone, "LA");
+
+    await firestoreFuncs.setTimeZone(workspaceId, 'Space');
+    timeZone = await firestoreFuncs.getTimeZone(workspaceID).then((obj)=>{
+      return obj;
+    }).catch((error) => {
+          console.log(error);
+    });
+    assert.equal(timeZone, "Space");
+
+    await firestoreFuncs.setTimeZone(workspaceId, 'LA');
+    timeZone = await firestoreFuncs.getTimeZone(workspaceID).then((obj)=>{
+      return obj;
+    }).catch((error) => {
+          console.log(error);
+    });
+    assert.equal(timeZone, "LA");
+
+  });
+
+  it('Set and Check Owner', async () => {
+    var t = await appHome.checkOwner(workspaceId, userId);
+    assert.equal(t, true);
+
+    await firestoreFuncs.setOwner(workspaceId, "Doctor who");
+    t = await appHome.checkOwner(workspaceId, userId);
+    assert.equal(t, false);
+
+    var ownerID = await firestoreFuncs.getOwner(workspaceId).then((obj)=>{
+      return obj;
+    }).catch((error) => {
+          console.log(error);
+    });
+    assert.equal(ownerID, "Doctor who");
+
+    await firestoreFuncs.setOwner(workspaceId, userId);
+    t = await appHome.checkOwner(workspaceId, userId);
+    assert.equal(t, true);
+
+  });
+
+  it('Get and Set Pairing Channel', async () => {
+    var channelId = await firestoreFuncs.getPairingChannel(workspaceId).then((obj)=>{
+      return obj;
+    }).catch((error) => {
+          console.log(error);
+      });
+    assert.equal(channelId, "Channel1");
+    
+    await firestoreFuncs.storeNewPairingChannel(workspaceId, "Channel2");
+    channelId = await firestoreFuncs.getPairingChannel(workspaceId).then((obj)=>{
+      return obj;
+    }).catch((error) => {
+          console.log(error);
+      });
+    assert.equal(channelId, "Channel2");
+
+    await firestoreFuncs.storeNewPairingChannel(workspaceId, "Channel1");
+    channelId = await firestoreFuncs.getPairingChannel(workspaceId).then((obj)=>{
+      return obj;
+    }).catch((error) => {
+          console.log(error);
+      });
+    assert.equal(channelId, "Channel1");
+  });
+
+  it('Test getAllTimes function', async () => {
+    var res = await appHome.getAllTimes(workspaceId, userId);  
+    for (var i = 1; i <= 10; i++) {
+      assert.equal(res[i], i);
+    }
+  });
+
 });

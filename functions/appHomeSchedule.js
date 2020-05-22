@@ -63,7 +63,7 @@ app.action('warmup_time_set_button', async({ack, body, context}) => {
     if (warmupTime1 !== null && warmupTime2 !== null) {
         var t = warmupTime1 + " " + warmupTime2;
         // console.log(t);
-        for (vari of days) {
+        for (var i of days) {
             firestoreFuncs.setWarmupTime(body.team.id, body.user.id, t, i);
         }
     }
@@ -112,7 +112,7 @@ app.action('set_custom_times', async({ack, body, context}) => {
     resetTimeVariables();
 
     app.client.views.open({
-        token: token,
+        token: context.botToken,
         trigger_id: body.trigger_id,
         view: appHomeObjects.modal
     }).catch((error) => {

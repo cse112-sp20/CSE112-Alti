@@ -14,7 +14,7 @@ app.command('/setup', async ({payload, body, ack, say, context}) => {
     ack();
     say("Trying to set up");
     createOnBoardingChannel(app, context.botToken, payload.team_id, "alti-pairing");
-    appHome.updateAppHome(body.user.id, body.team.id, context);
+    appHome.updateAppHome(body.user_id, body.team_id, context);
 });
 
 
@@ -29,13 +29,13 @@ app.action('pairing_channel_selected', async({body, ack, say, context}) => {
     });
     var team_id = body.team.id;
     // TODO make the update run after the db is updated in boardExistingChannel call
-    boardExistingChannel(app, context.botToken, team_id, body.actions[0].selected_channel);
+    await boardExistingChannel(app, context.botToken, team_id, body.actions[0].selected_channel);
+    console.log("After boardExisting -> Before update app home");
     appHome.updateAppHome(body.user.id, body.team.id, context);
 });
 
 
 // Create a channel with all the users in the workspace and set as active pairing channel
-exports.onBoard = createOnBoardingChannel;
 async function createOnBoardingChannel(app, token, team_id, channelName) {
     try {
         var promises = [];
@@ -118,7 +118,6 @@ async function createOnBoardingChannel(app, token, team_id, channelName) {
 }
 
 // Set an existing channel as the active pairing channel
-exports.onBoardExisting = boardExistingChannel;
 async function boardExistingChannel(app, token, team_id, channelId) {
     try {
         var promises = [];
@@ -190,3 +189,5 @@ async function findUsersChannel(app, token, channelId) {
 }
 
 
+exports.onBoard = createOnBoardingChannel;
+exports.onBoardExisting = boardExistingChannel;

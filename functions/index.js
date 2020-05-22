@@ -194,5 +194,5 @@ app.action('warmup_quote_select', async ({ ack, body, context }) => {
  });
  
 exports.testFirestore = functions.https.onRequest(async (req, res) => {
-    console.log(await  firestoreFuncs.getExercisePrompt('T011H6FAPV4', 'U011C8CCYDV', true))
+    console.log(await  firestoreFuncs.getExercisePrompt('T011H6FAPV4', 'U011C8CCYDV', true));
 });

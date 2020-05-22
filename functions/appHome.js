@@ -114,7 +114,6 @@ async function loadHomeTabUI(app, workspaceID, userId, context) {
 	}).catch((error) => {
         console.log(error);
 	});
-	console.log("Owner id: " + ownerId);
 	
 	if (ownerId === undefined) {
 		firestoreFuncs.setOwner(workspaceID, userId);
@@ -124,21 +123,19 @@ async function loadHomeTabUI(app, workspaceID, userId, context) {
 		return obj;
 	}).catch((error) => {
         console.log(error);
-  });
+  	});
+  	console.log("Pairing channel: " + channelId);
   
 	var timeZone = await firestoreFuncs.getTimeZone(workspaceID).then((obj)=>{
 		return obj;
 	}).catch((error) => {
         console.log(error);
 	});
-	// TODO store default LA timezome in on board file
-	if (timeZone === undefined) {
-		timeZone = "None";
-	}
+	// TODO store default LA timezone, probably on installation so in oauth.js
 
   var channelName;
   if (typeof(channelId) !== "undefined") {
-    channelName = await app.client.channels.info({
+    channelName = await app.client.conversations.info({
       token: context.botToken,
       channel: channelId
     }).then((obj)=>{
@@ -152,7 +149,27 @@ async function loadHomeTabUI(app, workspaceID, userId, context) {
   }
 
   var sched = await createScheduleDisplay(workspaceID, userId);
-  //console.log(sched);
+  var ownerText;
+  var channelText;
+  var timeZoneText;
+  if (ownerId === undefined) {
+	  ownerText = `Current Owner of Alti is...there is no current owner of Alti! :scream: You can easily set an owner in the *Pick a folk* section.`;
+  }
+  else {
+	  ownerText = `Current Owner of Alti is <@${  ownerId  }>, you can ask the owner for modifying the time zone and change paring channel of the team.`;
+  }
+  if (channelId === undefined) {
+	  channelText = `Current Pairing Channel: None`;
+  }
+  else {
+	  channelText = `Current Pairing Channel: #${  channelName  }`;
+  }
+  if (timeZone === undefined) {
+	  timeZoneText = `Working Time Zone: None`;
+  }
+  else {
+	  timeZoneText = `Working Time Zone: UTC ${  timeZone  }`;
+  }
 
 	if(await checkOwner(workspaceID, userId)){
 		view = {
@@ -172,18 +189,19 @@ async function loadHomeTabUI(app, workspaceID, userId, context) {
 						"text": "Hi there 👋 I'm Alti. I'm here to help you smoothly enter and exit your workflow! Get started by choosing a channel to set up with :)"
 					}
 				},
+
 				{
 					"type": "section",
 					"text": {
 						"type": "mrkdwn",
-						"text": `Current Pairing Channel: #${  channelName  }`,
+						"text": channelText,
 					}
 				},
 				{
 					"type": "section",
 					"text": {
 						"type": "plain_text",
-						"text": `Working Time Zone: UTC ${  timeZone  }`,
+						"text": timeZoneText,
 						"emoji": true
 					}
 				},
@@ -464,14 +482,14 @@ async function loadHomeTabUI(app, workspaceID, userId, context) {
 					"type": "section",
 					"text": {
 						"type": "mrkdwn",
-						"text": `Current Owner of Alti is <@${  ownerId  }>, you can ask the owner for modifying the time zone and change paring channel of the team.`
+						"text": ownerText
 					}
 				},
 				{
 					"type": "section",
 					"text": {
 						"type": "plain_text",
-						"text": `Warm Up Channels You're In ${  channelName  }`,
+						"text": channelText,
 						"emoji": true
 					}
 				},
@@ -479,12 +497,27 @@ async function loadHomeTabUI(app, workspaceID, userId, context) {
 					"type": "section",
 					"text": {
 						"type": "plain_text",
-						"text": `Working Time Zone UTC${  timeZone  }`,
+						"text": timeZoneText,
 						"emoji": true
 					}
 				},
 				{
 					"type": "divider"
+				  },
+				  {
+					"type": "section",
+					"text": {
+					  "type": "mrkdwn",
+					  "text": "Current schedule:"
+					}
+				  },
+				  sched.Monday,
+				  sched.Tuesday,
+				  sched.Wednesday,
+				  sched.Thursday,
+				  sched.Friday,
+				  {
+					"type": "divider",
 				  },
 				  {
 					"type": "section",
@@ -626,3 +659,5 @@ async function setOwner(app, body, context){
 exports.setTimeZone = setTimeZone;
 exports.setOwner = setOwner;
 exports.updateAppHome = updateAppHome;
+exports.getAllTimes = getAllTimes;
+exports.checkOwner = checkOwner;

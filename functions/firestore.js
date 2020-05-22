@@ -44,7 +44,7 @@ exports.storeAPIPair = (team_id, api_key) => {
         botUserId: api_key.botUserId
     }; 
 
-    console.log("Team ID: " + team_id) 
+    console.log("Team ID: " + team_id);
     console.log("API Keys: Copy/Paste this" + JSON.stringify(setValue, null, 1)); 
     db.collection('api_keys').doc(team_id).set(setValue);
 };
@@ -87,7 +87,7 @@ exports.getAPIPair = (team_id) => {
             //return null if there was an error in fetching the data
             return null;
         });
-}
+};
 
 
 /* 
@@ -286,7 +286,7 @@ exports.getExercisePrompt = async function getExercisePrompt(workspaceID, userID
             console.log('Error getting user document: ', err);
             return undefined;
         });
-}
+};
 
 /*
     Description:
