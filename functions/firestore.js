@@ -539,3 +539,16 @@ exports.setTimeZone = function updateTimeZone(workspaceID, timeZone) {
         timezone: timeZone
     }, {merge: true});
 };
+
+/*
+    Description:
+        Retrieves all workspace ids
+    Returns: 
+        list of workspace ids, for ex: ['T123452324', 'T62345234', 'T6762342342']
+*/
+exports.getAllWorkspaces = async function getAllWorkspaces() {
+    const snapshot = await db.collection('workspaces').get();
+    let allWorkspaces = await snapshot.docs.map(doc => doc.id);
+
+    return allWorkspaces;
+}
