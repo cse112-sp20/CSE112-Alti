@@ -146,7 +146,7 @@ exports.storeNewPairingChannel = async function storeNewPairingChannel(workspace
         // To avoid the "ghost document" problem on the workspace
         db.collection('workspaces').doc(workspaceID).set({}, {merge: true});
 
-        deleteCollection('workspaces/'+ workspaceID + '/activeChannels', 100);
+        await deleteCollection('workspaces/'+ workspaceID + '/activeChannels', 100);
         db.collection("workspaces").doc(workspaceID).collection('activeChannels').doc(newChannel).set({}, {merge: true});
     }
 };
