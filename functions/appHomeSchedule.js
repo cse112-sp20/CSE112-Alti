@@ -23,7 +23,7 @@ var warmupTimes =
   wedAMPM: null,
   thursAMPM: null,
   friAMPM: null
-}
+};
 
 var cooldownTimes = 
 {
@@ -37,7 +37,7 @@ var cooldownTimes =
   wedAMPM: null,
   thursAMPM: null,
   friAMPM: null
-}
+};
 
 var days = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"];
 
@@ -63,7 +63,7 @@ app.action('warmup_time_set_button', async({ack, body, context}) => {
     if (warmupTime1 !== null && warmupTime2 !== null) {
         var t = warmupTime1 + " " + warmupTime2;
         // console.log(t);
-        for (i of days) {
+        for (var i of days) {
             firestoreFuncs.setWarmupTime(body.team.id, body.user.id, t, i);
         }
     }
@@ -89,7 +89,7 @@ app.action('cooldown_time_set_button', async({ack, body, context}) => {
     if (cooldownTime1 !== null && cooldownTime2 !== null) {
         var t = cooldownTime1 + " " + cooldownTime2;
         // console.log(t);
-        for (i of days) {
+        for (var i of days) {
             firestoreFuncs.setCooldownTime(body.team.id, body.user.id, t, i);
         }
     }
@@ -112,7 +112,7 @@ app.action('set_custom_times', async({ack, body, context}) => {
     resetTimeVariables();
 
     app.client.views.open({
-        token: token,
+        token: context.botToken,
         trigger_id: body.trigger_id,
         view: appHomeObjects.modal
     }).catch((error) => {
@@ -348,7 +348,7 @@ function resetTimeVariables() {
         wedAMPM: null,
         thursAMPM: null,
         friAMPM: null
-    }
+    };
 
     cooldownTimes = 
     {
@@ -362,6 +362,6 @@ function resetTimeVariables() {
         wedAMPM: null,
         thursAMPM: null,
         friAMPM: null
-    }
+    };
 }
   

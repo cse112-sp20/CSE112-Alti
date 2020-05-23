@@ -8,7 +8,7 @@ var days = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"];
 
 // Listen to the app_home_opened Events API event to hear when a user opens your app from the sidebar
 app.event("app_home_opened", async ({ body, context }) => {
-//   console.log("It's running");
+  //console.log("It's running");
   appHome(app, body, context);
 });
 
@@ -54,12 +54,15 @@ async function appHome(app, payload, context) {
 */
 async function checkOwner(workspaceID, userId) {
 	//console.log(workspaceID);
+	if (userId === undefined) {
+		return true;
+	}
 	var ownerID = await firestoreFuncs.getOwner(workspaceID).then((obj)=>{
 		return obj;
 	}).catch((error) => {
         console.log(error);
 	});
-
+	
 	if(typeof(ownerID) === "undefined") {
 		return true;
 	}
@@ -75,7 +78,7 @@ async function checkOwner(workspaceID, userId) {
 
 function getAllTimes(workspaceId, userId) {
   var results = [];
-  for (day of days) {
+  for (var day of days) {
     results.push(firestoreFuncs.getWarmupTime(workspaceId, userId, day));
     results.push(firestoreFuncs.getCooldownTime(workspaceId, userId, day));
   }
@@ -87,14 +90,14 @@ async function createScheduleDisplay(workspaceId, userId) {
   var res = await getAllTimes(workspaceId, userId);  
   var sched = {};
   var index = 0;
-  for (day of days) {
+  for (var day of days) {
     var block = {
       "type": "section",
       "text": {
         "type": "mrkdwn",
         "text": day + ": " + res[index] + "-" + res[index+1]
       }
-    }
+    };
     sched[day] = block;
     index += 2;
   }
@@ -104,6 +107,7 @@ async function createScheduleDisplay(workspaceId, userId) {
 /* Checks if user is owner or not and loads up either owner home tab or non-owner home tab
 */
 async function loadHomeTabUI(app, workspaceID, userId, context) {
+
 	var view;
 
 	var ownerId = await firestoreFuncs.getOwner(workspaceID).then((obj)=>{
@@ -111,22 +115,28 @@ async function loadHomeTabUI(app, workspaceID, userId, context) {
 	}).catch((error) => {
         console.log(error);
 	});
+	
+	if (ownerId === undefined) {
+		firestoreFuncs.setOwner(workspaceID, userId);
+	}
 
 	var channelId = await firestoreFuncs.getPairingChannel(workspaceID).then((obj)=>{
 		return obj;
 	}).catch((error) => {
         console.log(error);
-  });
+  	});
+  	console.log("Pairing channel: " + channelId);
   
 	var timeZone = await firestoreFuncs.getTimeZone(workspaceID).then((obj)=>{
 		return obj;
 	}).catch((error) => {
         console.log(error);
 	});
+	// TODO store default LA timezone, probably on installation so in oauth.js
 
   var channelName;
   if (typeof(channelId) !== "undefined") {
-    channelName = await app.client.channels.info({
+    channelName = await app.client.conversations.info({
       token: context.botToken,
       channel: channelId
     }).then((obj)=>{
@@ -140,7 +150,27 @@ async function loadHomeTabUI(app, workspaceID, userId, context) {
   }
 
   var sched = await createScheduleDisplay(workspaceID, userId);
-  //console.log(sched);
+  var ownerText;
+  var channelText;
+  var timeZoneText;
+  if (ownerId === undefined) {
+	  ownerText = `Current Owner of Alti is...there is no current owner of Alti! :scream: You can easily set an owner in the *Pick a folk* section.`;
+  }
+  else {
+	  ownerText = `Current Owner of Alti is <@${  ownerId  }>, you can ask the owner for modifying the time zone and change paring channel of the team.`;
+  }
+  if (channelId === undefined) {
+	  channelText = `Current Pairing Channel: None`;
+  }
+  else {
+	  channelText = `Current Pairing Channel: #${  channelName  }`;
+  }
+  if (timeZone === undefined) {
+	  timeZoneText = `Working Time Zone: None`;
+  }
+  else {
+	  timeZoneText = `Working Time Zone: UTC ${  timeZone  }`;
+  }
 
 	if(await checkOwner(workspaceID, userId)){
 		view = {
@@ -160,18 +190,19 @@ async function loadHomeTabUI(app, workspaceID, userId, context) {
 						"text": "Hi there 👋 I'm Alti. I'm here to help you smoothly enter and exit your workflow! Get started by choosing a channel to set up with :)"
 					}
 				},
+
 				{
 					"type": "section",
 					"text": {
 						"type": "mrkdwn",
-						"text": `Current Pairing Channel: #${  channelName  }`,
+						"text": channelText,
 					}
 				},
 				{
 					"type": "section",
 					"text": {
 						"type": "plain_text",
-						"text": `Working Time Zone: UTC ${  timeZone  }`,
+						"text": timeZoneText,
 						"emoji": true
 					}
 				},
@@ -452,14 +483,14 @@ async function loadHomeTabUI(app, workspaceID, userId, context) {
 					"type": "section",
 					"text": {
 						"type": "mrkdwn",
-						"text": `Current Owner of Alti is <@${  ownerId  }>, you can ask the owner for modifying the time zone and change paring channel of the team.`
+						"text": ownerText
 					}
 				},
 				{
 					"type": "section",
 					"text": {
 						"type": "plain_text",
-						"text": `Warm Up Channels You're In ${  channelName  }`,
+						"text": channelText,
 						"emoji": true
 					}
 				},
@@ -467,12 +498,27 @@ async function loadHomeTabUI(app, workspaceID, userId, context) {
 					"type": "section",
 					"text": {
 						"type": "plain_text",
-						"text": `Working Time Zone UTC${  timeZone  }`,
+						"text": timeZoneText,
 						"emoji": true
 					}
 				},
 				{
 					"type": "divider"
+				  },
+				  {
+					"type": "section",
+					"text": {
+					  "type": "mrkdwn",
+					  "text": "Current schedule:"
+					}
+				  },
+				  sched.Monday,
+				  sched.Tuesday,
+				  sched.Wednesday,
+				  sched.Thursday,
+				  sched.Friday,
+				  {
+					"type": "divider",
 				  },
 				  {
 					"type": "section",
@@ -614,3 +660,5 @@ async function setOwner(app, body, context){
 exports.setTimeZone = setTimeZone;
 exports.setOwner = setOwner;
 exports.updateAppHome = updateAppHome;
+exports.getAllTimes = getAllTimes;
+exports.checkOwner = checkOwner;
