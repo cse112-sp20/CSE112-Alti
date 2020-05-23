@@ -232,10 +232,11 @@ describe('Setup Warmup Callbacks', () => {
     var exercisePrompt = handleTypingSelect(fakeAck, fakeBody, fakeContext).then( () => {
       return firestoreFuncs.getExercisePrompt(workspaceId, userId2, true)
     })
-    var asd = exercisePrompt.then( prompt => {
+    return exercisePrompt.then( prompt => {
       var expectedString = "Your partner sent you this cool speed coding challenge in java to get your mind and fingers ready for the day!\nComplete it here: ";
       assert.equal(ackCalled, true);
-      return assert.equal(prompt.substring(0,expectedString.length), expectedString);
+      assert.equal(prompt.substring(0,expectedString.length), expectedString);
+      return Promise.resolve();
     });
   });
     
@@ -244,7 +245,7 @@ describe('Setup Warmup Callbacks', () => {
     var exercisePrompt = handlePuzzleSelect(fakeAck, fakeBody, fakeContext).then( ret => {
       return firestoreFuncs.getExercisePrompt(workspaceId, userId2, true)
     })
-    var asd = exercisePrompt.then( prompt => {
+    return exercisePrompt.then( prompt => {
       var expectedString = "Your partner sent you this sudoku puzzle to help you get those brain juices flowing!\nComplete it here: ";
       assert.equal(ackCalled, true);
       assert.equal(prompt.substring(0,expectedString.length), expectedString);
