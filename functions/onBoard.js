@@ -14,7 +14,7 @@ app.command('/setup', async ({payload, body, ack, say, context}) => {
     ack();
     say("Trying to set up");
     createOnBoardingChannel(app, context.botToken, payload.team_id, "alti-pairing");
-    appHome.updateAppHome(body.user.id, body.team.id, context);
+    appHome.updateAppHome(body.user_id, body.team_id, context);
 });
 
 
@@ -28,16 +28,18 @@ app.action('pairing_channel_selected', async({body, ack, say, context}) => {
         console.log(error);
     });
     var team_id = body.team.id;
-    boardExistingChannel(app, context.botToken, team_id, body.actions[0].selected_channel);
+    // TODO make the update run after the db is updated in boardExistingChannel call
+    await boardExistingChannel(app, context.botToken, team_id, body.actions[0].selected_channel);
+    //console.log("After boardExisting -> Before update app home");
     appHome.updateAppHome(body.user.id, body.team.id, context);
 });
 
 
 // Create a channel with all the users in the workspace and set as active pairing channel
-exports.onBoard = createOnBoardingChannel;
 async function createOnBoardingChannel(app, token, team_id, channelName) {
     try {
-
+        var promises = [];
+        
         var channels = await app.client.conversations.list({
             token: token
         }).catch((error) => {
@@ -92,14 +94,17 @@ async function createOnBoardingChannel(app, token, team_id, channelName) {
                         (To opt out, just leave the channel.)`
             });
             
-            firestoreFuncs.storeNewPairingChannel(team_id, conversationObj.channel.id);
+            promises.push(firestoreFuncs.storeNewPairingChannel(team_id, conversationObj.channel.id));
 
-            for (userId in usersDict) {
-                for (day of days) {
-                    firestoreFuncs.setWarmupTime(team_id, userId, "9:00 AM", day);
-                    firestoreFuncs.setCooldownTime(team_id, userId, "5:00 PM", day);
+            for (var userId in usersDict) {
+                for (var day of days) {
+                    promises.push(firestoreFuncs.setWarmupTime(team_id, userId, "9:00 AM", day));
+                    promises.push(firestoreFuncs.setCooldownTime(team_id, userId, "5:00 PM", day));
                 }
             }
+            Promise.all(promises).catch((error) => {
+                console.log(error);
+            });
 
         }
         else {
@@ -113,9 +118,9 @@ async function createOnBoardingChannel(app, token, team_id, channelName) {
 }
 
 // Set an existing channel as the active pairing channel
-exports.onBoardExisting = boardExistingChannel;
 async function boardExistingChannel(app, token, team_id, channelId) {
     try {
+        var promises = [];
         var userList = await findUsersChannel(app, token, channelId);
 
         // send welcome message
@@ -128,13 +133,16 @@ async function boardExistingChannel(app, token, team_id, channelId) {
             
         });
         // TODO (To opt out, just leave the channel.)
-        firestoreFuncs.storeNewPairingChannel(team_id, channelId);
-        for (userId of userList) {
-            for (day of days) {
-                firestoreFuncs.setWarmupTime(team_id, userId, "9:00 AM", day);
-                firestoreFuncs.setCooldownTime(team_id, userId, "5:00 PM", day);
+        await firestoreFuncs.storeNewPairingChannel(team_id, channelId);
+        for (var userId of userList) {
+            for (var day of days) {
+                promises.push(firestoreFuncs.setWarmupTime(team_id, userId, "9:00 AM", day));
+                promises.push(firestoreFuncs.setCooldownTime(team_id, userId, "5:00 PM", day));
             }
         }
+        Promise.all(promises).catch((error) => {
+            console.log(error);
+        });
     }
     catch (error) {
         console.log(error);
@@ -181,3 +189,5 @@ async function findUsersChannel(app, token, channelId) {
 }
 
 
+exports.onBoard = createOnBoardingChannel;
+exports.onBoardExisting = boardExistingChannel;

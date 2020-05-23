@@ -44,7 +44,7 @@ exports.storeAPIPair = (team_id, api_key) => {
         botUserId: api_key.botUserId
     }; 
 
-    console.log("Team ID: " + team_id) 
+    console.log("Team ID: " + team_id);
     console.log("API Keys: Copy/Paste this" + JSON.stringify(setValue, null, 1)); 
     db.collection('api_keys').doc(team_id).set(setValue);
 };
@@ -87,7 +87,7 @@ exports.getAPIPair = (team_id) => {
             //return null if there was an error in fetching the data
             return null;
         });
-}
+};
 
 
 /* 
@@ -114,14 +114,14 @@ exports.storeNewPairing = async function storeNewPairing(workspace, dmThreadID, 
     usersRef.doc(pairedUsers[1]).set({
         dmThreadID: dmThreadID,
         partnerID: pairedUsers[0],
-    }, {merge: true})
-}
+    }, {merge: true});
+};
 
 exports.writeMsgToDB = function writeMsgToDB(teamId, userID, channelID,msgToSend,isWarmup) {
 	db.collection("workspaces").doc(teamId+"/activeChannels/"+channelID+"/teammatePairings/"+userID).set({
 		warmupMessage: msgToSend
 	});
-}
+};
 
 /*
     Description:
@@ -146,10 +146,10 @@ exports.storeNewPairingChannel = async function storeNewPairingChannel(workspace
         // To avoid the "ghost document" problem on the workspace
         db.collection('workspaces').doc(workspaceID).set({}, {merge: true});
 
-        deleteCollection('workspaces/'+ workspaceID + '/activeChannels', 100);
+        await deleteCollection('workspaces/'+ workspaceID + '/activeChannels', 100);
         db.collection("workspaces").doc(workspaceID).collection('activeChannels').doc(newChannel).set({}, {merge: true});
     }
-}
+};
 
 
 /*
@@ -222,7 +222,7 @@ exports.getPairingChannel = async function getPairingChannel(workspaceID) {
     const snapshot = await db.collection('workspaces').doc(workspaceID).collection('activeChannels').get();
     let allChannels = await snapshot.docs.map(doc => doc.id);
     return allChannels[0];
-}
+};
 
 /* 
     Description:
@@ -287,7 +287,7 @@ exports.getExercisePrompt = async function getExercisePrompt(workspaceID, userID
             console.log('Error getting user document: ', err);
             return undefined;
         });
-}
+};
 
 /*
     Description:
@@ -319,7 +319,7 @@ exports.getPartner = function getPartner(workspaceID, channelID, userID) {
             console.log('Error getting user document: ', err);
             return undefined;
         });
-}
+};
 
 /*
     Description:
@@ -346,12 +346,12 @@ exports.getPairedUsers = async function getPairedUsers(workspaceID) {
             let partner = doc.data().partnerID;
             if (!partnerIDs.includes(doc.id)) {
                 pairings.push({users: [doc.id, partner], dmThreadID: doc.data().dmThreadID});
-                partnerIDs.push(partner)
+                partnerIDs.push(partner);
             }
         });
         return pairings;
     });
-}
+};
  
 /*
     Description:
@@ -372,7 +372,7 @@ exports.setWarmupTime = function setWarmupTime(workspaceID, userID, time, day) {
     let data = {};
     data[day + 'Start'] = time;
     userDocRef.set(data, {merge: true});
-}
+};
 
 /*
     Description:
@@ -401,7 +401,7 @@ exports.getWarmupTime = function getWarmupTime(workspaceID, userID, day) {
             console.log('Error getting user document: ', err);
             return undefined;
         });
-}
+};
 
 /*
     Description:
@@ -422,7 +422,7 @@ exports.setCooldownTime = function setWarmupTime(workspaceID, userID, time, day)
     let data = {};
     data[day + 'End'] = time;
     userDocRef.set(data, {merge: true});
-}
+};
 
 /*
     Description:
@@ -451,7 +451,7 @@ exports.getCooldownTime = function getWarmupTime(workspaceID, userID, day) {
             console.log('Error getting user document: ', err);
             return undefined;
         });
-}
+};
 
 /*
     Description:
@@ -478,7 +478,7 @@ exports.getOwner = function getOwner(workspaceID) {
             console.log('Error getting workspace document: ', err);
             return undefined;
         });
-}
+};
 
 /*
     Description:
@@ -494,7 +494,7 @@ exports.setOwner = function updateOwner(workspaceID, userID) {
     workspaceDocRef.set({
         owner: userID
     }, {merge: true});
-}
+};
 
 /*
     Description:
@@ -522,7 +522,7 @@ exports.getTimeZone = function getTimezone(workspaceID) {
             console.log('Error getting workspace document: ', err);
             return undefined;
         });
-}
+};
 
 /*
     Description:
@@ -537,5 +537,18 @@ exports.setTimeZone = function updateTimeZone(workspaceID, timeZone) {
 
     workspaceDocRef.set({
         timezone: timeZone
-    }, {merge: true})
+    }, {merge: true});
+};
+
+/*
+    Description:
+        Retrieves all workspace ids
+    Returns: 
+        list of workspace ids, for ex: ['T123452324', 'T62345234', 'T6762342342']
+*/
+exports.getAllWorkspaces = async function getAllWorkspaces() {
+    const snapshot = await db.collection('workspaces').get();
+    let allWorkspaces = await snapshot.docs.map(doc => doc.id);
+
+    return allWorkspaces;
 }

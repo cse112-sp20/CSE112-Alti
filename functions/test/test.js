@@ -10,8 +10,6 @@ var generateTaskData = require('../generateTaskData');
 
 let token = "xoxb-1109790171392-1110712837169-OxF8igcVuxkFUhbZVuoXxypj";
 
-
-
 // If it passes, means the function finished and message was scheduled, baseline test
 // Need more rigorous testing using promises of async function and validation from Slack API channel reading
 describe('Scheduler', () => {
@@ -66,7 +64,7 @@ describe('Pairup', () => {
       firestoreFuncs = require('../firestore');
       workspaceInfo = await app.client.team.info({
         token: token
-      })
+      });
       workspaceId = workspaceInfo.team.id;
       
     });
@@ -129,6 +127,7 @@ describe('util', () => {
 
 
 describe('generateCodingChallenge', () => {
+  var url;
   it('Testing english', () => {
     //generateCodingChallenge();
     url = generateTaskData.generateCodingChallenge('english');
@@ -166,8 +165,6 @@ describe('generateCodingChallenge', () => {
     assert.equal(url.substring(0, 37),'http://www.speedcoder.net/lessons/cpp');
   });
 });
-
-
 
 // This functions assumes that the HandleQuoteSelect function
 // only sets warmups. Needs to be changed when cooldowns are added
@@ -235,10 +232,11 @@ describe('Setup Warmup Callbacks', () => {
     var exercisePrompt = handleTypingSelect(fakeAck, fakeBody, fakeContext).then( () => {
       return firestoreFuncs.getExercisePrompt(workspaceId, userId2, true)
     })
-    var asd = exercisePrompt.then( prompt => {
+    return exercisePrompt.then( prompt => {
       var expectedString = "Your partner sent you this cool speed coding challenge in java to get your mind and fingers ready for the day!\nComplete it here: ";
       assert.equal(ackCalled, true);
-      return assert.equal(prompt.substring(0,expectedString.length), expectedString);
+      assert.equal(prompt.substring(0,expectedString.length), expectedString);
+      return Promise.resolve();
     });
   });
     
@@ -247,11 +245,64 @@ describe('Setup Warmup Callbacks', () => {
     var exercisePrompt = handlePuzzleSelect(fakeAck, fakeBody, fakeContext).then( ret => {
       return firestoreFuncs.getExercisePrompt(workspaceId, userId2, true)
     })
-    var asd = exercisePrompt.then( prompt => {
+    return exercisePrompt.then( prompt => {
       var expectedString = "Your partner sent you this sudoku puzzle to help you get those brain juices flowing!\nComplete it here: ";
       assert.equal(ackCalled, true);
       assert.equal(prompt.substring(0,expectedString.length), expectedString);
       return Promise.resolve();
     });
   });
+});
+
+describe('App Home tests', () => {
+  let appHome;
+  let onBoard;
+  let workspaceId;
+  let firestoreFuncs;
+  let userId;
+  before(async () => {
+    appHome = require('../appHome'); 
+    onBoard = require('../onBoard');
+    firestoreFuncs = require('../firestore');
+    workspaceId = "TestWorkspace";
+    userId = "user1";
+    await firestoreFuncs.setTimeZone(workspaceId, 'LA');
+    await firestoreFuncs.setOwner(workspaceId, userId);
+    await firestoreFuncs.storeNewPairingChannel(workspaceId, "Channel1");
+  });
+
+  it('Get time zone', async () => {
+    var timeZone = await firestoreFuncs.getTimeZone(workspaceId).then((obj)=>{
+      return obj;
+    }).catch((error) => {
+          console.log(error);
+    });
+    assert.equal(timeZone, "LA");
+
+  });
+
+
+  it('Check Owner', async () => {
+    var t = await appHome.checkOwner(workspaceId, userId);
+    assert.equal(t, true);
+
+  });
+
+  it('Get Pairing Channel', async () => {
+    var channelId = await firestoreFuncs.getPairingChannel(workspaceId).then((obj)=>{
+      return obj;
+    }).catch((error) => {
+          console.log(error);
+      });
+    assert.equal(channelId, "Channel1");
+
+  });
+
+  it('Test getAllTimes function', async () => {
+    var res = await appHome.getAllTimes(workspaceId, userId);  
+    for (var i = 0; i < 10; i++) {
+      assert.equal(res[i], i+1);
+    }
+  });
+
 });

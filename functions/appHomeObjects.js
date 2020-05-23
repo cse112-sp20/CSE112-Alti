@@ -908,7 +908,7 @@ var modal =
     "text": "Done"
   },
   "private_metadata": "Shhhhhhhh"
-}
+};
 
 
 exports.times = times;
