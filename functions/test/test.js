@@ -166,6 +166,92 @@ describe('generateCodingChallenge', () => {
   });
 });
 
+// This functions assumes that the HandleQuoteSelect function
+// only sets warmups. Needs to be changed when cooldowns are added
+// Does not test the generated url. Only checks the prompt stored in the firestore 
+describe('Setup Warmup Callbacks', () => {
+  let firestoreFuncs;
+  let workspaceInfo;
+  let workspaceId;
+  let ackCalled;
+  var fakeContext;
+  var pair;
+  // UserId1 is the one choosing the exercise,
+  // UserId2 is the one being assigned the exercise
+  var userId1, userId2;
+
+  var fakeBody; 
+
+  async function fakeAck(){
+    ackCalled = true;
+  }
+
+  before(async () => {    
+    fakeContext = { botToken: token};
+    firestoreFuncs = require('../firestore');
+    return app.client.team.info({
+      token: token
+    }).then( workspaceInfoReturn => {
+      workspaceInfo = workspaceInfoReturn;
+      workspaceId = workspaceInfo.team.id;
+      return Promise.resolve(firestoreFuncs.getPairedUsers(workspaceId));
+    }).then( pairsReturn => {
+      var pairs = pairsReturn;    
+      // Fails if there are no paired people existing in
+      // the database already. needs to be fixed by initializing
+      // a pre-set db at the start of the test
+      var pairsExist = (pairs.length > 0);
+      assert.equal(pairsExist, true);
+      pair = pairs[0];
+      // Fails if the paired up people is not a pair.
+      // Need to be changed if we allow groups of 3.
+      assert.equal(pair.users.length, 2);
+      userId1 = pair.users[0];
+      userId2 = pair.users[1];
+      fakeBody = {
+        team: {id:workspaceId},
+        user: {id:userId1},
+        view: {id:undefined},
+        // The value needs to be set based on the type of exercise
+        actions: [{value:''}]
+      };
+
+      return Promise.resolve();
+    });
+  });
+
+  beforeEach((done) => {
+    firestoreFuncs.storeTypeOfExercise(workspaceId, userId2, true, "");
+    ackCalled = false;
+    setTimeout(done, 1000);
+  });
+
+
+  it('handleTypingSelect', () => {  
+    fakeBody.actions[0].value = 'java';
+    var exercisePrompt = handleTypingSelect(fakeAck, fakeBody, fakeContext).then( () => {
+      return firestoreFuncs.getExercisePrompt(workspaceId, userId2, true)
+    })
+    var asd = exercisePrompt.then( prompt => {
+      var expectedString = "Your partner sent you this cool speed coding challenge in java to get your mind and fingers ready for the day!\nComplete it here: ";
+      assert.equal(ackCalled, true);
+      return assert.equal(prompt.substring(0,expectedString.length), expectedString);
+    });
+  });
+    
+  it('handlePuzzleSelect', () => {
+    fakeBody.actions[0].value = 'sudoku';
+    var exercisePrompt = handlePuzzleSelect(fakeAck, fakeBody, fakeContext).then( ret => {
+      return firestoreFuncs.getExercisePrompt(workspaceId, userId2, true)
+    })
+    var asd = exercisePrompt.then( prompt => {
+      var expectedString = "Your partner sent you this sudoku puzzle to help you get those brain juices flowing!\nComplete it here: ";
+      assert.equal(ackCalled, true);
+      assert.equal(prompt.substring(0,expectedString.length), expectedString);
+      return Promise.resolve();
+    });
+  });
+});
 
 describe('App Home tests', () => {
   let appHome;
