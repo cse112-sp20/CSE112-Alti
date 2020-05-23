@@ -30,7 +30,7 @@ app.action('pairing_channel_selected', async({body, ack, say, context}) => {
     var team_id = body.team.id;
     // TODO make the update run after the db is updated in boardExistingChannel call
     await boardExistingChannel(app, context.botToken, team_id, body.actions[0].selected_channel);
-    console.log("After boardExisting -> Before update app home");
+    //console.log("After boardExisting -> Before update app home");
     appHome.updateAppHome(body.user.id, body.team.id, context);
 });
 
