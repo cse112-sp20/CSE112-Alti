@@ -910,7 +910,6 @@ var modal =
   "private_metadata": "Shhhhhhhh"
 };
 
-
 exports.times = times;
 exports.ampm = ampm;
 exports.time_zones = time_zones;
@@ -920,4 +919,3 @@ exports.wednesday_custom_block = this.wednesday_custom_block;
 exports.thursday_custom_block = this.thursday_custom_block;
 exports.friday_custom_block = this.friday_custom_block;
 exports.modal = modal;
-
