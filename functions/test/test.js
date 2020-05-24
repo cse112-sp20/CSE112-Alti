@@ -13,10 +13,24 @@ let token = "xoxb-1109790171392-1110712837169-OxF8igcVuxkFUhbZVuoXxypj";
 async function setupDatabase()
 {
   // Create new Channel "Pairing Channel"
-  let firestoreFuncs = firestoreFuncs = require('../firestore');
+  let firestoreFuncs = require('../firestore');
 
-  await firestoreFuncs.storeNewPairingChannel("T0137P851BJ", "C012B6BTVDL");
-  //await firestoreFuncs.storeNewPairing("T0137P851BJ", dmThreadID, pairedUsers)
+  let channelSet = await firestoreFuncs.storeNewPairingChannel("T0137P851BJ", "C012B6BTVDL");
+
+  var pair1 = ["U01236C905V", "U012HPHS2FR"];
+  var pair2 = ["U012P9C053Q", "U012RQ0TQG6"];
+  var pair3 = ["U012X3JJS78", "U012YEB5HR8"];
+  var pair4 = ["U012YGB2M50", "U0133SAJ0E7"];
+
+  let pair1id = getdmThreadID(pair1);
+  let pair2id = getdmThreadID(pair2);
+  let pair3id = getdmThreadID(pair3);
+  let pair4id = getdmThreadID(pair4);
+
+  await firestoreFuncs.storeNewPairing("T0137P851BJ", pair1id , pair1);
+  await firestoreFuncs.storeNewPairing("T0137P851BJ", pair2id , pair2);
+  await firestoreFuncs.storeNewPairing("T0137P851BJ", pair3id , pair3);
+  await firestoreFuncs.storeNewPairing("T0137P851BJ", pair4id , pair4);
 }
 
 async function clearDatabase()
@@ -28,15 +42,21 @@ async function clearDatabase()
   //await firestoreFuncs.deleteCollection(collectionPath, -1);
 }
 
-async function test()
+async function getdmThreadID(users)
 {
   var check = await app.client.conversations.open({
     token: token, 
     return_im: false,
-    users: "U012YGB2M50,U0133SAJ0E7,U012P9C053Q"
+    users: users[0] + "," + users[1]
   });
 
-  console.log(check);
+  var postM = await app.client.chat.postMessage({
+    token: token,
+    channel: check.channel.id,
+    text: "You are paired"
+  });
+
+  return check.channel.id;
 }
 
 // If it passes, means the function finished and message was scheduled, baseline test
@@ -47,7 +67,7 @@ describe('Scheduler', () => {
   before(() => {
     schedule = require('../schedule');
 
-    //setupDatabase();
+    setupDatabase();
     //clearDatabase();
     //test();
   });
