@@ -36,6 +36,12 @@ async function test()
     users: "U012YGB2M50,U0133SAJ0E7,U012P9C053Q"
   });
 
+  app.client.chat.postMessage({
+    token:token,
+    channel: (check.channel).id, 
+    text: "Testing making thread with api"
+  });
+
   console.log(check);
 }
 
@@ -49,7 +55,7 @@ describe('Scheduler', () => {
 
     //setupDatabase();
     //clearDatabase();
-    //test();
+    test();
   });
 
   it('schedule for 2 min after', async () => {
@@ -81,9 +87,11 @@ describe('Scheduler', () => {
 });
 
 describe('Pairup', () => {
+
   let pairUp;
 
   before(() => {
+    
     pairUp = require('../pairUp');
   });
 
