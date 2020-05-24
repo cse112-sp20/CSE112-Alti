@@ -434,12 +434,38 @@ exports.warmupPuzzleSelect = async function(ack,body,context) {
 
 exports.warmupArticleSelect = async function(ack,body,context) {
 	await ack();
-	let thisView = createModalView("Alti","generic_close","generic_ack","Great choice articles are fun!","Pick a topic",body.channel.id,["code","server","ml"],["1","2", "3"]);
     try {
       const result = await app.client.views.open({
         token: context.botToken,
 		trigger_id: body.trigger_id,
-        view: JSON.stringify(thisView)
+        view: {
+			type: 'modal',
+			// View identifier
+			callback_id: 'warmup_article_selected_ack',
+			title: {
+			  type: 'plain_text',
+			  text: 'Warmup Article Input'
+			},
+			blocks: [
+			  {
+				type: 'input',
+				block_id: body.channel.id,
+				label: {
+				  type: 'plain_text',
+				  text: 'Submit your article link below!'
+				},
+				element: {
+				  type: 'plain_text_input',
+				  action_id: 'input_text',
+				  multiline: true
+				}
+			  }
+			],
+			submit: {
+			  type: 'plain_text',
+			  text: 'Submit'
+			}
+		  }
       });
     }
     catch (error) {
@@ -582,7 +608,7 @@ createModalView = function(title,callbackID,actionID,responseText,choiceText,cha
 	
 	return newView;
 }	
-   
+    
 /*
 createConfirmationView
 Creates a json modal view with specified arguments.
@@ -719,6 +745,33 @@ handleTypingSelect = async function(ack,body,context) {
 	}
 	return storeReturn;
 }
+
+//handles asynchrous handling of confirmation of article selection
+handleArticleSelect = async function(view,ack,body,context) {
+	ack({
+	  //clear the modal off the users screen
+	 "response_action": "clear"
+	});
+	// get a  reference to the view object's values
+	const valuesObject = view['state']['values']
+	let quoteToSend = ''
+	let counter = 0; 
+	//obtain the first key in the values object and use it to grab the user input 
+	//as well as the channel the user wants to send the input to
+	for (key in valuesObject) {
+	  if (counter === 0) {
+		quoteToSend += valuesObject[key]['input_text']['value'];
+		counter++;
+	  }
+	}
+	//gets teamID from the action which functions as workspace id
+	const workspaceId = body['team']['id'];
+	//gets the userID from the action
+	const userId = body['user']['id'];
+	var text = generateData.generateMessageToSend('quote', quoteToSend);
+	var storeReturn = firestoreFuncs.storeTypeOfExercise(workspaceId, userId, true, text);
+	return storeReturn;
+}
 app.action('warmup_quote_selected_ack', ({ ack, body, context }) => {
 	handleQuoteSelect(ack,body,context);
  });
@@ -728,4 +781,7 @@ app.action('warmup_quote_selected_ack', ({ ack, body, context }) => {
  });
  app.action('warmup_typing_selected_ack', ({ ack, body, context }) => {
 	handleTypingSelect(ack,body,context);
+ });
+ app.view('warmup_article_selected_ack', ({ view, ack, body, context }) => {
+	handleArticleSelect(view,ack,body,context);
  });

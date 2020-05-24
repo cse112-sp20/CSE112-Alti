@@ -234,7 +234,12 @@ exports.generateMessageToSend = function generateMessageToSend(exerciseType, arg
         message = `Your partner sent you a motivational quote to help you start your day right! ${author} says: ${quote}`;
       }
       break;
-
+	  
+	case "article":
+		url = arg;
+		message = "Your partner sent you a tech article to read! Here is the link: " + arg;
+	break; 
+	
     default:
       throw new Exception('Exercise Type did not match any of the provided types.');
   }
