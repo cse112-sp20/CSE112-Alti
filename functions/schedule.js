@@ -1,10 +1,7 @@
 //working
-require('@google-cloud/trace-agent').start({
-  projectId: 'altitest-5f53d',
-});
+require('@google-cloud/trace-agent').start({});
 require('@google-cloud/profiler').start({
 	serviceContext: {
-    projectId: 'altitest-5f53d',
 	  service: 'schedule',
 	  version: '1.0.0',
 	},
