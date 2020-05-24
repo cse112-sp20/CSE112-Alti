@@ -1,3 +1,10 @@
+require('@google-cloud/profiler').start({
+	serviceContext: {
+	  service: 'Warmup_Messages',
+	  version: '1.0.0',
+	},
+	logLeveL: 3,
+});
 const index = require('./index');
 const quotes = require('./quotes');
 const app = index.getBolt();

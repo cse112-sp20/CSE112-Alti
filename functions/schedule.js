@@ -1,4 +1,11 @@
 //working
+require('@google-cloud/profiler').start({
+	serviceContext: {
+	  service: 'Sehedule',
+	  version: '1.0.0',
+	},
+	logLeveL: 3,
+});
 const index = require('./index')
 const functions = require('firebase-functions');
 const app = index.getBolt();

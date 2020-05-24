@@ -1,5 +1,11 @@
 // File containing all the utility functions
-
+require('@google-cloud/profiler').start({
+	serviceContext: {
+	  service: 'Utilities',
+	  version: '1.0.0',
+	},
+	logLeveL: 3,
+});
 
 // Given a channel name, returns the channel ID.
 exports.getChannelIdByName = async function getChannelIdByName(app, token, channelName){

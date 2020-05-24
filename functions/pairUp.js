@@ -1,3 +1,10 @@
+require('@google-cloud/profiler').start({
+	serviceContext: {
+	  service: 'Pair_up',
+	  version: '1.0.0',
+	},
+	logLeveL: 3,
+});
 const shuffle = require('shuffle-array');
 const firestoreFuncs = require('./firestore');
 const index = require('./index');
