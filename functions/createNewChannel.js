@@ -23,61 +23,99 @@ app.view('new_modal', async ({ ack, body, view, context }) => {
     const newChannelName = valuesObject['write_name']['input_text']['value'];
     console.log(newChannelName);
     // create new channel with newChannelName
+    await createNewPairingChannel(app, context.botToken, body.team_id, newChannelName);
+
 });
 
-// if (hasInvalidChars(newChannelName)) {
-//     app.view('new_modal', async ({ ack, body, view, context }) => {
-//         ack({
-//             "response_action": "errors",
-//             "errors": {
-//                 "write_name": "A channel name may only contain lowercase letters, numbers, hyphens, and underscores."
-//         }
-//         });
-//     });
-// }
+// Creates a new pairing channel
+async function createNewPairingChannel(app, token, team_id, channelName) {
+    try {
+        var promises = [];
+        
+        if (!isAnExistingChannel(channelName) && !hasInvalidChars(channelName) && !isSlackWord(channelName)) {
+            //console.log("No channel called " + channelName);
 
-// handling errors
-// if (hasInvalidChars(newChannelName)) {
-//     app.view('new_modal', async ({ ack, body, view, context }) => {
-//         ack({
-//             "response_action": "errors",
-//             "errors": {
-//                 "write_name": "A channel name may only contain lowercase letters, numbers, hyphens, and underscores."
-//         }
-//         });
-//     });
-// } else if (newChannelName.length() > 80) {
-//     app.view('new_modal', async ({ ack, body, view, context }) => {
-//         ack({
-//             "response_action": "errors",
-//             "errors": {
-//                 "write_name": "A channel name must be 80 or fewer characters."
-//             }
-//         });
-//     });
-// } else if (isSlackWord(newChannelName)) {
-//     app.view('new_modal', async ({ ack, body, view, context }) => {
-//         ack({
-//             "response_action": "errors",
-//             "errors": {
-//                 "write_name": "Slack will not allow this channel name."
-//             }
-//         });
-//     });
-// } else if (isAnExistingChannel(newChannelName)) { 
-//     app.view('new_modal', async ({ ack, body, view, context }) => {
-//         ack({
-//             "response_action": "errors",
-//             "errors": {
-//                 "write_name": "A channel with this name already exists!"
-//             }
-//         });
-//     });
-// } else { // input is valid
-//     app.view('new_modal', async ({ ack, body, view, context }) => {
-//         ack();
-//     });
-// }
+            var usersDict = await findUsersWorkSpace(app, token);
+
+            var userString = '';
+            Object.keys(usersDict).forEach((u) => {
+                userString += u + ',';
+            });
+            userString = userString.substring(0, userString.length - 1);
+
+            // create channel
+            var conversationObj = await app.client.conversations.create({
+                token: token,
+                name: channelName
+                //user_ids: userString
+            }).catch((error) => {
+                console.log(error);
+            });
+
+            // invite people
+            app.client.conversations.invite({
+                token: token, 
+                channel: conversationObj.channel.id,
+                users: userString
+            }).catch((error) => {
+                console.log(error);
+            });
+
+            // send welcome message
+            app.client.chat.postMessage({
+                token: token,
+                channel: conversationObj.channel.id,
+                text: `Hi everyone! This is where we'll pair you up to participate in quick 
+                        and fun warm up and cool down activities :)
+                        (To opt out, just leave the channel.)`
+            });
+            
+            promises.push(firestoreFuncs.storeNewPairingChannel(team_id, conversationObj.channel.id));
+
+            for (var userId in usersDict) {
+                for (var day of days) {
+                    promises.push(firestoreFuncs.setWarmupTime(team_id, userId, "9:00 AM", day));
+                    promises.push(firestoreFuncs.setCooldownTime(team_id, userId, "5:00 PM", day));
+                }
+            }
+            Promise.all(promises).catch((error) => {
+                console.log(error);
+            });
+
+        }
+        else {
+            console.log("Channel " + channelName + " already exists, has invalid characters, or is a slack word.");
+        }
+
+    }
+    catch (error) {
+        console.log(error);
+    }
+}
+
+
+// Find the users within a workspace and return it as a dict of userId: userName
+async function findUsersWorkSpace(app, token) {
+    // find users in server
+    var userMembers = await app.client.users.list({
+        token: token
+    }).then((obj) => {
+        return obj.members;
+    }).catch((error) => {
+        console.log(error);
+    });
+    var usersDict = {};
+
+    userMembers.forEach((u) => {
+        if (u.is_bot === false && u.name !== "slackbot") {
+            var id = u.id;
+            usersDict[id] = u.name;
+        }
+    });
+    
+    return usersDict;
+}
+
 
 // Check if channel already exists
 function isAnExistingChannel(channel) {
