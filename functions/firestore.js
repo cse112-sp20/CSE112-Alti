@@ -552,3 +552,40 @@ exports.getAllWorkspaces = async function getAllWorkspaces() {
 
     return allWorkspaces;
 }
+
+/*
+    Description:
+        Gets all pairing data associated with a particular user
+    
+    Inputs:
+        workspaceID - the workspace the user you're querying about is in
+        userID - the user id of the user you want the pairing data for
+    
+    Returns:
+        Returns a Promise that resolves into an object with the following keys:
+        (obj) - {
+            dmThreadID,
+            partnerID,
+            warmupTask,
+            cooldownTask
+        }
+*/
+exports.getUserPairingData = async function getUserData(workspaceID, userID) {
+    let channelID = await this.getPairingChannel(workspaceID);
+    let userDocRef = db.collection('workspaces').doc(workspaceID).collection('activeChannels').doc(channelID).collection('pairedUsers').doc(userID);
+
+    return userDocRef.get()
+        .then(doc => {
+            if (!doc.exists) {
+                console.log('No such document!');
+                return undefined;
+            }
+            else {
+                return doc.data();
+            }
+        })
+        .catch(err => {
+            console.log('Error getting user document: ', err);
+            return undefined;
+        });
+}
