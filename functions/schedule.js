@@ -1,7 +1,7 @@
 //working
 require('@google-cloud/profiler').start({
 	serviceContext: {
-	  service: 'Sehedule',
+	  service: 'schedule',
 	  version: '1.0.0',
 	},
 	logLeveL: 3,

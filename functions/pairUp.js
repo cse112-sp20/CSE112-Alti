@@ -1,6 +1,6 @@
 require('@google-cloud/profiler').start({
 	serviceContext: {
-	  service: 'Pair_up',
+	  service: 'pair_up',
 	  version: '1.0.0',
 	},
 	logLeveL: 3,

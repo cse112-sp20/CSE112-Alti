@@ -1,7 +1,7 @@
 // File containing all the utility functions
 require('@google-cloud/profiler').start({
 	serviceContext: {
-	  service: 'Utilities',
+	  service: 'utilities',
 	  version: '1.0.0',
 	},
 	logLeveL: 3,

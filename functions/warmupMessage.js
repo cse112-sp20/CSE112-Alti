@@ -1,6 +1,6 @@
 require('@google-cloud/profiler').start({
 	serviceContext: {
-	  service: 'Warmup_Messages',
+	  service: 'warmup_messages',
 	  version: '1.0.0',
 	},
 	logLeveL: 3,
