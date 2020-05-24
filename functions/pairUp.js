@@ -19,7 +19,7 @@ exports.pairUp = async function pairUp(context=undefined, botToken=undefined){
         // TODO: Take this out of this function and pass it in as a parameter ideally
         const workspaceInfo = await app.client.team.info({
             token: token
-        })
+        });
         const allUsers = app.client.users.list({
             token: token
         });

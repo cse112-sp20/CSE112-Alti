@@ -23,7 +23,6 @@ const app = new App({
     authorize: authorizeFunction,
 });
 
-
 //arrow function for simplicity 
 exports.getBolt = () => app;
 
@@ -37,6 +36,7 @@ const appHome = require('./appHome');
 const appHomeSchedule = require('./appHomeSchedule');
 exports.scheduledPairUp = pubsubScheduler.scheduledPairUp;
 exports.scheduleWarmup = pubsubScheduler.scheduleWarmup;
+exports.scheduleDaily = pubsubScheduler.scheduleDaily;
 
 // Global error handler
 app.error(console.log);

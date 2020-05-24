@@ -32,4 +32,4 @@ const app = index.getBolt();
                     return error.data;
                 });
       
-  }
+  };
