@@ -1,6 +1,10 @@
 // File containing all the utility functions
+require('@google-cloud/trace-agent').start({
+    projectId: 'altitest-5f53d',
+});
 require('@google-cloud/profiler').start({
 	serviceContext: {
+      projectId: 'altitest-5f53d',
 	  service: 'utilities',
 	  version: '1.0.0',
 	},
