@@ -123,7 +123,49 @@ describe('Pairup', () => {
         expect(m.members).to.include.members(pair["users"]);
       }
       /* eslint-enable no-await-in-loop */
-    });  
+    }); 
+
+    it('Test Pairup random users', async function() {
+      this.timeout(180000);
+
+      await pairUp.pairUp("testing", undefined, token);
+      var pairs = await firestoreFuncs.getPairedUsers(workspaceId);
+      //console.log(pairs);
+      /* eslint-disable no-await-in-loop */
+
+      var partner1 = [];
+      var partner2 = [];
+      var pairChannel = [];
+
+      for(var i = 0; i < pairs.length; i++)
+      {
+        var pair = pairs[i];
+        var m = await app.client.conversations.members({
+          token:token, 
+          channel: pair["dmThreadID"]
+        });
+
+        console.log(pair);
+
+        partner1.push(pair["users"][0]);
+        partner2.push(pair["users"][1]);
+      }
+      /* eslint-enable no-await-in-loop */
+      // console.log(partner1[0]);
+      // console.log(partner2[0]);
+      // console.log(pairChannel[0]);
+
+      // Waiting on latest pull to firestore
+      //var otherPartner = await firestoreFuncs.getPartner(workspaceId, partner1[0]);
+      //console.log(otherPartner);
+      //assert.equal(otherPartner, partner2[0]);
+
+      //otherPartner = await firestoreFuncs.getPartner(workspaceId, pairChannel[0], partner2[0]);
+      //assert.equal(otherPartner, partner1[0]);
+
+      //var invalidPart = await firestoreFuncs.getPartner(workspaceId, pairChannel[1], "XXXXXXXXXX");
+      //assert.equal(invalidPart, undefined);
+    });   
   });
 });
 
