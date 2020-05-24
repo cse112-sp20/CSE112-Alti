@@ -1,15 +1,9 @@
 const index = require('./index');
 const app = index.getBolt();
 const appHome = require('./appHome');
-const appHomeObjects = require('./appHomeObjects');
 const firestoreFuncs = require('./firestore');
 
-var newChannelName = null;
-
-// app.event("app_home_opened", async ({ payload, context }) => {
-//     newChannelName = null;
-// });
-
+// create button - action listener
 app.action('new_channel_button', async({ack, body, context}) => {
     ack();
     console.log("DISPLAYING MODAL...");
@@ -22,12 +16,25 @@ app.action('new_channel_button', async({ack, body, context}) => {
     });
 });
 
-// standard listener
+// modal - view listener
 app.view('new_modal', async ({ ack, body, view, context }) => {
     ack();
-    console.log("Pressed Create!");
+    const valuesObject = view['state']['values']; // get a reference to the view object's values
+    const newChannelName = valuesObject['write_name']['input_text']['value'];
+    console.log(newChannelName);
+    // create new channel with newChannelName
 });
 
+// if (hasInvalidChars(newChannelName)) {
+//     app.view('new_modal', async ({ ack, body, view, context }) => {
+//         ack({
+//             "response_action": "errors",
+//             "errors": {
+//                 "write_name": "A channel name may only contain lowercase letters, numbers, hyphens, and underscores."
+//         }
+//         });
+//     });
+// }
 
 // handling errors
 // if (hasInvalidChars(newChannelName)) {
@@ -150,7 +157,7 @@ var new_channel_modal =
 			},
 			"element": {
 				"type": "plain_text_input",
-				"action_id": 'input_name'
+				"action_id": 'input_text'
 			}
 		}
 	]
