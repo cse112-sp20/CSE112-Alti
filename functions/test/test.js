@@ -10,6 +10,35 @@ var generateTaskData = require('../generateTaskData');
 
 let token = "xoxb-1109790171392-1110712837169-OxF8igcVuxkFUhbZVuoXxypj";
 
+async function setupDatabase()
+{
+  // Create new Channel "Pairing Channel"
+  let firestoreFuncs = firestoreFuncs = require('../firestore');
+
+  await firestoreFuncs.storeNewPairingChannel("T0137P851BJ", "C012B6BTVDL");
+  //await firestoreFuncs.storeNewPairing("T0137P851BJ", dmThreadID, pairedUsers)
+}
+
+async function clearDatabase()
+{
+  // To do Delete Firebase Collection everything after workspace ID
+  let firestoreFuncs = firestoreFuncs = require('../firestore');
+  
+  // Collection path ?   "C012B6BTVDL" active Channel afterwards
+  //await firestoreFuncs.deleteCollection(collectionPath, -1);
+}
+
+async function test()
+{
+  var check = await app.client.conversations.open({
+    token: token, 
+    return_im: false,
+    users: "U012YGB2M50,U0133SAJ0E7,U012P9C053Q"
+  });
+
+  console.log(check);
+}
+
 // If it passes, means the function finished and message was scheduled, baseline test
 // Need more rigorous testing using promises of async function and validation from Slack API channel reading
 describe('Scheduler', () => {
@@ -17,6 +46,10 @@ describe('Scheduler', () => {
   let schedule;
   before(() => {
     schedule = require('../schedule');
+
+    //setupDatabase();
+    //clearDatabase();
+    //test();
   });
 
   it('schedule for 2 min after', async () => {
@@ -306,3 +339,19 @@ describe('App Home tests', () => {
   });
 
 });
+
+
+// U01236C905V Ani
+// U012HPHS2FR Daniel
+// U012P9C053Q Jeremiah
+// U012RQ0TQG6 Alvin
+// U012X3JJS78 Shardul Bot
+// U012YEB5HR8 Jonathan Leigh
+// U012YGB2M50 Rahul
+// U012YNT21C3 Him Li
+// U0132DWLTT7 Lacey Umamoto
+// U0133SAJ0E7 Jason Ding
+// U01341THLV9 Brent Vanzant
+// U01341VGSE7 Thomas Limperis
+// U0134PZ89UL Eric Wei
+// U013G97PNFK Ruixan Song
