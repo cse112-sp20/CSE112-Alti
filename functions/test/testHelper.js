@@ -16,20 +16,21 @@ setupPairs = async function(workspaceId, channelId)
 
   await firestoreFuncs.storeNewPairingChannel(workspaceId, channelId);
 
-    createDmThread(pair1).then(id => {
-      return Promise.resolve(firestoreFuncs.storeNewPairing(workspaceId, id , pair1));
+    
+    return Promise.resolve(function(){
+        createDmThread(pair1).then(id => {
+          return firestoreFuncs.storeNewPairing(workspaceId, id , pair1);
+        });
+        createDmThread(pair2).then(id => {
+          return firestoreFuncs.storeNewPairing(workspaceId, id , pair2);
+        });
+        createDmThread(pair3).then(id => {
+          return firestoreFuncs.storeNewPairing(workspaceId, id , pair3);
+        });
+        createDmThread(pair4).then(id => {
+          return firestoreFuncs.storeNewPairing(workspaceId, id , pair4);
+        });
     });
-    createDmThread(pair2).then(id => {
-      return Promise.resolve(firestoreFuncs.storeNewPairing(workspaceId, id , pair2));
-    });
-    createDmThread(pair3).then(id => {
-      return Promise.resolve(firestoreFuncs.storeNewPairing(workspaceId, id , pair3));
-    });
-    createDmThread(pair4).then(id => {
-      return Promise.resolve(firestoreFuncs.storeNewPairing(workspaceId, id , pair4));
-    });
-  
-  return Promise.resolve();
 }
 
 async function createDmThread(users)
