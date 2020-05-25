@@ -264,7 +264,7 @@ describe('Setup Warmup Callbacks', () => {
   });
 
   after(async() => {
-    await clearDatabase('/workspaces/' + workspaceId + '/activeChannels');
+    await clearDatabase("/workspaces/" + workspaceId + "/activeChannels");
   })
 
   it('handleTypingSelect', () => {  
