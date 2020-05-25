@@ -5,40 +5,112 @@ const expect = require('chai').expect;
 const index = require('../index');
 const app = index.getBolt();
 var generateTaskData = require('../generateTaskData');
+const admin = require('firebase-admin');
+let db = admin.firestore();
+let firestoreFuncs = require('../firestore');
 
 //hardcode the token 
 let token = "xoxb-1109790171392-1110712837169-OxF8igcVuxkFUhbZVuoXxypj";
 
-async function setupDatabase()
+async function setupPairs(workspaceId, channelId)
 {
   // Create new Channel "Pairing Channel"
-  let firestoreFuncs = require('../firestore');
 
-  let channelSet = await firestoreFuncs.storeNewPairingChannel("T0137P851BJ", "C012B6BTVDL");
+  let pair1 = ["U01236C905V", "U012HPHS2FR"];
+  let pair2 = ["U012P9C053Q", "U012RQ0TQG6"];
+  let pair3 = ["U012X3JJS78", "U012YEB5HR8"];
+  let pair4 = ["U012YGB2M50", "U0133SAJ0E7"];
 
-  var pair1 = ["U01236C905V", "U012HPHS2FR"];
-  var pair2 = ["U012P9C053Q", "U012RQ0TQG6"];
-  var pair3 = ["U012X3JJS78", "U012YEB5HR8"];
-  var pair4 = ["U012YGB2M50", "U0133SAJ0E7"];
+  await firestoreFuncs.storeNewPairingChannel(workspaceId, channelId);
 
-  let pair1id = getdmThreadID(pair1);
-  let pair2id = getdmThreadID(pair2);
-  let pair3id = getdmThreadID(pair3);
-  let pair4id = getdmThreadID(pair4);
-
-  await firestoreFuncs.storeNewPairing("T0137P851BJ", pair1id , pair1);
-  await firestoreFuncs.storeNewPairing("T0137P851BJ", pair2id , pair2);
-  await firestoreFuncs.storeNewPairing("T0137P851BJ", pair3id , pair3);
-  await firestoreFuncs.storeNewPairing("T0137P851BJ", pair4id , pair4);
+  getdmThreadID(pair1).then(id => {
+    return firestoreFuncs.storeNewPairing(workspaceId, id , pair1);
+  });
+  getdmThreadID(pair2).then(id => {
+    return firestoreFuncs.storeNewPairing(workspaceId, id , pair2);
+  });
+  getdmThreadID(pair3).then(id => {
+    return firestoreFuncs.storeNewPairing(workspaceId, id , pair3);
+  });
+  getdmThreadID(pair4).then(id => {
+    return firestoreFuncs.storeNewPairing(workspaceId, id , pair4);
+  });
+  return Promise.resolve();
 }
 
-async function clearDatabase()
+async function clearDatabase(path)
 {
-  // To do Delete Firebase Collection everything after workspace ID
-  let firestoreFuncs = firestoreFuncs = require('../firestore');
+  let collectionRef = db.collection(path);
+  let query = collectionRef.orderBy('__name__').limit(100);
+
+  return new Promise((resolve, reject) => {
+    deleteQueryBatch(query, resolve, reject);
+  });
+}
+
+/*
+    Description:
+        Helper function for deleteCollection
+*/
+function deleteQueryBatch(query, resolve, reject) {
+  query.get()
+    .then((snapshot) => {
+      // When there are no documents left, we are done
+      if (snapshot.size === 0) {
+          return 0;
+      }
+
+      // Delete documents in a batch
+      let batch = db.batch();
+      snapshot.docs.forEach((doc) => {
+        batch.delete(doc.ref);
+        //console.log(doc.ref);
+      });
+
+      // eslint-disable-next-line promise/no-nesting
+      return batch.commit().then(() => {
+        return snapshot.size;
+      });
+    }).then((numDeleted) => {
+      if (numDeleted === 0) {
+        resolve();
+        return;
+      }
+
+      // Recurse on the next process tick, to avoid
+      // exploding the stack.
+      process.nextTick(() => {
+        deleteQueryBatch(query, resolve, reject);
+      });
+      // eslint-disable-next-line consistent-return
+      return null;
+    })
+    .catch(reject);
+}
+
+async function populateUsers(workspaceId) {
+  let schedule = {'FridayEnd': '5:00 PM',
+                  'ThursdayEnd': '5:00 PM',
+                  'WednesdayEnd': '5:00 PM',
+                  'TuesdayEnd': '5:00 PM',
+                  'MondayEnd': '5:00 PM',
+                  'FridayStart': '9:00 AM',
+                  'ThursdayStart': '9:00 AM',
+                  'WednesdayStart': '9:00 AM',
+                  'TuesdayStart': '9:00 AM', 
+                  'MondayStart': '9:00 AM'};
+  let users = ["U01236C905V", "U012HPHS2FR",
+               "U012P9C053Q", "U012RQ0TQG6" ,
+               "U012X3JJS78", "U012YEB5HR8" , 
+               "U012YGB2M50", "U012YNT21C3" ,
+               "U0132DWLTT7", "U0133SAJ0E7" ,
+               "U01341THLV9", "U01341VGSE7" ,
+               "U0134PZ89UL", "U013G97PNFK"];
   
-  // Collection path ?   "C012B6BTVDL" active Channel afterwards
-  //await firestoreFuncs.deleteCollection(collectionPath, -1);
+  /* eslint-disable no-await-in-loop */
+  for(let i = 0; i < users.length; i++)
+    await db.collection("workspaces").doc(workspaceId).collection("users").doc(users[i]).set(schedule);
+  /* eslint-enable no-await-in-loop */
 }
 
 async function getdmThreadID(users)
@@ -55,7 +127,7 @@ async function getdmThreadID(users)
     text: "Testing making thread with api"
   });
 
-  console.log(check);
+  return check.channel.id;
 }
 
 // If it passes, means the function finished and message was scheduled, baseline test
@@ -63,12 +135,8 @@ async function getdmThreadID(users)
 describe('Scheduler', () => {
  
   let schedule;
-  before(() => {
+  before(async () => {
     schedule = require('../schedule');
-
-    //setupDatabase();
-    //clearDatabase();
-    //getdmThreadID();
   });
 
   it('schedule for 2 min after', async () => {
@@ -102,26 +170,23 @@ describe('Scheduler', () => {
 describe('Pairup', () => {
 
   let pairUp;
-
+  
   before(() => {
-    
     pairUp = require('../pairUp');
   });
 
   describe('Test the pairup function as a whole', () => {
-    let firestoreFuncs;
     let workspaceInfo;
-    let workspaceId;
-    let testChannelId = "C012B6BTVDL" // got that from the console.
+    let workspaceId = "T0137P851BJ";
+    let channelId = "C012B6BTVDL";
 
     before(async () => {
-      firestoreFuncs = require('../firestore');
-      workspaceInfo = await app.client.team.info({
-        token: token
-      });
-      workspaceId = workspaceInfo.team.id;
-      
+      await firestoreFuncs.storeNewPairingChannel(workspaceId, channelId);
     });
+
+    after(async() => {
+      await clearDatabase('/workspaces/' + workspaceId + '/activeChannels/' + channelId + '/pairedUsers');
+    })
 
     it('Test Pairup with testing channel', async function() {
       this.timeout(180000) // 3 min
@@ -149,7 +214,7 @@ describe('Pairup', () => {
     it('Test Pairup random users', async function() {
       this.timeout(180000);
 
-      await pairUp.pairUp("testing", undefined, token);
+      //await pairUp.pairUp(undefined, token);
       var pairs = await firestoreFuncs.getPairedUsers(workspaceId);
       //console.log(pairs);
       /* eslint-disable no-await-in-loop */
@@ -166,7 +231,7 @@ describe('Pairup', () => {
           channel: pair["dmThreadID"]
         });
 
-        console.log(pair);
+        //console.log(pair);
 
         partner1.push(pair["users"][0]);
         partner2.push(pair["users"][1]);
@@ -177,15 +242,15 @@ describe('Pairup', () => {
       // console.log(pairChannel[0]);
 
       // Waiting on latest pull to firestore
-      //var otherPartner = await firestoreFuncs.getPartner(workspaceId, partner1[0]);
-      //console.log(otherPartner);
-      //assert.equal(otherPartner, partner2[0]);
+      // var otherPartner = await firestoreFuncs.getPartner(workspaceId, partner1[0]);
+      // console.log(otherPartner);
+      // assert.equal(otherPartner, partner2[0]);
 
-      //otherPartner = await firestoreFuncs.getPartner(workspaceId, pairChannel[0], partner2[0]);
-      //assert.equal(otherPartner, partner1[0]);
+      // otherPartner = await firestoreFuncs.getPartner(workspaceId, pairChannel[0], partner2[0]);
+      // assert.equal(otherPartner, partner1[0]);
 
-      //var invalidPart = await firestoreFuncs.getPartner(workspaceId, pairChannel[1], "XXXXXXXXXX");
-      //assert.equal(invalidPart, undefined);
+      // var invalidPart = await firestoreFuncs.getPartner(workspaceId, pairChannel[1], "XXXXXXXXXX");
+      // assert.equal(invalidPart, undefined);
     });   
   });
 });
@@ -196,24 +261,27 @@ describe('util', () => {
     let util;
     before(async () => {
       util = require('../util');
-      var response = await app.client.conversations.list({
-        token: token
-      })
-      var channels = response.channels;
+      // var response = await app.client.conversations.list({
+      //   token: token
+      // })
+      //var channels = response.channels;
       //console.log(channels)
     });
     
-    it('Test with channel general', async () => {
+    it('Test with channel general', async function() {
+      this.timeout(5000); // 5 sec
       var channelId = await util.getChannelIdByName(app, token, "general");
       assert.equal(channelId, "C012WGXPYC9"); //hardcoded it with console.log
     });
 
-    it('Test with channel alti-paring', async () => {
+    it('Test with channel alti-paring', async function() {
+      this.timeout(5000); // 5 sec
       var channelId = await util.getChannelIdByName(app, token, "alti-pairing");
       assert.equal(channelId, "C01391DPZV4"); //hardcoded it with console.log
     });
 
-    it('Test with channel that doesnt exist', async () => {
+    it('Test with channel that doesnt exist', async function () {
+      this.timeout(5000); // 5 sec
       var channelId = await util.getChannelIdByName(app, token, "should not exist");
       assert.equal(channelId, undefined); 
     });
@@ -285,34 +353,35 @@ describe('Setup Warmup Callbacks', () => {
   before(async () => {    
     fakeContext = { botToken: token};
     firestoreFuncs = require('../firestore');
-    return app.client.team.info({
-      token: token
-    }).then( workspaceInfoReturn => {
-      workspaceInfo = workspaceInfoReturn;
-      workspaceId = workspaceInfo.team.id;
-      return Promise.resolve(firestoreFuncs.getPairedUsers(workspaceId));
-    }).then( pairsReturn => {
-      var pairs = pairsReturn;    
-      // Fails if there are no paired people existing in
-      // the database already. needs to be fixed by initializing
-      // a pre-set db at the start of the test
-      var pairsExist = (pairs.length > 0);
-      assert.equal(pairsExist, true);
-      pair = pairs[0];
-      // Fails if the paired up people is not a pair.
-      // Need to be changed if we allow groups of 3.
-      assert.equal(pair.users.length, 2);
-      userId1 = pair.users[0];
-      userId2 = pair.users[1];
-      fakeBody = {
-        team: {id:workspaceId},
-        user: {id:userId1},
-        view: {id:undefined},
-        // The value needs to be set based on the type of exercise
-        actions: [{value:''}]
-      };
-
-      return Promise.resolve();
+    return setupPairs('T0137P851BJ','C012B6BTVDL').then(response => {
+      return app.client.team.info({
+        token: token
+      }).then( workspaceInfoReturn => {
+        workspaceInfo = workspaceInfoReturn;
+        workspaceId = workspaceInfo.team.id;
+        return Promise.resolve(firestoreFuncs.getPairedUsers(workspaceId));
+      }).then( pairsReturn => {
+        var pairs = pairsReturn;    
+        // Fails if there are no paired people existing in
+        // the database already. needs to be fixed by initializing
+        // a pre-set db at the start of the test
+        var pairsExist = (pairs.length > 0);
+        assert.equal(pairsExist, true);
+        pair = pairs[0];
+        // Fails if the paired up people is not a pair.
+        // Need to be changed if we allow groups of 3.
+        assert.equal(pair.users.length, 2);
+        userId1 = pair.users[0];
+        userId2 = pair.users[1];
+        fakeBody = {
+          team: {id:workspaceId},
+          user: {id:userId1},
+          view: {id:undefined},
+          // The value needs to be set based on the type of exercise
+          actions: [{value:''}]
+        };
+        return Promise.resolve();
+      });
     });
   });
 
@@ -328,6 +397,7 @@ describe('Setup Warmup Callbacks', () => {
     var exercisePrompt = handleTypingSelect(fakeAck, fakeBody, fakeContext).then( () => {
       return firestoreFuncs.getExercisePrompt(workspaceId, userId2, true)
     })
+
     return exercisePrompt.then( prompt => {
       var expectedString = "Your partner sent you this cool speed coding challenge in java to get your mind and fingers ready for the day!\nComplete it here: ";
       assert.equal(ackCalled, true);
@@ -350,58 +420,58 @@ describe('Setup Warmup Callbacks', () => {
   });
 });
 
-describe('App Home tests', () => {
-  let appHome;
-  let onBoard;
-  let workspaceId;
-  let firestoreFuncs;
-  let userId;
-  before(async () => {
-    appHome = require('../appHome'); 
-    onBoard = require('../onBoard');
-    firestoreFuncs = require('../firestore');
-    workspaceId = "TestWorkspace";
-    userId = "user1";
-    await firestoreFuncs.setTimeZone(workspaceId, 'LA');
-    await firestoreFuncs.setOwner(workspaceId, userId);
-    await firestoreFuncs.storeNewPairingChannel(workspaceId, "Channel1");
-  });
+// describe('App Home tests', () => {
+//   let appHome;
+//   let onBoard;
+//   let workspaceId;
+//   let firestoreFuncs;
+//   let userId;
+//   before(async () => {
+//     appHome = require('../appHome'); 
+//     onBoard = require('../onBoard');
+//     firestoreFuncs = require('../firestore');
+//     workspaceId = "TestWorkspace";
+//     userId = "user1";
+//     await firestoreFuncs.setTimeZone(workspaceId, 'LA');
+//     await firestoreFuncs.setOwner(workspaceId, userId);
+//     await firestoreFuncs.storeNewPairingChannel(workspaceId, "Channel1");
+//   });
 
-  it('Get time zone', async () => {
-    var timeZone = await firestoreFuncs.getTimeZone(workspaceId).then((obj)=>{
-      return obj;
-    }).catch((error) => {
-          console.log(error);
-    });
-    assert.equal(timeZone, "LA");
+//   it('Get time zone', async () => {
+//     var timeZone = await firestoreFuncs.getTimeZone(workspaceId).then((obj)=>{
+//       return obj;
+//     }).catch((error) => {
+//           console.log(error);
+//     });
+//     assert.equal(timeZone, "LA");
 
-  });
+//   });
 
 
-  it('Check Owner', async () => {
-    var t = await appHome.checkOwner(workspaceId, userId);
-    assert.equal(t, true);
+//   it('Check Owner', async () => {
+//     var t = await appHome.checkOwner(workspaceId, userId);
+//     assert.equal(t, true);
 
-  });
+//   });
 
-  it('Get Pairing Channel', async () => {
-    var channelId = await firestoreFuncs.getPairingChannel(workspaceId).then((obj)=>{
-      return obj;
-    }).catch((error) => {
-          console.log(error);
-      });
-    assert.equal(channelId, "Channel1");
+//   it('Get Pairing Channel', async () => {
+//     var channelId = await firestoreFuncs.getPairingChannel(workspaceId).then((obj)=>{
+//       return obj;
+//     }).catch((error) => {
+//           console.log(error);
+//       });
+//     assert.equal(channelId, "Channel1");
 
-  });
+//   });
 
-  it('Test getAllTimes function', async () => {
-    var res = await appHome.getAllTimes(workspaceId, userId);  
-    for (var i = 0; i < 10; i++) {
-      assert.equal(res[i], i+1);
-    }
-  });
+//   it('Test getAllTimes function', async () => {
+//     var res = await appHome.getAllTimes(workspaceId, userId);  
+//     for (var i = 0; i < 10; i++) {
+//       assert.equal(res[i], i+1);
+//     }
+//   });
 
-});
+// });
 
 
 // U01236C905V Ani

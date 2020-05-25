@@ -1,8 +1,8 @@
 const functions = require('firebase-functions');
 const admin = require('firebase-admin');
 const request = require('request');
-//const dotenv = require('dotenv');
-//dotenv.config();
+// const dotenv = require('dotenv');
+// dotenv.config();
 
 // console.log(typeof(process.env.FUNCTIONS_EMULATOR));
 if(process.env.FUNCTIONS_EMULATOR === "true"){
@@ -101,7 +101,6 @@ exports.getAPIPair = (team_id) => {
 */
 exports.storeNewPairing = async function storeNewPairing(workspace, dmThreadID, pairedUsers) {
     let channelID = await this.getPairingChannel(workspace);
-
     let usersRef = db.collection('workspaces').doc(workspace)
                            .collection('activeChannels').doc(channelID)
                            .collection('pairedUsers');
