@@ -221,7 +221,7 @@ exports.generateCodingChallenge = function generateCodingChallenge(codingLanguag
 exports.generateMessageToSend = function generateMessageToSend(exerciseType, arg) {
   var url = "";     // generated url (for exerciseTypes: puzzle, typing)
   var message = ""; // full message to store
-
+  var msg = "";  	//temporary msg to store
   switch(exerciseType) {
     case "puzzle":
       url = generatePuzzle(arg);
@@ -234,12 +234,8 @@ exports.generateMessageToSend = function generateMessageToSend(exerciseType, arg
                 "' to complete";
 	  break;
 	 case "video":
-		var msg = arg; 
+		msg = arg; 
 		message = "Your partner sent you this video to watch! : " + msg;
-	  break;
-	  case "article":
-		var msg = arg;
-		message = "Your partner sent you a tech article to read! Here is the link: " + arg;
 	  break;
 	case "cooldownArticle":
 		var msg = arg;
