@@ -198,7 +198,8 @@ exports.customMsgView =  async function(ack, body, view, context, isWarmup) {
   //console.log used for local testing
   //console.log(userID + " in " + channelID + " sent the following: " + msgToSend+ "in team:"+ teamID);
   //writes the data collected to the firebase
-  firestoreFuncs.writeMsgToDB(teamID, userID, channelID,msgToSend,isWarmup);
+  let text = "Here's a custom message from your buddy: '" + msgToSend+ "'";
+  firestoreFuncs.storeTypeOfExercise(teamID, userID, isWarmup, text);
 }
 
 
