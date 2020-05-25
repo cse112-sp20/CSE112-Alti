@@ -349,7 +349,7 @@ exports.cooldownVideoSelect = async function(ack,body,context) {
 			callback_id: 'cooldown_video_selected_ack',
 			title: {
 			  type: 'plain_text',
-			  text: 'Cooldown Video Selection'
+			  text: 'Video Selection'
 			},
 			blocks: [
 			  {
@@ -391,7 +391,7 @@ exports.cooldownArticleSelect = async function(ack,body,context) {
 			callback_id: 'cooldown_article_selected_ack',
 			title: {
 			  type: 'plain_text',
-			  text: 'Cooldown Article Selection'
+			  text: 'Article Selection'
 			},
 			blocks: [
 			  {
@@ -858,7 +858,7 @@ handleArticleSelect = async function(view,ack,body,context) {
 	const workspaceId = body['team']['id'];
 	//gets the userID from the action
 	const userId = body['user']['id'];
-	var text = generateData.generateMessageToSend('quote', quoteToSend);
+	var text = generateData.generateMessageToSend('article', quoteToSend);
 	var storeReturn = firestoreFuncs.storeTypeOfExercise(workspaceId, userId, true, text);
 	return storeReturn;
 }
@@ -885,7 +885,7 @@ handleCooldownArticleSelect = async function(view,ack,body,context) {
 	const workspaceId = body['team']['id'];
 	//gets the userID from the action
 	const userId = body['user']['id'];
-	var text = generateData.generateMessageToSend('quote', quoteToSend); //TODO UPDATE
+	var text = generateData.generateMessageToSend('cooldownArticle', quoteToSend); //TODO UPDATE
 	var storeReturn = firestoreFuncs.storeTypeOfExercise(workspaceId, userId, false, text);
 	return storeReturn;
 }
@@ -912,7 +912,7 @@ handleVideoSelect = async function(view,ack,body,context) {
 	const workspaceId = body['team']['id'];
 	//gets the userID from the action
 	const userId = body['user']['id'];
-	var text = generateData.generateMessageToSend('quote', quoteToSend); //TODO UPDATE
+	var text = generateData.generateMessageToSend('video', quoteToSend);
 	var storeReturn = firestoreFuncs.storeTypeOfExercise(workspaceId, userId, false, text);
 	return storeReturn;
 }

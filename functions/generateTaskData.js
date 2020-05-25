@@ -229,9 +229,21 @@ exports.generateMessageToSend = function generateMessageToSend(exerciseType, arg
                 " puzzle to help you get those brain juices flowing!\nComplete it here: " + url;
       break;
 	case "retro":
+		var index = arg; 
+		message = "Your partner sent you this retro: '" + retroQuestions[index].retro +
+                "' to complete";
+	  break;
+	 case "video":
 		var msg = arg; 
-		message = "Your partner sent you this retro: " + msg +
-                " to complete";
+		message = "Your partner sent you this video to watch! : " + msg;
+	  break;
+	  case "article":
+		var msg = arg;
+		message = "Your partner sent you a tech article to read! Here is the link: " + arg;
+	  break;
+	case "cooldownArticle":
+		var msg = arg;
+		message = "Your partner sent you a non-tech article to read! Here is the link: " + arg;
 	  break;
     case "typing":
       url = exports.generateCodingChallenge(arg);
