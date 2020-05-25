@@ -24,7 +24,8 @@
     "firebase-functions": "^3.6.1",
     "node-pre-gyp": "^0.14.0",
     "request": "^2.88.2",
-    "shuffle-array": "^1.0.1"
+    "shuffle-array": "^1.0.1",
+    "xmlhttprequest": "^1.8.0"
   },
   "devDependencies": {
     "body-parser": "^1.15.2",

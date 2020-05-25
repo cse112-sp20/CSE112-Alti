@@ -35,8 +35,8 @@ exports.generateQuote = function() {
     return randomQuoteIndex+"-"+quoteText+" - "+ quoteAuthor ;
 }
 
-// TODO
-function generatePuzzle(typeOfPuzzle) {
+// Generates a puzzle URL
+exports.generatePuzzle = function generatePuzzle(typeOfPuzzle) {
     // Hardcoded difficulty, can be changed but also need to
     // hardcode the upper limit for each game in that case
     const difficulty = "1";
