@@ -280,7 +280,7 @@ async function loadHomeTabUI(app, workspaceID, userId, context) {
 					"type": "section",
 					"text": {
 						"type": "mrkdwn",
-						"text": "Or, *create a new channel*. "
+						"text": "Or, *create a new pairing channel*. "
 					},
 					"accessory": {
 						"type": "button",
