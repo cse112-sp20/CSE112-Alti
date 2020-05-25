@@ -38,6 +38,10 @@ exports.pairUp = async function pairUp(context=undefined, botToken=undefined){
         // const workspaceInfo = await workspaceInfoPromise.then(result => result.data);
 
         const members = channelId.then( id => {
+            if(id === undefined){
+                return Promise.reject(new Error("Could not pair channel " + workspaceInfo.team.id + 
+                                                ". Pairing channel could not be retrieved."));
+            }
             pairingChannelIdVal = id;
             return app.client.conversations.members({
                     token:token,
@@ -48,6 +52,14 @@ exports.pairUp = async function pairUp(context=undefined, botToken=undefined){
         const usersInfo = await Promise.all([allUsers, members]).then(data => {
             const allUsers = data[0];
             const members = data[1];
+            if(!allUsers.ok){
+                return Promise.reject(new Error("Could not get all users for workspace " + workspaceInfo.team.id + 
+                                                ". (app.client.users.list)"));
+            }
+            if(!members.ok){
+                return Promise.reject(new Error("Could not get pairing channel members for workspace " + workspaceInfo.team.id + 
+                                                ". (app.client.users.list)"));
+            }
             const membersList = members.members;
             const selectedUsers = allUsers.members.filter( user => membersList.includes(user.id));
             return Promise.resolve(selectedUsers);
@@ -55,7 +67,6 @@ exports.pairUp = async function pairUp(context=undefined, botToken=undefined){
 
         // Get all the necessary user ids
         const ids = await Promise.all(usersInfo).then( users => {
-            // console.log(usersInfo)
             // const users = usersInfo.map( info => info.user);
             const humans = users.filter( user => {
                 //SlackBot is also excluded. Filters non-humans
@@ -78,18 +89,22 @@ exports.pairUp = async function pairUp(context=undefined, botToken=undefined){
             var responsePromise = app.client.conversations.open({
                 token: token,
                 return_im: false,
-                users: ids[i]+','+ids[(ids.length/2) + i]
+                users: ids[i]+','+ids[Math.floor((ids.length/2) + i)]
             })
             conversationInfos.push(responsePromise);
         }
         // Going through the paired channels and post messages to them.
         // also store the pairing info on the firebase
         return conversationInfos.map( conversationInfo => {
-            return conversationInfo.then( response => handlePairingResponse(response, app, token, workspaceInfo, pairingChannelIdVal));
+            return conversationInfo
+                .then( response => handlePairingResponse(response, app, token, workspaceInfo, pairingChannelIdVal))
+                .catch(err => {
+                    return console.error(err.message+"\n Could not open conversation at workspace " + workspaceInfo.team.id + ".");
+            });
         });    
     }
     catch(error){
-        console.log(error);
+        console.error(error);
         return error.data;
     }
 }
@@ -97,7 +112,7 @@ exports.pairUp = async function pairUp(context=undefined, botToken=undefined){
 // Handles pairing response by posting a message to the pairing channel and storing pairing information on firestore
 async function handlePairingResponse(response, app, token, workspaceInfo, pairingChannelIdVal){
     if(!response.ok){
-        return console.error(response.error);
+        return (response.error);
     }
     app.client.chat.postMessage({
         token: token,
@@ -109,7 +124,6 @@ async function handlePairingResponse(response, app, token, workspaceInfo, pairin
         token: token,
         channel: response.channel.id
     });
-
     let pairedUsers = [];
     /* eslint-disable no-await-in-loop */
     for (var i = 0; i < users.members.length; i++) {
