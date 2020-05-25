@@ -82,15 +82,14 @@ exports.scheduleDaily = functions.pubsub
 
 async function scheduleDailyHelper() {
   let workspaces = await firestoreFuncs.getAllWorkspaces();
-  console.log(workspaces);
-  /*
+  
   for (var w of workspaces) {
-    console.log("Workspace: " + w);
     var p = scheduleDailyWorkspace(w);
     
   }
-  */
-  scheduleDailyWorkspace("T012US11G4X");
+  
+  // TESTING LINE BELOW
+  // scheduleDailyWorkspace("T012US11G4X");
   return null;
 }
 
@@ -99,7 +98,6 @@ async function scheduleDailyWorkspace(workspaceId) {
   var d = new Date();
   var n = d.getDay();
   var day = days[n];
-  console.log(day);
 
   var keyObj = await firestoreFuncs.getAPIPair(workspaceId);
   if (!keyObj) {
@@ -116,7 +114,7 @@ async function scheduleDailyWorkspace(workspaceId) {
     return;
   }
   else {
-    console.log("Pairing Channel: " + channel);
+    // console.log("Pairing Channel: " + channel);
   }
   let convoObj = await app.client.conversations.members({
     token: w_token,
@@ -134,8 +132,9 @@ async function scheduleDailyWorkspace(workspaceId) {
 
 // Helper function for scheduleDailyWorkspace
 async function scheduleDailyUser(workspaceId, userId, token, day) {
-  day = "Monday";
-  console.log("user: " + userId);
+  // CHANGE TESTING LINE BELOW BEFORE DEPLOYING
+  // day = "Monday";
+  // console.log("user: " + userId);
   let pairingData = await firestoreFuncs.getUserPairingData(workspaceId, userId);
   let warmupTime = await firestoreFuncs.getWarmupTime(workspaceId, userId, day);
   let cooldownTime = await firestoreFuncs.getCooldownTime(workspaceId, userId, day);
@@ -148,59 +147,66 @@ async function scheduleDailyUser(workspaceId, userId, token, day) {
   var warmupTask;
   var cooldownTask;
   var dmThreadID = pairingData.dmThreadID;
+  var quote;
 
   if (day === "Monday") {
     //TODO generate hardcoded tasks for monday quote and retrospective
-    warmupTask = null;
-    cooldownTask = null;
+    quote = generateTaskData.generateQuote();
+    quote = quote.split("-")[1] + "-" + quote.split("-")[2];
+    warmupTask = `Your partner sent you a motivational quote to help you start your day right!\n${quote}`;
+    cooldownTask = `Retrospective question`;
   }
   else {
     warmupTask = pairingData.warmupTask;
     cooldownTask = pairingData.cooldownTask;
   }
 
-  //TODO if no such warmup or cooldown make one for testing
+  //if no such warmup or cooldown make one for testing
+  /*
   if (!warmupTask) {
-    // add
+    quote = generateTaskData.generateQuote();
+    quote = quote.split("-")[1] + "-" + quote.split("-")[2];
+    warmupTask = `Your partner sent you a motivational quote to help you start your day right!\n${quote}`;
   }
   if (!cooldownTask) {
-    // add
+    cooldownTask = `Retrospective question`;
   }
-
   console.log(warmupTime);
   console.log(cooldownTime);
   console.log(pairingData);
+  */
 
   if (dmThreadID) {
     var hour, min, mid;
 
-    split = warmupTime.split(" ");
-    hour = warmupTime.split(" ")[0].split(":")[0];
-    min = warmupTime.split(" ")[0].split(":")[1];
-    mid = warmupTime.split(" ")[1];
-    if (mid === "PM") {
-      hour = String(Number(hour) + 12);
+    if (warmupTask) {
+
+      split = warmupTime.split(" ");
+      hour = warmupTime.split(" ")[0].split(":")[0];
+      min = warmupTime.split(" ")[0].split(":")[1];
+      mid = warmupTime.split(" ")[1];
+      if (mid === "PM") {
+        hour = String(Number(hour) + 12);
+      }
+
+      schedule.scheduleMsg(hour, min, warmupTask, dmThreadID, token);
+      // Test
+      // schedule.scheduleMsg(21, 27, warmupTask, dmThreadID, token);
     }
-    console.log(hour);
-    console.log(min);
-    console.log(mid);
 
-    schedule.scheduleMsg(hour, min, warmupTask, dmThreadID, token);
-    
+    if (cooldownTask) {
+      split = cooldownTime.split(" ");
+      hour = cooldownTime.split(" ")[0].split(":")[0];
+      min = cooldownTime.split(" ")[0].split(":")[1];
+      mid = cooldownTime.split(" ")[1];
 
-    split = cooldownTime.split(" ");
-    hour = cooldownTime.split(" ")[0].split(":")[0];
-    min = cooldownTime.split(" ")[0].split(":")[1];
-    mid = cooldownTime.split(" ")[1];
+      if (mid === "PM") {
+        hour = String(Number(hour) + 12);
+      }
 
-    if (mid === "PM") {
-      hour = String(Number(hour) + 12);
+      schedule.scheduleMsg(hour, min, cooldownTask, dmThreadID, token);
+      //schedule.scheduleMsg(21, 23, cooldownTask, dmThreadID, token);
     }
-    console.log(hour);
-    console.log(min);
-    console.log(mid);
-
-    schedule.scheduleMsg(hour, min, cooldownTask, dmThreadID, token);
   }
 
   return null;

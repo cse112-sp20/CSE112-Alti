@@ -30,7 +30,7 @@ const app = index.getBolt();
     reminder.setHours(hour);
     reminder.setMinutes(minute);
     reminder.setSeconds(0);
-
+    console.log("Schedule msg runs");
     //call api
     return app.client.chat.scheduleMessage({
                       token: token,
