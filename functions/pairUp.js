@@ -1,4 +1,4 @@
-require('@google-cloud/trace-agent').start({});
+//require('@google-cloud/trace-agent').start({});
 require('@google-cloud/profiler').start({
 	serviceContext: {
 	  service: 'pair_up',

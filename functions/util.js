@@ -1,5 +1,5 @@
 // File containing all the utility functions
-require('@google-cloud/trace-agent').start({});
+//require('@google-cloud/trace-agent').start({});
 require('@google-cloud/profiler').start({
 	serviceContext: {
 	  service: 'utilities',
