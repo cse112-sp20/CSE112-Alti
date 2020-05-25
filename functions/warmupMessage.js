@@ -1,4 +1,3 @@
-'use strict'
 //require('@google-cloud/trace-agent').start({});
 require('@google-cloud/profiler').start({
 	serviceContext: {

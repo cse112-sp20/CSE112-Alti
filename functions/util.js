@@ -1,4 +1,4 @@
-'use strict'
+
 // File containing all the utility functions
 
 //require('@google-cloud/trace-agent').start({});

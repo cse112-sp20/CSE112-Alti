@@ -1,4 +1,4 @@
-'use strict'
+
 //working
 //require('@google-cloud/trace-agent').start({});
 require('@google-cloud/profiler').start({
