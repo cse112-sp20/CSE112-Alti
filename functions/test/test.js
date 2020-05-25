@@ -7,16 +7,29 @@ const app = index.getBolt();
 var generateTaskData = require('../generateTaskData');
 
 //hardcode the token 
-
 let token = "xoxb-1109790171392-1110712837169-OxF8igcVuxkFUhbZVuoXxypj";
 
 async function setupDatabase()
 {
   // Create new Channel "Pairing Channel"
-  let firestoreFuncs = firestoreFuncs = require('../firestore');
+  let firestoreFuncs = require('../firestore');
 
-  await firestoreFuncs.storeNewPairingChannel("T0137P851BJ", "C012B6BTVDL");
-  //await firestoreFuncs.storeNewPairing("T0137P851BJ", dmThreadID, pairedUsers)
+  let channelSet = await firestoreFuncs.storeNewPairingChannel("T0137P851BJ", "C012B6BTVDL");
+
+  var pair1 = ["U01236C905V", "U012HPHS2FR"];
+  var pair2 = ["U012P9C053Q", "U012RQ0TQG6"];
+  var pair3 = ["U012X3JJS78", "U012YEB5HR8"];
+  var pair4 = ["U012YGB2M50", "U0133SAJ0E7"];
+
+  let pair1id = getdmThreadID(pair1);
+  let pair2id = getdmThreadID(pair2);
+  let pair3id = getdmThreadID(pair3);
+  let pair4id = getdmThreadID(pair4);
+
+  await firestoreFuncs.storeNewPairing("T0137P851BJ", pair1id , pair1);
+  await firestoreFuncs.storeNewPairing("T0137P851BJ", pair2id , pair2);
+  await firestoreFuncs.storeNewPairing("T0137P851BJ", pair3id , pair3);
+  await firestoreFuncs.storeNewPairing("T0137P851BJ", pair4id , pair4);
 }
 
 async function clearDatabase()
@@ -28,12 +41,12 @@ async function clearDatabase()
   //await firestoreFuncs.deleteCollection(collectionPath, -1);
 }
 
-async function test()
+async function getdmThreadID(users)
 {
   var check = await app.client.conversations.open({
     token: token, 
     return_im: false,
-    users: "U012YGB2M50,U0133SAJ0E7,U012P9C053Q"
+    users: users[0] + "," + users[1]
   });
 
   app.client.chat.postMessage({
@@ -55,7 +68,7 @@ describe('Scheduler', () => {
 
     //setupDatabase();
     //clearDatabase();
-    test();
+    //getdmThreadID();
   });
 
   it('schedule for 2 min after', async () => {
@@ -131,7 +144,49 @@ describe('Pairup', () => {
         expect(m.members).to.include.members(pair["users"]);
       }
       /* eslint-enable no-await-in-loop */
-    });  
+    }); 
+
+    it('Test Pairup random users', async function() {
+      this.timeout(180000);
+
+      await pairUp.pairUp("testing", undefined, token);
+      var pairs = await firestoreFuncs.getPairedUsers(workspaceId);
+      //console.log(pairs);
+      /* eslint-disable no-await-in-loop */
+
+      var partner1 = [];
+      var partner2 = [];
+      var pairChannel = [];
+
+      for(var i = 0; i < pairs.length; i++)
+      {
+        var pair = pairs[i];
+        var m = await app.client.conversations.members({
+          token:token, 
+          channel: pair["dmThreadID"]
+        });
+
+        console.log(pair);
+
+        partner1.push(pair["users"][0]);
+        partner2.push(pair["users"][1]);
+      }
+      /* eslint-enable no-await-in-loop */
+      // console.log(partner1[0]);
+      // console.log(partner2[0]);
+      // console.log(pairChannel[0]);
+
+      // Waiting on latest pull to firestore
+      //var otherPartner = await firestoreFuncs.getPartner(workspaceId, partner1[0]);
+      //console.log(otherPartner);
+      //assert.equal(otherPartner, partner2[0]);
+
+      //otherPartner = await firestoreFuncs.getPartner(workspaceId, pairChannel[0], partner2[0]);
+      //assert.equal(otherPartner, partner1[0]);
+
+      //var invalidPart = await firestoreFuncs.getPartner(workspaceId, pairChannel[1], "XXXXXXXXXX");
+      //assert.equal(invalidPart, undefined);
+    });   
   });
 });
 
