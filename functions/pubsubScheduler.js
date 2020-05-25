@@ -54,14 +54,19 @@ exports.scheduleDaily = functions.pubsub
 
 async function scheduleDailyHelper() {
   let workspaces = await firestoreFuncs.getAllWorkspaces();
-    console.log(workspaces);
-    for (var w of workspaces) {
-      console.log("Workspace: " + w);
-      scheduleDailyWorkspace(w);
-    }
-    return null;
+  console.log(workspaces);
+  /*
+  for (var w of workspaces) {
+    console.log("Workspace: " + w);
+    var p = scheduleDailyWorkspace(w);
+    
+  }
+  */
+  scheduleDailyWorkspace("T012US11G4X");
+  return null;
 }
 
+// Helper function for scheduleDailyHelper
 async function scheduleDailyWorkspace(workspaceId) {
   var d = new Date();
   var n = d.getDay();
@@ -99,13 +104,76 @@ async function scheduleDailyWorkspace(workspaceId) {
 
 }
 
+// Helper function for scheduleDailyWorkspace
 async function scheduleDailyUser(workspaceId, userId, token, day) {
+  day = "Monday";
   console.log("user: " + userId);
-  let channel_id;
-  // TODO make firestore function to get thread id
-  // Grab channel id, warm up text, cooldown text, warmup time, cooldown time
-  // Schedule warmup msg at warmup time
-  // Schedule cooldown msg at cooldown time
+  let pairingData = await firestoreFuncs.getUserPairingData(workspaceId, userId);
+  let warmupTime = await firestoreFuncs.getWarmupTime(workspaceId, userId, day);
+  let cooldownTime = await firestoreFuncs.getCooldownTime(workspaceId, userId, day);
 
-  // schedule.scheduleMsg(hour, min, text, channel_id, token);
+  if (!pairingData || !warmupTime || !cooldownTime) {
+    console.log("Incomplete user data");
+    return null;
+  }
+
+  var warmupTask;
+  var cooldownTask;
+  var dmThreadID = pairingData.dmThreadID;
+
+  if (day === "Monday") {
+    //TODO generate hardcoded tasks for monday quote and retrospective
+    warmupTask = null;
+    cooldownTask = null;
+  }
+  else {
+    warmupTask = pairingData.warmupTask;
+    cooldownTask = pairingData.cooldownTask;
+  }
+
+  //TODO if no such warmup or cooldown make one for testing
+  if (!warmupTask) {
+    // add
+  }
+  if (!cooldownTask) {
+    // add
+  }
+
+  console.log(warmupTime);
+  console.log(cooldownTime);
+  console.log(pairingData);
+
+  if (dmThreadID) {
+    var hour, min, mid;
+
+    split = warmupTime.split(" ");
+    hour = warmupTime.split(" ")[0].split(":")[0];
+    min = warmupTime.split(" ")[0].split(":")[1];
+    mid = warmupTime.split(" ")[1];
+    if (mid === "PM") {
+      hour = String(Number(hour) + 12);
+    }
+    console.log(hour);
+    console.log(min);
+    console.log(mid);
+
+    schedule.scheduleMsg(hour, min, warmupTask, token);
+    
+
+    split = cooldownTime.split(" ");
+    hour = cooldownTime.split(" ")[0].split(":")[0];
+    min = cooldownTime.split(" ")[0].split(":")[1];
+    mid = cooldownTime.split(" ")[1];
+
+    if (mid === "PM") {
+      hour = String(Number(hour) + 12);
+    }
+    console.log(hour);
+    console.log(min);
+    console.log(mid);
+
+    schedule.scheduleMsg(hour, min, cooldownTask, pairingData.dmThreadID, token);
+  }
+
+  return null;
 }
