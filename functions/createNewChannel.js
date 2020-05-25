@@ -16,25 +16,24 @@ app.action('new_channel_button', async({ack, body, context}) => {
     });
 });
 
+// ack({
+//     "response_action": "errors",
+//     "errors": {
+//         "invalid_chars": "A channel name may only contain lowercase letters, numbers, hyphens, and underscores.",
+//         "too_many_chars": "A channel name must be 80 or fewer characters.",
+//         "slack_word": "Slack will not allow this channel name.",
+//         "already_exists": "A channel with this name already exists!"
+//     }
+// });
+
 // modal - view listener
 app.view('new_modal', async ({ ack, body, view, context }) => {
     ack();
     const valuesObject = view['state']['values']; // get a reference to the view object's values
-    const newChannelName = valuesObject['write_name']['input_text']['value'];
+    const newChannelName = valuesObject['write_name']['input_text']['value']; // get channel name
     console.log(newChannelName);
     // create new channel with newChannelName
 });
-
-// if (hasInvalidChars(newChannelName)) {
-//     app.view('new_modal', async ({ ack, body, view, context }) => {
-//         ack({
-//             "response_action": "errors",
-//             "errors": {
-//                 "write_name": "A channel name may only contain lowercase letters, numbers, hyphens, and underscores."
-//         }
-//         });
-//     });
-// }
 
 // handling errors
 // if (hasInvalidChars(newChannelName)) {
@@ -128,6 +127,7 @@ function isSlackWord(name) {
         }
 }
 
+// modal for creating a new channel
 var new_channel_modal = 
 {
   "type": "modal",
