@@ -49,13 +49,13 @@ app.view('new_modal', async ({ ack, body, view, context }) => {
 async function createNewPairingChannel(app, token, team_id, channelName) {
     try {
         var promises = [];
-        var usersDict = await findUsersWorkSpace(app, token);
 
-        var userString = '';
-        Object.keys(usersDict).forEach((u) => {
-            userString += u + ',';
+        // get owner id
+        var ownerId = await firestoreFuncs.getOwner(team_id).then((obj)=>{
+            return obj;
+        }).catch((error) => {
+            console.log(error);
         });
-        userString = userString.substring(0, userString.length - 1);
 
         // create channel
         var conversationObj = await app.client.conversations.create({
@@ -66,11 +66,11 @@ async function createNewPairingChannel(app, token, team_id, channelName) {
             console.log(error);
         });
 
-        // invite people
+        // invite owner to channel
         app.client.conversations.invite({
             token: token, 
             channel: conversationObj.channel.id,
-            users: userString
+            users: ownerId
         }).catch((error) => {
             console.log(error);
         });
@@ -84,13 +84,13 @@ async function createNewPairingChannel(app, token, team_id, channelName) {
                     (To opt out, just leave the channel.)`
         });
 
+        // store new channel in firestore
         promises.push(firestoreFuncs.storeNewPairingChannel(team_id, conversationObj.channel.id));
-
-        for (var userId in usersDict) {
-            for (var day of days) {
-                promises.push(firestoreFuncs.setWarmupTime(team_id, userId, "9:00 AM", day));
-                promises.push(firestoreFuncs.setCooldownTime(team_id, userId, "5:00 PM", day));
-            }
+        
+        // store default times for owner in firestore
+        for (var day of days) {
+            promises.push(firestoreFuncs.setWarmupTime(team_id, ownerId, "9:00 AM", day));
+            promises.push(firestoreFuncs.setCooldownTime(team_id, ownerId, "5:00 PM", day));
         }
         Promise.all(promises).catch((error) => {
             console.log(error);
@@ -98,28 +98,6 @@ async function createNewPairingChannel(app, token, team_id, channelName) {
     } catch (error) {
         console.log(error);
     }
-}
-
-// Find the users within a workspace and return it as a dict of userId: userName
-async function findUsersWorkSpace(app, token) {
-    // find users in server
-    var userMembers = await app.client.users.list({
-        token: token
-    }).then((obj) => {
-        return obj.members;
-    }).catch((error) => {
-        console.log(error);
-    });
-    var usersDict = {};
-
-    userMembers.forEach((u) => {
-        if (u.is_bot === false && u.name !== "slackbot") {
-            var id = u.id;
-            usersDict[id] = u.name;
-        }
-    });
-    
-    return usersDict;
 }
 
 // FOR ERROR CHECKING
@@ -180,7 +158,7 @@ function isAnExistingChannel(name) {
     }
 }
 
-// Gets channel names and stores them in channelNames
+// Get channel names (not IDs) and store them in channelNames
 async function getChannelNames(token) {
     var channels = await app.client.conversations.list({
         token: token
@@ -195,7 +173,7 @@ async function getChannelNames(token) {
         return channelNames;
     });
 }
-
+    
 // Modal for creating a new channel
 var new_channel_modal = 
 {
@@ -235,13 +213,3 @@ var new_channel_modal =
 		}
 	]
 };
-
-// modal - view listener (standard, no checks)
-// app.view('new_modal', async ({ ack, body, view, context }) => {
-//     ack();
-//     const valuesObject = view['state']['values'];
-//     const newChannelName = valuesObject['write_name']['input_text']['value'];
-    
-//     // create new channel named newChannelName
-//     await createNewPairingChannel(app, context.botToken, body.team.id, newChannelName);
-// });
