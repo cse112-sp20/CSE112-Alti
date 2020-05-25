@@ -4,6 +4,7 @@ const schedule = require('./schedule');
 const functions = require('firebase-functions');
 const firestoreFuncs = require('./firestore');
 const warmupMessage = require('./warmupMessage');
+const generateTaskData = require('./generateTaskData');
 const app = index.getBolt();
 
 var days = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
@@ -184,7 +185,7 @@ async function scheduleDailyUser(workspaceId, userId, token, day) {
     console.log(min);
     console.log(mid);
 
-    schedule.scheduleMsg(hour, min, warmupTask, token);
+    schedule.scheduleMsg(hour, min, warmupTask, dmThreadID, token);
     
 
     split = cooldownTime.split(" ");
@@ -199,7 +200,7 @@ async function scheduleDailyUser(workspaceId, userId, token, day) {
     console.log(min);
     console.log(mid);
 
-    schedule.scheduleMsg(hour, min, cooldownTask, pairingData.dmThreadID, token);
+    schedule.scheduleMsg(hour, min, cooldownTask, dmThreadID, token);
   }
 
   return null;
