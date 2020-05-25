@@ -311,9 +311,19 @@ exports.sendSelectCooldownChoice = async function(targChannelID,app,token){
 }
 
 exports.cooldownRetroSelect = async function(ack,body,context) {
-	await ack();
-		let thisView = createModalView("Alti","generic_close","generic_ack","Nice, retros are fun!","Pick an article type",body.channel.id,["memes","more memes","dreans"],["1","2", "3"]);
-
+	ack();
+	let refArray = []; //array with quote author names
+	let valArray = []; //array with quote values
+	let amountOfRetros = 6; 
+	for (var retroGenerationIter = 0; retroGenerationIter < amountOfRetros; retroGenerationIter++) {
+		let retroGenerated = generateData.generateRetro();
+		//cut the index out of the quote generated
+		let index = retroGenerated.substr(0, retroGenerated.indexOf('-')); 
+		retroGenerated = retroGenerated.substr(retroGenerated.indexOf('-')); 
+		valArray[retroGenerationIter] = index;
+		refArray[retroGenerationIter] = retroGenerated;
+	}
+	let thisView = createModalView("Alti","generic_close","cooldown_retro_selected_ack","Nice, retros are fun!","Pick an article type",body.channel.id,refArray,valArray);
     try {
       const result = await app.client.views.open({
         token: context.botToken,
@@ -329,12 +339,38 @@ exports.cooldownRetroSelect = async function(ack,body,context) {
 
 exports.cooldownVideoSelect = async function(ack,body,context) {
 	await ack();
-	let thisView = createModalView("Alti","generic_close","generic_ack","Nice, cooldown articles are fun!","Pick an article type",body.channel.id,["memes","more memes","dreans"],["1","2", "3"]);
     try {
       const result = await app.client.views.open({
         token: context.botToken,
 		trigger_id: body.trigger_id,
-        view: JSON.stringify(thisView)
+        view: {
+			type: 'modal',
+			// View identifier
+			callback_id: 'cooldown_video_selected_ack',
+			title: {
+			  type: 'plain_text',
+			  text: 'Cooldown Video Selection'
+			},
+			blocks: [
+			  {
+				type: 'input',
+				block_id: body.channel.id,
+				label: {
+				  type: 'plain_text',
+				  text: 'Submit your non-tech video link below!'
+				},
+				element: {
+				  type: 'plain_text_input',
+				  action_id: 'input_text',
+				  multiline: true
+				}
+			  }
+			],
+			submit: {
+			  type: 'plain_text',
+			  text: 'Submit'
+			}
+		  }
       });
     }
     catch (error) {
@@ -345,12 +381,38 @@ exports.cooldownVideoSelect = async function(ack,body,context) {
 
 exports.cooldownArticleSelect = async function(ack,body,context) {
 	await ack();
-	let thisView = createModalView("Alti","generic_close","generic_ack","Nice, cooldown articles are fun!","Pick an article type",body.channel.id,["memes","more memes","dreans"],["1","2", "3"]);
     try {
       const result = await app.client.views.open({
         token: context.botToken,
 		trigger_id: body.trigger_id,
-        view: JSON.stringify(thisView)
+        view: {
+			type: 'modal',
+			// View identifier
+			callback_id: 'cooldown_article_selected_ack',
+			title: {
+			  type: 'plain_text',
+			  text: 'Cooldown Article Selection'
+			},
+			blocks: [
+			  {
+				type: 'input',
+				block_id: body.channel.id,
+				label: {
+				  type: 'plain_text',
+				  text: 'Submit your non-tech article link below!'
+				},
+				element: {
+				  type: 'plain_text_input',
+				  action_id: 'input_text',
+				  multiline: true
+				}
+			  }
+			],
+			submit: {
+			  type: 'plain_text',
+			  text: 'Submit'
+			}
+		  }
       });
     }
     catch (error) {
@@ -745,7 +807,35 @@ handleTypingSelect = async function(ack,body,context) {
 	}
 	return storeReturn;
 }
+ 
+handleRetroSelect = async function(ack,body,context) {
+	await ack();
+	var action = body.actions[0];
+	var language = action.value;
 
+	var text = generateData.generateMessageToSend('retro', language);
+
+	var workspaceId = body.team.id;
+	var userId = body.user.id;
+	var storeReturn = firestoreFuncs.storeTypeOfExercise(workspaceId, userId, false, text);
+	let confirmationJSON = createConfirmationView("Alti-Confirmation","*Your buddy will receive the retro for their cooldown tomorrow!*");
+    try {
+		//push new view above old
+		if(body.view.id !== undefined){
+			const result = await app.client.views.update({
+				token: context.botToken,
+				view_id: body.view.id,
+				view: JSON.stringify(confirmationJSON)
+			});
+		}
+    }
+    catch (error) {
+      console.error(error);
+	}
+	return storeReturn;
+}
+ 
+ 
 //handles asynchrous handling of confirmation of article selection
 handleArticleSelect = async function(view,ack,body,context) {
 	ack({
@@ -772,9 +862,65 @@ handleArticleSelect = async function(view,ack,body,context) {
 	var storeReturn = firestoreFuncs.storeTypeOfExercise(workspaceId, userId, true, text);
 	return storeReturn;
 }
+
+//handles asynchrous handling of confirmation of cooldown article selection
+handleCooldownArticleSelect = async function(view,ack,body,context) {
+	ack({
+	  //clear the modal off the users screen
+	 "response_action": "clear"
+	});
+	// get a  reference to the view object's values
+	const valuesObject = view['state']['values']
+	let quoteToSend = ''
+	let counter = 0; 
+	//obtain the first key in the values object and use it to grab the user input 
+	//as well as the channel the user wants to send the input to
+	for (key in valuesObject) {
+	  if (counter === 0) {
+		quoteToSend += valuesObject[key]['input_text']['value'];
+		counter++;
+	  }
+	}
+	//gets teamID from the action which functions as workspace id
+	const workspaceId = body['team']['id'];
+	//gets the userID from the action
+	const userId = body['user']['id'];
+	var text = generateData.generateMessageToSend('quote', quoteToSend); //TODO UPDATE
+	var storeReturn = firestoreFuncs.storeTypeOfExercise(workspaceId, userId, false, text);
+	return storeReturn;
+}
+
+//handles asynchrous handling of confirmation of cooldown video selection
+handleVideoSelect = async function(view,ack,body,context) {
+	ack({
+	  //clear the modal off the users screen
+	 "response_action": "clear"
+	});
+	// get a  reference to the view object's values
+	const valuesObject = view['state']['values']
+	let quoteToSend = ''
+	let counter = 0; 
+	//obtain the first key in the values object and use it to grab the user input 
+	//as well as the channel the user wants to send the input to
+	for (key in valuesObject) {
+	  if (counter === 0) {
+		quoteToSend += valuesObject[key]['input_text']['value'];
+		counter++;
+	  }
+	}
+	//gets teamID from the action which functions as workspace id
+	const workspaceId = body['team']['id'];
+	//gets the userID from the action
+	const userId = body['user']['id'];
+	var text = generateData.generateMessageToSend('quote', quoteToSend); //TODO UPDATE
+	var storeReturn = firestoreFuncs.storeTypeOfExercise(workspaceId, userId, false, text);
+	return storeReturn;
+}
+
+
 app.action('warmup_quote_selected_ack', ({ ack, body, context }) => {
 	handleQuoteSelect(ack,body,context);
- });
+});
 
  app.action('warmup_puzzle_selected_ack', ({ ack, body, context }) => {
 	handlePuzzleSelect(ack,body,context);
@@ -785,3 +931,13 @@ app.action('warmup_quote_selected_ack', ({ ack, body, context }) => {
  app.view('warmup_article_selected_ack', ({ view, ack, body, context }) => {
 	handleArticleSelect(view,ack,body,context);
  });
+  app.action('cooldown_retro_selected_ack', ({ ack, body, context }) => {
+	handleRetroSelect(ack,body,context);
+ });
+ app.view('cooldown_article_selected_ack', ({ view, ack, body, context }) => {
+	handleCooldownArticleSelect(view,ack,body,context);
+ });
+ app.view('cooldown_video_selected_ack', ({ view, ack, body, context }) => {
+	handleVideoSelect(view,ack,body,context);
+ });
+ 

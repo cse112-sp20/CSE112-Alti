@@ -1,7 +1,9 @@
 const index = require('./index');
 const app = index.getBolt();
 const quotes = require('./quotes');
+const retros = require('./retros');
 const motivationalQuotes = quotes.getQuotesObj();
+const retroQuestions = retros.getRetrosObj();
 
 app.command('/generatequote', async({command, ack, say}) => {
     ack();
@@ -34,6 +36,15 @@ exports.generateQuote = function() {
 	}
     return randomQuoteIndex+"-"+quoteText+" - "+ quoteAuthor ;
 }
+
+// Generates a retro object
+exports.generateRetro = function() {
+	let retroPoolSize =  Object.keys(retroQuestions).length;
+	let randomRetroIndex = Math.floor(Math.random() * retroPoolSize);
+	let retroText = retroQuestions[randomRetroIndex].retro;
+    return randomRetroIndex+"-"+retroText;
+}
+
 
 // TODO
 function generatePuzzle(typeOfPuzzle) {
@@ -217,7 +228,11 @@ exports.generateMessageToSend = function generateMessageToSend(exerciseType, arg
       message = "Your partner sent you this " + arg +
                 " puzzle to help you get those brain juices flowing!\nComplete it here: " + url;
       break;
-
+	case "retro":
+		var msg = arg; 
+		message = "Your partner sent you this retro: " + msg +
+                " to complete";
+	  break;
     case "typing":
       url = exports.generateCodingChallenge(arg);
       message = "Your partner sent you this cool speed coding challenge in " + arg +
