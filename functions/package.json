@@ -15,11 +15,14 @@
   },
   "dependencies": {
     "@google-cloud/firestore": "3.7.5",
+    "@google-cloud/profiler": "^4.0.0",
     "@google-cloud/pubsub": "^1.7.3",
+    "@google-cloud/trace-agent": "^4.2.5",
     "@slack/bolt": "^2.0.1",
     "dotenv": "^8.2.0",
     "firebase-admin": "^8.12.1",
     "firebase-functions": "^3.6.1",
+    "node-pre-gyp": "^0.14.0",
     "request": "^2.88.2",
     "shuffle-array": "^1.0.1"
   },

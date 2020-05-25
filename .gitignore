@@ -11,3 +11,4 @@ ngrok
 firebase.json
 functions/tokens.env
 functions/.env
+ui-debug.log
