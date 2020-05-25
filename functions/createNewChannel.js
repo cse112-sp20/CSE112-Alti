@@ -3,8 +3,9 @@ const app = index.getBolt();
 const firestoreFuncs = require('./firestore');
 
 var days = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"];
+var channelNames = [];
 
-// create button - action listener
+// ACTION listener - create button
 app.action('new_channel_button', async({ack, body, context}) => {
     ack();
     app.client.views.open({
@@ -14,72 +15,86 @@ app.action('new_channel_button', async({ack, body, context}) => {
     }).catch((error) => {
         console.log(error);
     });
+    getChannelNames(context.botToken);
 });
 
-// modal - view listener
+// VIEW listener - modal
 app.view('new_modal', async ({ ack, body, view, context }) => {
-    ack();
     const valuesObject = view['state']['values'];
     const newChannelName = valuesObject['write_name']['input_text']['value'];
-    
-    // create new channel named newChannelName
-    await createNewPairingChannel(app, context.botToken, body.team.id, newChannelName);
+    const errors = {};
+    if (hasInvalidChars(newChannelName))
+        errors['write_name'] = "A channel name can only contain lowercase letters, numbers, hyphens, and underscores";
+    else if (isOnlyPunctuation(newChannelName))
+        errors['write_name'] = "A channel name cannot contain only punctuation";
+    else if (newChannelName.length > 80)
+        errors['write_name'] = "A channel name must be fewer than 80 characters";
+    else if (isSlackWord(newChannelName))
+        errors['write_name'] = "Slack does not allow channels to have this name";
+    else if (isAnExistingChannel(newChannelName))
+        errors['write_name'] = "A channel with this name already exists!";
+
+    if (Object.entries(errors).length > 0) {
+        ack({
+            response_action: 'errors',
+            errors: errors
+        });
+    } else {
+        ack();
+        await createNewPairingChannel(app, context.botToken, body.team.id, newChannelName);
+    }
 });
 
 // Creates a new pairing channel
 async function createNewPairingChannel(app, token, team_id, channelName) {
     try {
         var promises = [];
-        if (!isAnExistingChannel(channelName, token) && !hasInvalidChars(channelName) && !isSlackWord(channelName)) {
+        var usersDict = await findUsersWorkSpace(app, token);
 
-            var usersDict = await findUsersWorkSpace(app, token);
+        var userString = '';
+        Object.keys(usersDict).forEach((u) => {
+            userString += u + ',';
+        });
+        userString = userString.substring(0, userString.length - 1);
 
-            var userString = '';
-            Object.keys(usersDict).forEach((u) => {
-                userString += u + ',';
-            });
-            userString = userString.substring(0, userString.length - 1);
+        // create channel
+        var conversationObj = await app.client.conversations.create({
+            token: token,
+            name: channelName
+        }).catch((error) => {
 
-            // create channel
-            var conversationObj = await app.client.conversations.create({
-                token: token,
-                name: channelName
-            }).catch((error) => {
-                console.log(error);
-            });
+            console.log(error);
+        });
 
-            // invite people
-            app.client.conversations.invite({
-                token: token, 
-                channel: conversationObj.channel.id,
-                users: userString
-            }).catch((error) => {
-                console.log(error);
-            });
+        // invite people
+        app.client.conversations.invite({
+            token: token, 
+            channel: conversationObj.channel.id,
+            users: userString
+        }).catch((error) => {
+            console.log(error);
+        });
 
-            // send welcome message
-            app.client.chat.postMessage({
-                token: token,
-                channel: conversationObj.channel.id,
-                text: `Hi everyone! This is where we'll pair you up to participate in quick 
-                        and fun warm up and cool down activities :)
-                        (To opt out, just leave the channel.)`
-            });
+        // send welcome message
+        app.client.chat.postMessage({
+            token: token,
+            channel: conversationObj.channel.id,
+            text: `Hi everyone! This is where we'll pair you up to participate in quick 
+                    and fun warm up and cool down activities :)
+                    (To opt out, just leave the channel.)`
+        });
 
-            promises.push(firestoreFuncs.storeNewPairingChannel(team_id, conversationObj.channel.id));
+        promises.push(firestoreFuncs.storeNewPairingChannel(team_id, conversationObj.channel.id));
 
-            for (var userId in usersDict) {
-                for (var day of days) {
-                    promises.push(firestoreFuncs.setWarmupTime(team_id, userId, "9:00 AM", day));
-                    promises.push(firestoreFuncs.setCooldownTime(team_id, userId, "5:00 PM", day));
-                }
+        for (var userId in usersDict) {
+            for (var day of days) {
+                promises.push(firestoreFuncs.setWarmupTime(team_id, userId, "9:00 AM", day));
+                promises.push(firestoreFuncs.setCooldownTime(team_id, userId, "5:00 PM", day));
             }
-            Promise.all(promises).catch((error) => {
-                console.log(error);
-            });
-        } else {
-            console.log("Channel " + channelName + " already exists, has invalid characters, or is a slack word.");
         }
+        Promise.all(promises).catch((error) => {
+            console.log(error);
+        });
     } catch (error) {
         console.log(error);
     }
@@ -107,26 +122,21 @@ async function findUsersWorkSpace(app, token) {
     return usersDict;
 }
 
-// Check if channel already exists
-function isAnExistingChannel(channel, token) {     
-    var channels = app.client.conversations.list({
-        token: token
-    });
-    var channelNames = [];
-    for (var i = 0; i < Object.keys(channels).length; i++) {
-        channelNames.push(channels[i].name);
-    }
-    if (channelNames.includes(channel)) {
-        console.log("already exists");
-        return true;
-    } else {
-        return false;
-    }
-}
+// FOR ERROR CHECKING
 
 // Check if name contains invalid characters
 function hasInvalidChars(name) {
     if (name.match(/[^a-z0-9\-_]/)) {
+        return true;
+    }
+    else { 
+        return false; 
+    }
+}
+
+// Check if name contains only punctuation
+function isOnlyPunctuation(name) {
+    if (name.match(/[^\-_]/)) {
         return false;
     }
     else { 
@@ -161,7 +171,32 @@ function isSlackWord(name) {
         }
 }
 
-// modal for creating a new channel
+// Check if channel already exists
+function isAnExistingChannel(name) {   
+    if (channelNames.includes(name)) {
+        return true;
+    } else {
+        return false;
+    }
+}
+
+// Gets channel names and stores them in channelNames
+async function getChannelNames(token) {
+    var channels = await app.client.conversations.list({
+        token: token
+    }).catch((error) => {
+        console.log(error);
+    }).then((obj) => {
+        return obj.channels;
+    }).then((channels) => {
+        for (var i = 0; i < Object.keys(channels).length; i++) {
+            channelNames.push(channels[i].name);
+        }
+        return channelNames;
+    });
+}
+
+// Modal for creating a new channel
 var new_channel_modal = 
 {
   "type": "modal",
@@ -191,60 +226,22 @@ var new_channel_modal =
 			},
 			"element": {
 				"type": "plain_text_input",
-				"action_id": 'input_text'
+                "action_id": "input_text",
+                "placeholder": {
+					"type": "plain_text",
+					"text": "alti-pairing",
+				},
 			}
 		}
 	]
 };
 
-// var success_modal =
-// {
-// 	"type": "modal",
-// 	"title": {
-// 		"type": "plain_text",
-// 		"text": "New Channel Created",
-// 		"emoji": true
-// 	},
-// 	"submit": {
-// 		"type": "plain_text",
-// 		"text": "Done",
-// 		"emoji": true
-// 	},
-// 	"blocks": [
-// 		{
-// 			"type": "section",
-// 			"text": {
-// 				"type": "mrkdwn",
-// 				"text": "The pairing channel has been created!"
-// 			}
-// 		}
-// 	]
-// }
-
-// var fail_modal =
-
-
-// modal - view listener - fancy, but times out
+// modal - view listener (standard, no checks)
 // app.view('new_modal', async ({ ack, body, view, context }) => {
+//     ack();
 //     const valuesObject = view['state']['values'];
 //     const newChannelName = valuesObject['write_name']['input_text']['value'];
-//     const errors = {};
-//     if (newChannelName.length > 80)
-//         errors['write_name'] = "A channel name must be 80 or fewer characters."
-//     else if (hasInvalidChars(newChannelName))
-//         errors['write_name'] = "A channel name may only contain lowercase letters, numbers, hyphens, and underscores."
-//     else if (isAnExistingChannel(newChannelName))
-//         errors['write_name'] = "A channel with this name already exists!"
-//     else if (isSlackWord(newChannelName))
-//         errors['write_name'] = "Slack will not allow this channel name."
-
-//     if (Object.entries(errors).length > 0) {
-//         ack({
-//             response_action: 'errors',
-//             errors: errors
-//         });
-//     } else {
-//         ack();
-//         await createNewPairingChannel(app, context.botToken, body.team_id, newChannelName);
-//     }
+    
+//     // create new channel named newChannelName
+//     await createNewPairingChannel(app, context.botToken, body.team.id, newChannelName);
 // });
