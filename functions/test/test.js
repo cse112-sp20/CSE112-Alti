@@ -166,10 +166,8 @@ describe('generateCodingChallenge', () => {
   });
 });
 
-<<<<<<< HEAD
-=======
 // Checks if generated puzzle URLs are working (don't result in a 404)
-describe('generatePuzzle', () => {
+describe('Testing generated puzzle URLs', () => {
   it('Generate Random Sudoku 1', () => {
     url = generateTaskData.generatePuzzle("sudoku");
     assert.notEqual(404, httpGetStatus(url));
@@ -214,7 +212,16 @@ describe('generatePuzzle', () => {
   });
 });
 
->>>>>>> 49f8fd78241611762160806a0986c7d2e781354d
+
+// Opens a GET request, given a URL, and returns its status code (as an int)
+function httpGetStatus(url) {
+  var XMLHttpRequest = require("xmlhttprequest").XMLHttpRequest;
+  var xmlHttp = new XMLHttpRequest();
+  xmlHttp.open("GET", url, false); // false for synchronous request
+  xmlHttp.send(null);
+  return xmlHttp.status;
+}
+
 // This functions assumes that the HandleQuoteSelect function
 // only sets warmups. Needs to be changed when cooldowns are added
 // Does not test the generated url. Only checks the prompt stored in the firestore 
@@ -303,7 +310,6 @@ describe('Setup Warmup Callbacks', () => {
   });
 });
 
-<<<<<<< HEAD
 describe('App Home tests', () => {
   let appHome;
   let onBoard;
@@ -354,15 +360,4 @@ describe('App Home tests', () => {
       assert.equal(res[i], i+1);
     }
   });
-
 });
-=======
-// Opens a GET request, given a URL, and returns its status code (as an int)
-function httpGetStatus(url) {
-    var XMLHttpRequest = require("xmlhttprequest").XMLHttpRequest;
-    var xmlHttp = new XMLHttpRequest();
-    xmlHttp.open("GET", url, false); // false for synchronous request
-    xmlHttp.send(null);
-    return xmlHttp.status;
-}
->>>>>>> 49f8fd78241611762160806a0986c7d2e781354d
