@@ -1,4 +1,13 @@
+
 //working
+//require('@google-cloud/trace-agent').start({});
+require('@google-cloud/profiler').start({
+	serviceContext: {
+	  service: 'schedule',
+	  version: '1.0.0',
+	},
+	logLeveL: 3,
+});
 const index = require('./index')
 const functions = require('firebase-functions');
 const app = index.getBolt();
