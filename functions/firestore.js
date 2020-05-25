@@ -159,7 +159,7 @@ exports.storeNewPairingChannel = async function storeNewPairingChannel(workspace
         collectionPath - path to get to the collection you want to delete.
         batchSize - the max # of documents you want to delete within that collection, I think?
 */
-function deleteCollection(collectionPath, batchSize) {
+deleteCollection = function(collectionPath, batchSize) {
     let collectionRef = db.collection(collectionPath);
     let query = collectionRef.orderBy('__name__').limit(batchSize);
 
@@ -184,7 +184,7 @@ function deleteQueryBatch(query, resolve, reject) {
         let batch = db.batch();
         snapshot.docs.forEach((doc) => {
           batch.delete(doc.ref);
-          console.log(doc.ref);
+          //console.log(doc.ref);
         });
   
         // eslint-disable-next-line promise/no-nesting
