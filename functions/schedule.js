@@ -140,16 +140,18 @@ const app = index.getBolt();
 					}
 				}
 			];
-		//try function logic
-			return app.client.chat.scheduleMessage({
+			var res = app.client.chat.scheduleMessage({
 				token: token,
 				channel: targChannelID,
 				text:  notificationString,
-				blocks: cooldownSelect,
+				blocks: warmupSelect,
 				post_at: reminder.getTime()/1000 
 			}).catch((error) => {
-				return error.data;
-		});
+				console.log(error);
+			});
+			if(!res.ok) {
+				console.log(res.error);
+			} 
 	}
 
 	exports.scheduleWarmupChoice = async function(hour, minute,targChannelID,token){
@@ -265,13 +267,16 @@ const app = index.getBolt();
 				}
 			];
 		//try function logic
-		return app.client.chat.scheduleMessage({
-				token: token,
-				channel: targChannelID,
-				text:  notificationString,
-				blocks: warmupSelect,
-				post_at: reminder.getTime()/1000 
-			}).catch((error) => {
-				return error.data;
+		var res = app.client.chat.scheduleMessage({
+			token: token,
+			channel: targChannelID,
+			text:  notificationString,
+			blocks: warmupSelect,
+			post_at: reminder.getTime()/1000 
+		}).catch((error) => {
+			console.log(error);
 		});
+		if(!res.ok) {
+			console.log(res.error);
+		} 
 	}

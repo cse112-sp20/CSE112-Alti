@@ -76,14 +76,10 @@ exports.scheduleDaily = functions.pubsub
 													.timeZone('America/Los_Angeles')
 													.onRun((context) => {
 		// Look through workspace's users in db and schedule warmup for each user
-		schedule.scheduleWarmupChoice(23, 41,'G0140B5QM8E', 'xoxb-1104347199445-1124064737425-M8qfMiU3N5MrW2DTZ9oRWT3Q');
-		//scheduleDailyHelper();
+
+		scheduleDailyHelper();
 
 });
-
-exports.test1 = async function() {
-	console.log("test1");
-}
 
 async function scheduleDailyHelper() {
 	let workspaces = await firestoreFuncs.getAllWorkspaces();
@@ -111,6 +107,7 @@ async function scheduleDailyWorkspace(workspaceId) {
 		console.log("No API key");
 		return;
 	}
+	console.log(keyObj);
 	
 	var w_token = keyObj.botToken;
 
@@ -123,6 +120,7 @@ async function scheduleDailyWorkspace(workspaceId) {
 	else {
 		console.log("Pairing Channel: " + channel);
 	}
+
 	let convoObj = await app.client.conversations.members({
 		token: w_token,
 		channel: channel
@@ -152,8 +150,6 @@ async function scheduleDailyUser(workspaceId, userId, token, day) {
 
 	var warmupTask;
 	var cooldownTask;
-	
-
 	var dmThreadID = pairingData.dmThreadID;
 
 	if (day === "Monday") {
@@ -166,8 +162,6 @@ async function scheduleDailyUser(workspaceId, userId, token, day) {
 		cooldownTask = pairingData.cooldownTask;
 	}
 
-	
-	
 	//TODO if no such warmup or cooldown make one for testing
 	if (!warmupTask) {
 		// add
@@ -215,7 +209,6 @@ async function scheduleDailyUser(workspaceId, userId, token, day) {
 			schedule.scheduleWarmupChoice(hour, min, dmThreadID, token);
 			schedule.scheduleCooldownChoice(hour, min, dmThreadID, token);
 		}
-
 	}
 
 	return null;
