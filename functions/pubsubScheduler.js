@@ -10,9 +10,9 @@ const app = index.getBolt();
 var days = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
 
 /* Scheduling Idea:
-/ Pair everyone up on Monday mornings and in the intro DM, send a motivational quote as a warmup
-/ for both partners and immediately ask them to select a cooldown activity for their partner's 
-/ Monday cooldown. 
+/ Pair everyone up on Sundays but only create and send the thread on earliest partner's workday start
+/ on Monday. 
+/ For Mondays, always send a quote in the intro DM as warmup and retro question as cooldown.
 / On other weekdays, send each person their warmup in the morning, cooldown in the evening, and
 / prompt for their warmup and cooldown selection for their partner in the evening too.
 / (Morning = start of workday, Evening = end of workday)
