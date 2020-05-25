@@ -1,3 +1,12 @@
+
+//require('@google-cloud/trace-agent').start({});
+// require('@google-cloud/profiler').start({
+// 	serviceContext: {
+// 	  service: 'pair_up',
+// 	  version: '1.0.0',
+// 	},
+// 	logLeveL: 3,
+// });
 const shuffle = require('shuffle-array');
 const firestoreFuncs = require('./firestore');
 const index = require('./index');
