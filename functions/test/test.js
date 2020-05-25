@@ -59,11 +59,11 @@ describe('Pairup', () => {
     let workspaceId = "T0137P851BJ";
     let channelId = "C012B6BTVDL";
 
-    beforeEach(async () => {
+    beforeEach(async function(){
       await firestoreFuncs.storeNewPairingChannel(workspaceId, channelId);
     });
 
-    afterEach(async() => {
+    afterEach(async function() {
       await clearDatabase('/workspaces/' + workspaceId + '/activeChannels');
     }); 
 
@@ -224,7 +224,7 @@ describe('Setup Warmup Callbacks', () => {
     ackCalled = true;
   }
 
-  before(async () => {    
+  before(async function() {  
     fakeContext = { botToken: token};
     return setupPairs('T0137P851BJ','C012B6BTVDL').then(response => {
       return app.client.team.info({
@@ -258,12 +258,12 @@ describe('Setup Warmup Callbacks', () => {
     });
   });
 
-  beforeEach(async () => {
+  beforeEach(async function() {
     await firestoreFuncs.storeTypeOfExercise(workspaceId, userId2, true, "");
     ackCalled = false;
   });
 
-  after(async() => {
+  after(async function() {
     await clearDatabase("/workspaces/" + workspaceId + "/activeChannels");
   })
 
