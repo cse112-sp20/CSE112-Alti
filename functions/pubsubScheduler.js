@@ -6,7 +6,7 @@ const app = index.getBolt();
 const firestoreFuncs = require('./firestore');
 
 exports.scheduledPairUp = functions.pubsub
-                            .schedule('every monday 08:00')
+                            .schedule('every sunday 13:00')
                             .timeZone('America/Los_Angeles')
                             .onRun(async (context) =>  {
 
