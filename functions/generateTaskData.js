@@ -238,7 +238,7 @@ exports.generateMessageToSend = function generateMessageToSend(exerciseType, arg
 		message = "Your partner sent you this video to watch! : " + msg;
 	  break;
 	case "cooldownArticle":
-		var msg = arg;
+		msg = arg;
 		message = "Your partner sent you a non-tech article to read! Here is the link: " + arg;
 	  break;
     case "typing":
