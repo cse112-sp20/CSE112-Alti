@@ -30,13 +30,21 @@ exports.getBolt = () => app;
 const generateTaskData = require('./generateTaskData');
 const warmupMessage = require('./warmupMessage');
 const pubsubScheduler = require('./pubsubScheduler');
+const schedule = require('./schedule');
 const pairUp = require('./pairUp');
 const onBoard = require('./onBoard');
 const appHome = require('./appHome');
 const appHomeSchedule = require('./appHomeSchedule');
-exports.scheduledPairUp = pubsubScheduler.scheduledPairUp;
+
 exports.scheduleWarmup = pubsubScheduler.scheduleWarmup;
 exports.scheduleDaily = pubsubScheduler.scheduleDaily;
+
+
+//Test Ruixian 
+exports.test1 = pubsubScheduler.test1;
+//
+
+
 
 // Global error handler
 app.error(console.log);

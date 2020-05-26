@@ -19,57 +19,69 @@ var days = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "S
 */
 
 exports.scheduledPairUp = functions.pubsub
-                            .schedule('every sunday 13:00')
-                            .timeZone('America/Los_Angeles')
-                            .onRun(async (context) =>  {
+														.schedule('every sunday 13:00')
+														.timeZone('America/Los_Angeles')
+														.onRun(async (context) =>  {
 
-  const allWorkspaces = await firestoreFuncs.getAllWorkspaces();
+	const allWorkspaces = await firestoreFuncs.getAllWorkspaces();
 
-  for( i=0; i<allWorkspaces.length; i++){
-    timedTask(i, allWorkspaces);
-  }
-  return null;
+	for( i=0; i<allWorkspaces.length; i++){
+		timedTask(i, allWorkspaces);
+	}
+	return null;
 });
 
 function timedTask(i, allWorkspaces){
-  setTimeout(() => {
-    const workspace = allWorkspaces[i];
-    // if (  workspace !== "T0132A75VD3" && workspace !== "T0132A75VD3" ){
-    //   return;
-    // }
-    firestoreFuncs.getAPIPair(workspace)
-    .then( res => {
-      return handleWorkspacePairup(workspace, res);
-    }).catch(err => console.error(err));
-  }, 3000 * i)
+	setTimeout(() => {
+		const workspace = allWorkspaces[i];
+		// if (  workspace !== "T0132A75VD3" && workspace !== "T0132A75VD3" ){
+		//   return;
+		// }
+		firestoreFuncs.getAPIPair(workspace)
+		.then( res => {
+			return handleWorkspacePairup(workspace, res);
+		}).catch(err => console.error(err));
+	}, 3000 * i)
 }
 async function handleWorkspacePairup(workspace, apiPair){
-        if(apiPair !== null){
-          const botToken = apiPair.botToken;
-          try{
-            const pairUpResult = pairUp.pairUp(undefined, botToken);
-            // console.log("Paired up workspace " + workspace)
-            return pairUpResult;
-          }catch(error){
-            console.error("Could not schedule pair up for workspace " + workspace +
-            ". This may be because the pairing channel might not be set up in firestore.")
-          }
+				if(apiPair !== null){
+					const botToken = apiPair.botToken;
+					try{
+						const pairUpResult = pairUp.pairUp(undefined, botToken);
+						// console.log("Paired up workspace " + workspace)
+						return pairUpResult;
+					}catch(error){
+						console.error("Could not schedule pair up for workspace " + workspace +
+						". This may be because the pairing channel might not be set up in firestore.")
+					}
 
-        }
-        else{
-          console.error("Could not schedule pair up for workspace " + workspace +
-                        " because the api pair is not stored in firestore.")
-        }
-        return Promise.resolve();
+				}
+				else{
+					console.error("Could not schedule pair up for workspace " + workspace +
+												" because the api pair is not stored in firestore.")
+				}
+				return Promise.resolve();
 }
+<<<<<<< HEAD
 
+=======
+exports.scheduleWarmup = functions.pubsub
+														.schedule('every mon,tue,wed,thu,fri 00:10')
+														.timeZone('America/Los_Angeles')
+														.onRun((context) => {
+		app.use(({context}) => schedule.scheduleMsg(9, 0, "A reminder for warmup", "#general", context.botToken));
+		
+		
+});
+>>>>>>> 89e4af2e75bcbc727883b7ba06231a8997ba7d7c
 
 exports.scheduleDaily = functions.pubsub
-                          .schedule('every mon,tue,wed,thu,fri 00:10')
-                          .timeZone('America/Los_Angeles')
-                          .onRun((context) => {
-    // Look through workspace's users in db and schedule warmup for each user
-    scheduleDailyHelper();
+													.schedule('every mon,tue,wed,thu,fri 00:10')
+													.timeZone('America/Los_Angeles')
+													.onRun((context) => {
+		// Look through workspace's users in db and schedule warmup for each user
+
+		scheduleDailyHelper();
 
 });
 
@@ -202,7 +214,11 @@ async function scheduleDailyUser(workspaceId, userId, token, day) {
 
       schedule.scheduleMsg(hour, min, cooldownTask, dmThreadID, token);
       //schedule.scheduleMsg(21, 23, cooldownTask, dmThreadID, token);
-    }
+		}
+		if (day !== 'Friday') {
+			schedule.scheduleWarmupChoice(hour, min, dmThreadID, token);
+			schedule.scheduleCooldownChoice(hour, min, dmThreadID, token);
+		}
   }
 
   return null;
