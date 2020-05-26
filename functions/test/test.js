@@ -300,7 +300,9 @@ describe('App Home tests', () => {
 
   it('Test getAllTimes function', async () => {
     var res = await appHome.getAllTimes(workspaceId, userId);  
+    console.log(res);
     for (var i = 0; i < 10; i++) {
+      console.log("Should be: " + i + ", but is: " + res[i]);
       assert.equal(res[i], i+1);
     }
   });

@@ -62,18 +62,6 @@ async function handleWorkspacePairup(workspace, apiPair){
 				}
 				return Promise.resolve();
 }
-<<<<<<< HEAD
-
-=======
-exports.scheduleWarmup = functions.pubsub
-														.schedule('every mon,tue,wed,thu,fri 00:10')
-														.timeZone('America/Los_Angeles')
-														.onRun((context) => {
-		app.use(({context}) => schedule.scheduleMsg(9, 0, "A reminder for warmup", "#general", context.botToken));
-		
-		
-});
->>>>>>> 89e4af2e75bcbc727883b7ba06231a8997ba7d7c
 
 exports.scheduleDaily = functions.pubsub
 													.schedule('every mon,tue,wed,thu,fri 00:10')
