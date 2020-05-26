@@ -62,14 +62,7 @@ async function handleWorkspacePairup(workspace, apiPair){
         }
         return Promise.resolve();
 }
-exports.scheduleWarmup = functions.pubsub
-                            .schedule('every mon,tue,wed,thu,fri 00:10')
-                            .timeZone('America/Los_Angeles')
-                            .onRun((context) => {
-    app.use(({context}) => schedule.scheduleMsg(9, 0, "A reminder for warmup", "#general", context.botToken));
-    
-    
-});
+
 
 exports.scheduleDaily = functions.pubsub
                           .schedule('every mon,tue,wed,thu,fri 00:10')
@@ -101,16 +94,19 @@ async function scheduleDailyWorkspace(workspaceId) {
 
   var keyObj = await firestoreFuncs.getAPIPair(workspaceId);
   if (!keyObj) {
-    console.log("No API key");
+    console.error("No API key");
     return;
   }
   
   var w_token = keyObj.botToken;
+  if (!w_token) {
+    console.error("No workspace token");
+    return;
+  }
 
   let channel = await firestoreFuncs.getPairingChannel(workspaceId);
-
   if (!channel) {
-    console.log("No pairing channel");
+    console.error("No pairing channel");
     return;
   }
   else {
@@ -120,7 +116,7 @@ async function scheduleDailyWorkspace(workspaceId) {
     token: w_token,
     channel: channel
   }).catch((error) => {
-    console.log(error);
+    console.error(error);
   });
 
   let memberList = convoObj.members;
