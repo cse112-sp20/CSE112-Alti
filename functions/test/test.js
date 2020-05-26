@@ -3,26 +3,35 @@ const assert = require('assert');
 const should = require('chai').should();
 const expect = require('chai').expect;
 const index = require('../index');
+const testUtil = require('./testUtil');
 const app = index.getBolt();
+
 var generateTaskData = require ('../generateTaskData');
 const quotes = require('../quotes');
 const retros = require('../retros');
 const motivationalQuotes = quotes.getQuotesObj();
 const retroQuestions = retros.getRetrosObj();
-//hardcode the token 
 
-let token = "xoxb-1109790171392-1110712837169-OxF8igcVuxkFUhbZVuoXxypj";
+let firestoreFuncs = require('../firestore');
+
+const functions = require('firebase-functions');
+const config = functions.config();
+let token = config.slack.bot_token;
+console.log(token);
+//hardcode the token 
+//let token = "xoxb-1109790171392-1110712837169-OxF8igcVuxkFUhbZVuoXxypj";
 
 // If it passes, means the function finished and message was scheduled, baseline test
 // Need more rigorous testing using promises of async function and validation from Slack API channel reading
 describe('Scheduler', () => {
  
   let schedule;
-  before(() => {
+  before(async () => {
     schedule = require('../schedule');
   });
 
-  it('schedule for 2 min after', async () => {
+  it('schedule for 2 min after', async function() {
+    this.timeout(5000); // 5 sec
     let now = new Date();
     now.setTime(now.getTime() + 120000); 
     var response = await schedule.scheduleMsg(now.getHours(), now.getMinutes(), 
@@ -51,26 +60,29 @@ describe('Scheduler', () => {
 });
 
 describe('Pairup', () => {
-  let pairUp;
 
+  let pairUp;
+  
   before(() => {
     pairUp = require('../pairUp');
   });
 
   describe('Test the pairup function as a whole', () => {
-    let firestoreFuncs;
-    let workspaceInfo;
-    let workspaceId;
-    let testChannelId = "C012B6BTVDL" // got that from the console.
+    let workspaceId = "T0137P851BJ";
+    let channelId = "C012B6BTVDL";
 
     before(async () => {
-      firestoreFuncs = require('../firestore');
-      workspaceInfo = await app.client.team.info({
-        token: token
-      });
-      workspaceId = workspaceInfo.team.id;
-      
+      await testUtil.setupWorkspace(workspaceId);
     });
+
+    beforeEach(async function() {
+      this.timeout(5000) // 5 sec
+      await firestoreFuncs.storeNewPairingChannel(workspaceId, channelId);
+    });
+
+    afterEach(async () => {
+      await testUtil.deleteWorkspace(workspaceId);
+    }); 
 
     it('Test Pairup with testing channel', async function() {
       this.timeout(180000) // 3 min
@@ -93,8 +105,51 @@ describe('Pairup', () => {
         expect(m.members).to.include.members(pair["users"]);
       }
       /* eslint-enable no-await-in-loop */
+    }); 
+
+    it('Test Pairup random users', async function() {
+      this.timeout(180000);
+
+      await pairUp.pairUp(undefined, token);
+      var pairs = await firestoreFuncs.getPairedUsers(workspaceId);
+      //console.log(pairs);
+      /* eslint-disable no-await-in-loop */
+
+      var partner1 = [];
+      var partner2 = [];
+      var pairChannel = [];
+
+      for(var i = 0; i < pairs.length; i++)
+      {
+        var pair = pairs[i];
+        var m = await app.client.conversations.members({
+          token:token, 
+          channel: pair["dmThreadID"]
+        });
+
+        //console.log(pair);
+
+        partner1.push(pair["users"][0]);
+        partner2.push(pair["users"][1]);
+      }
+      /* eslint-enable no-await-in-loop */
+      // console.log(partner1[0]);
+      // console.log(partner2[0]);
+      // console.log(pairChannel[0]);
+
+      // Waiting on latest pull to firestore
+      // var otherPartner = await firestoreFuncs.getPartner(workspaceId, partner1[0]);
+      // console.log(otherPartner);
+      // assert.equal(otherPartner, partner2[0]);
+
+      // otherPartner = await firestoreFuncs.getPartner(workspaceId, pairChannel[0], partner2[0]);
+      // assert.equal(otherPartner, partner1[0]);
+
+      // var invalidPart = await firestoreFuncs.getPartner(workspaceId, pairChannel[1], "XXXXXXXXXX");
+      // assert.equal(invalidPart, undefined);
     });  
   });
+
 });
 
 describe('util', () => {
@@ -103,24 +158,22 @@ describe('util', () => {
     let util;
     before(async () => {
       util = require('../util');
-      var response = await app.client.conversations.list({
-        token: token
-      })
-      var channels = response.channels;
-      //console.log(channels)
     });
     
-    it('Test with channel general', async () => {
+    it('Test with channel general', async function() {
+      this.timeout(5000); // 5 sec
       var channelId = await util.getChannelIdByName(app, token, "general");
       assert.equal(channelId, "C012WGXPYC9"); //hardcoded it with console.log
     });
 
-    it('Test with channel alti-paring', async () => {
+    it('Test with channel alti-paring', async function() {
+      this.timeout(5000); // 5 sec
       var channelId = await util.getChannelIdByName(app, token, "alti-pairing");
       assert.equal(channelId, "C01391DPZV4"); //hardcoded it with console.log
     });
 
-    it('Test with channel that doesnt exist', async () => {
+    it('Test with channel that doesnt exist', async function () {
+      this.timeout(5000); // 5 sec
       var channelId = await util.getChannelIdByName(app, token, "should not exist");
       assert.equal(channelId, undefined); 
     });
@@ -201,7 +254,6 @@ describe('Testing Random Generation', () => {
 // only sets warmups. Needs to be changed when cooldowns are added
 // Does not test the generated url. Only checks the prompt stored in the firestore 
 describe('Setup Warmup Callbacks', () => {
-  let firestoreFuncs;
   let workspaceInfo;
   let workspaceId;
   let ackCalled;
@@ -217,52 +269,56 @@ describe('Setup Warmup Callbacks', () => {
     ackCalled = true;
   }
 
-  before(async () => {    
+  before(async function() {
+    this.timeout(5000); //5 sec    
     fakeContext = { botToken: token};
-    firestoreFuncs = require('../firestore');
-    return app.client.team.info({
-      token: token
-    }).then( workspaceInfoReturn => {
-      workspaceInfo = workspaceInfoReturn;
-      workspaceId = workspaceInfo.team.id;
-      return Promise.resolve(firestoreFuncs.getPairedUsers(workspaceId));
-    }).then( pairsReturn => {
-      var pairs = pairsReturn;    
-      // Fails if there are no paired people existing in
-      // the database already. needs to be fixed by initializing
-      // a pre-set db at the start of the test
-      var pairsExist = (pairs.length > 0);
-      assert.equal(pairsExist, true);
-      pair = pairs[0];
-      // Fails if the paired up people is not a pair.
-      // Need to be changed if we allow groups of 3.
-      assert.equal(pair.users.length, 2);
-      userId1 = pair.users[0];
-      userId2 = pair.users[1];
-      fakeBody = {
-        team: {id:workspaceId},
-        user: {id:userId1},
-        view: {id:undefined},
-        // The value needs to be set based on the type of exercise
-        actions: [{value:''}]
-      };
-
-      return Promise.resolve();
+    return testUtil.setupPairs('T0137P851BJ','C012B6BTVDL').then(response => {
+      return app.client.team.info({
+        token: token
+      }).then( workspaceInfoReturn => {
+        workspaceInfo = workspaceInfoReturn;
+        workspaceId = workspaceInfo.team.id;
+        return Promise.resolve(firestoreFuncs.getPairedUsers(workspaceId));
+      }).then( pairsReturn => {
+        var pairs = pairsReturn;    
+        // Fails if there are no paired people existing in
+        // the database already. needs to be fixed by initializing
+        // a pre-set db at the start of the test
+        var pairsExist = (pairs.length > 0);
+        assert.equal(pairsExist, true);
+        pair = pairs[0];
+        // Fails if the paired up people is not a pair.
+        // Need to be changed if we allow groups of 3.
+        assert.equal(pair.users.length, 2);
+        userId1 = pair.users[0];
+        userId2 = pair.users[1];
+        fakeBody = {
+          team: {id:workspaceId},
+          user: {id:userId1},
+          view: {id:undefined},
+          // The value needs to be set based on the type of exercise
+          actions: [{value:''}]
+        };
+        return Promise.resolve();
+      });
     });
   });
 
-  beforeEach((done) => {
-    firestoreFuncs.storeTypeOfExercise(workspaceId, userId2, true, "");
+  beforeEach(async () => {
+    await firestoreFuncs.storeTypeOfExercise(workspaceId, userId2, true, "");
     ackCalled = false;
-    setTimeout(done, 1000);
   });
 
+  after(async() => {
+    await testUtil.deleteWorkspace(workspaceId);
+  })
 
   it('handleTypingSelect', () => {  
     fakeBody.actions[0].value = 'java';
     var exercisePrompt = handleTypingSelect(fakeAck, fakeBody, fakeContext).then( () => {
       return firestoreFuncs.getExercisePrompt(workspaceId, userId2, true)
     })
+
     return exercisePrompt.then( prompt => {
       var expectedString = "Your partner sent you this cool speed coding challenge in java to get your mind and fingers ready for the day!\nComplete it here: ";
       assert.equal(ackCalled, true);
@@ -289,18 +345,33 @@ describe('App Home tests', () => {
   let appHome;
   let onBoard;
   let workspaceId;
-  let firestoreFuncs;
   let userId;
   before(async () => {
     appHome = require('../appHome'); 
     onBoard = require('../onBoard');
-    firestoreFuncs = require('../firestore');
     workspaceId = "TestWorkspace";
     userId = "user1";
     await firestoreFuncs.setTimeZone(workspaceId, 'LA');
     await firestoreFuncs.setOwner(workspaceId, userId);
     await firestoreFuncs.storeNewPairingChannel(workspaceId, "Channel1");
+
+    // example of schedule
+    let schedule = {'FridayEnd': '10',
+                  'ThursdayEnd': '8',
+                  'WednesdayEnd': '6',
+                  'TuesdayEnd': '4',
+                  'MondayEnd': '2',
+                  'FridayStart': '9',
+                  'ThursdayStart': '7',
+                  'WednesdayStart': '5',
+                  'TuesdayStart': '3', 
+                  'MondayStart': '1'};
+    await testUtil.customPopulateUsers(workspaceId, [{user: userId, schedule: schedule}]);
   });
+
+  after(async() => {
+    await testUtil.deleteWorkspace(workspaceId);
+  })
 
   it('Get time zone', async () => {
     var timeZone = await firestoreFuncs.getTimeZone(workspaceId).then((obj)=>{
@@ -309,14 +380,12 @@ describe('App Home tests', () => {
           console.log(error);
     });
     assert.equal(timeZone, "LA");
-
   });
 
 
   it('Check Owner', async () => {
     var t = await appHome.checkOwner(workspaceId, userId);
     assert.equal(t, true);
-
   });
 
   it('Get Pairing Channel', async () => {
@@ -335,5 +404,4 @@ describe('App Home tests', () => {
       assert.equal(res[i], i+1);
     }
   });
-
 });

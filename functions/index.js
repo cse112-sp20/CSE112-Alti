@@ -23,7 +23,6 @@ const app = new App({
     authorize: authorizeFunction,
 });
 
-
 //arrow function for simplicity 
 exports.getBolt = () => app;
 
@@ -31,12 +30,22 @@ exports.getBolt = () => app;
 const generateTaskData = require('./generateTaskData');
 const warmupMessage = require('./warmupMessage');
 const pubsubScheduler = require('./pubsubScheduler');
+const schedule = require('./schedule');
 const pairUp = require('./pairUp');
 const onBoard = require('./onBoard');
 const appHome = require('./appHome');
 const appHomeSchedule = require('./appHomeSchedule');
+const createNewChannel = require('./createNewChannel');
 exports.scheduledPairUp = pubsubScheduler.scheduledPairUp;
 exports.scheduleWarmup = pubsubScheduler.scheduleWarmup;
+exports.scheduleDaily = pubsubScheduler.scheduleDaily;
+
+
+//Test Ruixian 
+exports.test1 = pubsubScheduler.test1;
+//
+
+
 
 // Global error handler
 app.error(console.log);

@@ -1,8 +1,8 @@
 const functions = require('firebase-functions');
 const admin = require('firebase-admin');
 const request = require('request');
-//const dotenv = require('dotenv');
-//dotenv.config();
+// const dotenv = require('dotenv');
+// dotenv.config();
 
 // console.log(typeof(process.env.FUNCTIONS_EMULATOR));
 if(process.env.FUNCTIONS_EMULATOR === "true"){
@@ -101,7 +101,6 @@ exports.getAPIPair = (team_id) => {
 */
 exports.storeNewPairing = async function storeNewPairing(workspace, dmThreadID, pairedUsers) {
     let channelID = await this.getPairingChannel(workspace);
-
     let usersRef = db.collection('workspaces').doc(workspace)
                            .collection('activeChannels').doc(channelID)
                            .collection('pairedUsers');
@@ -185,7 +184,7 @@ function deleteQueryBatch(query, resolve, reject) {
         let batch = db.batch();
         snapshot.docs.forEach((doc) => {
           batch.delete(doc.ref);
-          console.log(doc.ref);
+          //console.log(doc.ref);
         });
   
         // eslint-disable-next-line promise/no-nesting
@@ -551,4 +550,41 @@ exports.getAllWorkspaces = async function getAllWorkspaces() {
     let allWorkspaces = await snapshot.docs.map(doc => doc.id);
 
     return allWorkspaces;
+}
+
+/*
+    Description:
+        Gets all pairing data associated with a particular user
+    
+    Inputs:
+        workspaceID - the workspace the user you're querying about is in
+        userID - the user id of the user you want the pairing data for
+    
+    Returns:
+        Returns a Promise that resolves into an object with the following keys:
+        (obj) - {
+            dmThreadID,
+            partnerID,
+            warmupTask,
+            cooldownTask
+        }
+*/
+exports.getUserPairingData = async function getUserData(workspaceID, userID) {
+    let channelID = await this.getPairingChannel(workspaceID);
+    let userDocRef = db.collection('workspaces').doc(workspaceID).collection('activeChannels').doc(channelID).collection('pairedUsers').doc(userID);
+
+    return userDocRef.get()
+        .then(doc => {
+            if (!doc.exists) {
+                console.log('No such document!');
+                return undefined;
+            }
+            else {
+                return doc.data();
+            }
+        })
+        .catch(err => {
+            console.log('Error getting user document: ', err);
+            return undefined;
+        });
 }
