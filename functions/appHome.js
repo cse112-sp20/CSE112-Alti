@@ -276,6 +276,23 @@ async function loadHomeTabUI(app, workspaceID, userId, context) {
 							  }
 						  }
 					}
+				},
+				// Create a new pairing channel
+				{
+					"type": "section",
+					"text": {
+						"type": "mrkdwn",
+						"text": "Or, *create a new pairing channel*. "
+					},
+					"accessory": {
+						"type": "button",
+						"action_id": "new_channel_button",
+						"text": {
+							"type": "plain_text",
+							"text": "Create",
+							"emoji": true
+						}
+					}
 				},/*
 				{
 					"type": "section",
@@ -447,7 +464,7 @@ async function loadHomeTabUI(app, workspaceID, userId, context) {
 					  "action_id": "set_custom_times",
 					  "text":{
 						  "type":"plain_text",
-						  "text":"customize",
+						  "text":"Customize",
 						  "emoji":true
 					  }
 					}
