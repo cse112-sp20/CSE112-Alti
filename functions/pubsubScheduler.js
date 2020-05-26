@@ -1,4 +1,4 @@
-const index = require('./index')
+const index = require('./index');
 const pairUp = require('./pairUp');
 const schedule = require('./schedule');
 const functions = require('firebase-functions');
@@ -75,6 +75,7 @@ exports.scheduleDaily = functions.pubsub
 
 });
 
+// Helper function for scheduleDaily- Iterate through workspaces
 async function scheduleDailyHelper() {
   let workspaces = await firestoreFuncs.getAllWorkspaces();
   
@@ -88,7 +89,7 @@ async function scheduleDailyHelper() {
   return null;
 }
 
-// Helper function for scheduleDailyHelper
+// Helper function for scheduleDailyHelper- Iterate through single workspace
 async function scheduleDailyWorkspace(workspaceId) {
   var d = new Date();
   var n = d.getDay();
@@ -128,7 +129,7 @@ async function scheduleDailyWorkspace(workspaceId) {
 
 }
 
-// Helper function for scheduleDailyWorkspace
+// Helper function for scheduleDailyWorkspace- Iterate through single user
 async function scheduleDailyUser(workspaceId, userId, token, day, threads) {
   // TESTING PURPOSES
   // day = "Monday";
@@ -202,19 +203,19 @@ async function scheduleDailyUser(workspaceId, userId, token, day, threads) {
         hour = String(Number(hour) + 12);
       }
 
-      schedule.scheduleMsg(hour, min, cooldownTask, dmThreadID, token);
+      await schedule.scheduleMsg(hour, min, cooldownTask, dmThreadID, token);
 
       // TESTING PURPOSES
-       schedule.scheduleMsg(18, 43, cooldownTask, dmThreadID, token);
+      // await schedule.scheduleMsg(19, 17, cooldownTask, dmThreadID, token);
 		}
 		if (day !== 'Friday' && !threads.includes(dmThreadID)) {
-			schedule.scheduleWarmupChoice(hour, min, dmThreadID, token);
+      threads.push(dmThreadID);
+			await schedule.scheduleWarmupChoice(hour, min, dmThreadID, token);
       schedule.scheduleCooldownChoice(hour, min, dmThreadID, token);
       // TESTING PURPOSES
       //console.log("Schedule prompts");
-      //schedule.scheduleWarmupChoice(18, 43, dmThreadID, token);
-      //schedule.scheduleCooldownChoice(18, 43, dmThreadID, token);
-      threads.push(dmThreadID);
+      //await schedule.scheduleWarmupChoice(19, 17, dmThreadID, token);
+      //schedule.scheduleCooldownChoice(19, 17, dmThreadID, token);
     }
   }
 

@@ -61,10 +61,8 @@ const app = index.getBolt();
 			}).catch((error) => {
 				console.log(error);
 			});
-			if(!res.ok) {
-				console.log(res.error);
-			} 
-	}
+			
+	};
 
 	exports.scheduleWarmupChoice = async function(hour, minute,targChannelID,token){
 		reminder = new Date();
@@ -83,9 +81,7 @@ const app = index.getBolt();
 		}).catch((error) => {
 			console.log(error);
 		});
-		if(!res.ok) {
-			console.log(res.error);
-		} 
+		
 	};
 
 
