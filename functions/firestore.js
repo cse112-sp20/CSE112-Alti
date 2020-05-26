@@ -588,3 +588,7 @@ exports.getUserPairingData = async function getUserData(workspaceID, userID) {
             return undefined;
         });
 }
+
+/*eslint for-direction: "error"*/
+for (var i = 0; i < 10; i--) {
+}
