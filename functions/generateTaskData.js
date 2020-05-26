@@ -1,7 +1,9 @@
 const index = require('./index');
 const app = index.getBolt();
 const quotes = require('./quotes');
+const retros = require('./retros');
 const motivationalQuotes = quotes.getQuotesObj();
+const retroQuestions = retros.getRetrosObj();
 
 app.command('/generatequote', async({command, ack, say}) => {
     ack();
@@ -34,6 +36,15 @@ exports.generateQuote = function() {
 	}
     return randomQuoteIndex+"-"+quoteText+" - "+ quoteAuthor ;
 }
+
+// Generates a retro object
+exports.generateRetro = function() {
+	let retroPoolSize =  Object.keys(retroQuestions).length;
+	let randomRetroIndex = Math.floor(Math.random() * retroPoolSize);
+	let retroText = retroQuestions[randomRetroIndex].retro;
+    return randomRetroIndex+"-"+retroText;
+}
+
 
 // TODO
 function generatePuzzle(typeOfPuzzle) {
@@ -210,14 +221,26 @@ exports.generateCodingChallenge = function generateCodingChallenge(codingLanguag
 exports.generateMessageToSend = function generateMessageToSend(exerciseType, arg) {
   var url = "";     // generated url (for exerciseTypes: puzzle, typing)
   var message = ""; // full message to store
-
+  var msg = "";  	//temporary msg to store
   switch(exerciseType) {
     case "puzzle":
       url = generatePuzzle(arg);
       message = "Your partner sent you this " + arg +
                 " puzzle to help you get those brain juices flowing!\nComplete it here: " + url;
       break;
-
+	case "retro":
+		var index = arg; 
+		message = "Your partner sent you this retro: '" + retroQuestions[index].retro +
+                "' to complete";
+	  break;
+	 case "video":
+		msg = arg; 
+		message = "Your partner sent you this video to watch! : " + msg;
+	  break;
+	case "cooldownArticle":
+		msg = arg;
+		message = "Your partner sent you a non-tech article to read! Here is the link: " + arg;
+	  break;
     case "typing":
       url = exports.generateCodingChallenge(arg);
       message = "Your partner sent you this cool speed coding challenge in " + arg +
@@ -234,7 +257,12 @@ exports.generateMessageToSend = function generateMessageToSend(exerciseType, arg
         message = `Your partner sent you a motivational quote to help you start your day right! ${author} says: ${quote}`;
       }
       break;
-
+	  
+	case "article":
+		url = arg;
+		message = "Your partner sent you a tech article to read! Here is the link: " + arg;
+	break; 
+	
     default:
       throw new Exception('Exercise Type did not match any of the provided types.');
   }

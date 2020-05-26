@@ -5,7 +5,13 @@ const expect = require('chai').expect;
 const index = require('../index');
 const testUtil = require('./testUtil');
 const app = index.getBolt();
-var generateTaskData = require('../generateTaskData');
+
+var generateTaskData = require ('../generateTaskData');
+const quotes = require('../quotes');
+const retros = require('../retros');
+const motivationalQuotes = quotes.getQuotesObj();
+const retroQuestions = retros.getRetrosObj();
+
 let firestoreFuncs = require('../firestore');
 
 const functions = require('firebase-functions');
@@ -215,7 +221,35 @@ describe('generateCodingChallenge', () => {
     assert.equal(url.substring(0, 37),'http://www.speedcoder.net/lessons/cpp');
   });
 });
-
+//tests random generation features
+describe('Testing Random Generation', () => {
+  var numTests = 20;
+  it('Testing Quote Generation', () => {
+    //generate multiple quotes
+		for (let testIterator = 0; testIterator < numTests; testIterator++) {
+			let testQuote = generateTaskData.generateQuote();
+			let quoteArray = testQuote.split("-");
+			let testArray = quoteArray[1].split(" ");
+			let testString = testArray[0];
+			let targetQuote = motivationalQuotes[quoteArray[0]].text;
+			let targetArray = targetQuote.split(/[ -]+/);
+			let targetString = targetArray[0];
+			assert.equal(testString,targetString);
+		}
+  });
+  it('Testing Retro Generation', () => {
+	  	for (let testIterator = 0; testIterator < numTests; testIterator++) {
+			let testRetro = generateTaskData.generateRetro();
+			let retroArray = testRetro.split("-");
+			let testArray = retroArray[1].split(" ");
+			let testString = testArray[0];
+			let targetRetro = retroQuestions[retroArray[0]].retro;
+			let targetArray = targetRetro.split(/[ -]+/);
+			let targetString = targetArray[0];
+			assert.equal(testString,targetString);
+		}
+  });
+});
 // This functions assumes that the HandleQuoteSelect function
 // only sets warmups. Needs to be changed when cooldowns are added
 // Does not test the generated url. Only checks the prompt stored in the firestore 
