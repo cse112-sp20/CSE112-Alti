@@ -4,17 +4,55 @@ const app = index.getBolt();
 let db = admin.firestore();
 let firestoreFuncs = require('../firestore');
 
+let defaultDocInfo = {'botToken':'fake_token', 'note': 'this is Alti-Test', 
+'owner' : 'U012HPHS2FR', 'time' : '-07:00'};
 
-setupPairs = async function(workspaceId, channelId)
-{
-  // Create new Channel "Pairing Channel"
+/* 
+    Removes the workspace from firebase. This is necessary to avoid test conflicts
+    Input:
+        workspaceId: The id of the workspace that will be removed from /workspaces
+*/
+deleteWorkspace = async function(workspaceId) {
+  let snapshot = await db.collection('workspaces').get();
+  let batch = db.batch();
+  snapshot.docs.forEach((doc) => {
+    if(doc.id === workspaceId)
+    {
+      //console.log(doc.id);
+      batch.delete(doc.ref);
+    }
+    //console.log(doc.ref);
+  });
+  await batch.commit();
+}
 
-  let pair1 = ["U01236C905V", "U012HPHS2FR"];
-  let pair2 = ["U012P9C053Q", "U012RQ0TQG6"];
-  let pair3 = ["U012X3JJS78", "U012YEB5HR8"];
-  let pair4 = ["U012YGB2M50", "U0133SAJ0E7"];
+/*
+    Creates the workspace and add the necessary info. 
+    Input:
+      workspaceId: the id of workspace
+      docInfo: any additional fields. The default value is what we have for Alti-Test 
+*/
+setupWorkspace = async function(workspaceId, docInfo=defaultDocInfo) {
+    await db.collection('workspaces').doc(workspaceId).set(docInfo);
+}
 
-  await firestoreFuncs.storeNewPairingChannel(workspaceId, channelId);
+/*
+    Create pairs in firebase. Use this before testing functions that
+    assumes pairs have been made. All the id references can be found at the bottom
+    of this file
+
+    Input: 
+      workspaceId: the id of workspace
+      channelId: the channel
+*/
+setupPairs = async function(workspaceId, channelId) {
+
+    let pair1 = ["U01236C905V", "U012HPHS2FR"];
+    let pair2 = ["U012P9C053Q", "U012RQ0TQG6"];
+    let pair3 = ["U012X3JJS78", "U012YEB5HR8"];
+    let pair4 = ["U012YGB2M50", "U0133SAJ0E7"];
+
+    await firestoreFuncs.storeNewPairingChannel(workspaceId, channelId);
 
     createDmThread(pair1).then(id => {
         return firestoreFuncs.storeNewPairing(workspaceId, id , pair1);
@@ -31,6 +69,10 @@ setupPairs = async function(workspaceId, channelId)
     return Promise.resolve();
 }
 
+/* 
+  A helpfer function for setupPairs. 
+  This create pairs on the slack end in Alti-Test workspace 
+*/
 async function createDmThread(users)
 {
   var check = await app.client.conversations.open({
@@ -48,12 +90,10 @@ async function createDmThread(users)
   return check.channel.id;
 }
 
-clearDatabase = async function(path)
-{
-  await deleteCollection(path, 100);
-}
-
-
+/*
+  The default way to populate user info with schedule in firebase
+  Default for warmup time is 9am and cool down time is 5pm
+*/
 defaultPopulateUsers = async function(workspaceId) {
   let schedule = {'FridayEnd': '5:00 PM',
                   'ThursdayEnd': '5:00 PM',
@@ -80,7 +120,9 @@ defaultPopulateUsers = async function(workspaceId) {
 }
 
 /*
-    userScheduleInfo = [{user1 = id, schedule1 = {see in default}}, {user2, schedule2 }, ...]
+    Customize the way you want to populate user data in firebase. 
+    Input: 
+      userScheduleInfo = [{user1 = id, schedule1 = {see in default}}, {user2, schedule2 }, ...]
 */
 customPopulateUsers = async function(workspaceId, userScheduleInfo) {
   /* eslint-disable no-await-in-loop */
@@ -89,5 +131,22 @@ customPopulateUsers = async function(workspaceId, userScheduleInfo) {
     schedule = userScheduleInfo[i].schedule;
     await db.collection("workspaces").doc(workspaceId).collection("users").doc(user).set(schedule);
   } 
-/* eslint-enable no-await-in-loop */
+  /* eslint-enable no-await-in-loop */
 }
+
+
+/* All the user ids we have in Alti-Test */
+// U01236C905V Ani
+// U012HPHS2FR Daniel
+// U012P9C053Q Jeremiah
+// U012RQ0TQG6 Alvin
+// U012X3JJS78 Shardul Bot
+// U012YEB5HR8 Jonathan Leigh
+// U012YGB2M50 Rahul
+// U012YNT21C3 Him Li
+// U0132DWLTT7 Lacey Umamoto
+// U0133SAJ0E7 Jason Ding
+// U01341THLV9 Brent Vanzant
+// U01341VGSE7 Thomas Limperis
+// U0134PZ89UL Eric Wei
+// U013G97PNFK Ruixan Song

@@ -19,7 +19,8 @@ describe('Scheduler', () => {
     schedule = require('../schedule');
   });
 
-  it('schedule for 2 min after', async () => {
+  it('schedule for 2 min after', async function() {
+    this.timeout(5000); // 5 sec
     let now = new Date();
     now.setTime(now.getTime() + 120000); 
     var response = await schedule.scheduleMsg(now.getHours(), now.getMinutes(), 
@@ -59,12 +60,16 @@ describe('Pairup', () => {
     let workspaceId = "T0137P851BJ";
     let channelId = "C012B6BTVDL";
 
-    beforeEach(async () => {
-      await firestoreFuncs.storeNewPairingChannel(workspaceId, channelId);
+    before(async () => {
+      setupWorkspace(workspaceId);
     });
 
-    afterEach(async() => {
-      await clearDatabase('/workspaces/' + workspaceId + '/activeChannels');
+    beforeEach(async () => {
+      return Promise.resolve(firestoreFuncs.storeNewPairingChannel(workspaceId, channelId));
+    });
+
+    afterEach(async () => {
+      await deleteWorkspace(workspaceId);
     }); 
 
     it('Test Pairup with testing channel', async function() {
@@ -264,7 +269,7 @@ describe('Setup Warmup Callbacks', () => {
   });
 
   after(async() => {
-    await clearDatabase("/workspaces/" + workspaceId + "/activeChannels");
+    await deleteWorkspace(workspaceId);
   })
 
   it('handleTypingSelect', () => {  
@@ -308,6 +313,8 @@ describe('App Home tests', () => {
     await firestoreFuncs.setTimeZone(workspaceId, 'LA');
     await firestoreFuncs.setOwner(workspaceId, userId);
     await firestoreFuncs.storeNewPairingChannel(workspaceId, "Channel1");
+
+    // example of schedule
     let schedule = {'FridayEnd': '10',
                   'ThursdayEnd': '9',
                   'WednesdayEnd': '8',
@@ -357,19 +364,3 @@ describe('App Home tests', () => {
     }
   });
 });
-
-
-// U01236C905V Ani
-// U012HPHS2FR Daniel
-// U012P9C053Q Jeremiah
-// U012RQ0TQG6 Alvin
-// U012X3JJS78 Shardul Bot
-// U012YEB5HR8 Jonathan Leigh
-// U012YGB2M50 Rahul
-// U012YNT21C3 Him Li
-// U0132DWLTT7 Lacey Umamoto
-// U0133SAJ0E7 Jason Ding
-// U01341THLV9 Brent Vanzant
-// U01341VGSE7 Thomas Limperis
-// U0134PZ89UL Eric Wei
-// U013G97PNFK Ruixan Song
