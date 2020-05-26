@@ -8,7 +8,7 @@ var days = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"];
 
 // Listen to the app_home_opened Events API event to hear when a user opens your app from the sidebar
 app.event("app_home_opened", async ({ body, context }) => {
-  //console.log("It's running");
+  console.log("It's running");
   appHome(app, body, context);
 });
 
@@ -126,14 +126,14 @@ async function loadHomeTabUI(app, workspaceID, userId, context) {
         console.log(error);
   	});
   	console.log("Pairing channel: " + channelId);
-  
+  /*
 	var timeZone = await firestoreFuncs.getTimeZone(workspaceID).then((obj)=>{
 		return obj;
 	}).catch((error) => {
         console.log(error);
 	});
 	// TODO store default LA timezone, probably on installation so in oauth.js
-
+*/
   var channelName;
   if (typeof(channelId) !== "undefined") {
     channelName = await app.client.conversations.info({
@@ -165,12 +165,14 @@ async function loadHomeTabUI(app, workspaceID, userId, context) {
   else {
 	  channelText = `Current Pairing Channel: #${  channelName  }`;
   }
+  /*
   if (timeZone === undefined) {
 	  timeZoneText = `Working Time Zone: None`;
   }
   else {
 	  timeZoneText = `Working Time Zone: UTC ${  timeZone  }`;
   }
+  */
 
 	if(await checkOwner(workspaceID, userId)){
 		view = {
@@ -197,7 +199,7 @@ async function loadHomeTabUI(app, workspaceID, userId, context) {
 						"type": "mrkdwn",
 						"text": channelText,
 					}
-				},
+				},/*
 				{
 					"type": "section",
 					"text": {
@@ -205,7 +207,7 @@ async function loadHomeTabUI(app, workspaceID, userId, context) {
 						"text": timeZoneText,
 						"emoji": true
 					}
-				},
+				},*/
 				{
 					"type": "section",
 					"block_id": "section678",
@@ -291,7 +293,7 @@ async function loadHomeTabUI(app, workspaceID, userId, context) {
 							"emoji": true
 						}
 					}
-				},
+				},/*
 				{
 					"type": "section",
 					"text": {
@@ -326,7 +328,7 @@ async function loadHomeTabUI(app, workspaceID, userId, context) {
 							}
 						}
 					}
-				},
+				},*/
 				{
 					"type": "divider"
 				},
@@ -510,7 +512,7 @@ async function loadHomeTabUI(app, workspaceID, userId, context) {
 						"text": channelText,
 						"emoji": true
 					}
-				},
+				},/*
 				{
 					"type": "section",
 					"text": {
@@ -518,7 +520,7 @@ async function loadHomeTabUI(app, workspaceID, userId, context) {
 						"text": timeZoneText,
 						"emoji": true
 					}
-				},
+				},*/
 				{
 					"type": "divider"
 				  },
