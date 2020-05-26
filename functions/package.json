@@ -2,7 +2,7 @@
   "name": "functions",
   "description": "Cloud Functions for Firebase",
   "scripts": {
-    "test": "mocha",
+    "test": "nyc --reporter=text mocha",
     "lint": "eslint .",
     "serve": "firebase emulators:start --only functions",
     "shell": "firebase functions:shell",
@@ -35,6 +35,7 @@
     "firebase-functions-test": "^0.2.0",
     "istanbul": "^0.4.5",
     "mocha": "^7.1.2",
+    "nyc": "^15.0.1",
     "proxyquire": "^1.7.10",
     "sinon": "^1.17.6",
     "sinon-chai": "^2.8.0",
