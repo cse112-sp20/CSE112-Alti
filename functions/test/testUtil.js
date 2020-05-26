@@ -12,7 +12,7 @@ let defaultDocInfo = {'botToken':'fake_token', 'note': 'this is Alti-Test',
     Input:
         workspaceId: The id of the workspace that will be removed from /workspaces
 */
-deleteWorkspace = async function(workspaceId) {
+exports.deleteWorkspace = async function(workspaceId) {
   let snapshot = await db.collection('workspaces').get();
   let batch = db.batch();
   snapshot.docs.forEach((doc) => {
@@ -32,7 +32,7 @@ deleteWorkspace = async function(workspaceId) {
       workspaceId: the id of workspace
       docInfo: any additional fields. The default value is what we have for Alti-Test 
 */
-setupWorkspace = async function(workspaceId, docInfo=defaultDocInfo) {
+exports.setupWorkspace = async function(workspaceId, docInfo=defaultDocInfo) {
     await db.collection('workspaces').doc(workspaceId).set(docInfo);
 }
 
@@ -45,7 +45,7 @@ setupWorkspace = async function(workspaceId, docInfo=defaultDocInfo) {
       workspaceId: the id of workspace
       channelId: the channel
 */
-setupPairs = async function(workspaceId, channelId) {
+exports.setupPairs = async function(workspaceId, channelId) {
 
     let pair1 = ["U01236C905V", "U012HPHS2FR"];
     let pair2 = ["U012P9C053Q", "U012RQ0TQG6"];
@@ -94,7 +94,7 @@ async function createDmThread(users)
   The default way to populate user info with schedule in firebase
   Default for warmup time is 9am and cool down time is 5pm
 */
-defaultPopulateUsers = async function(workspaceId) {
+exports.defaultPopulateUsers = async function(workspaceId) {
   let schedule = {'FridayEnd': '5:00 PM',
                   'ThursdayEnd': '5:00 PM',
                   'WednesdayEnd': '5:00 PM',
@@ -124,7 +124,7 @@ defaultPopulateUsers = async function(workspaceId) {
     Input: 
       userScheduleInfo = [{user1 = id, schedule1 = {see in default}}, {user2, schedule2 }, ...]
 */
-customPopulateUsers = async function(workspaceId, userScheduleInfo) {
+exports.customPopulateUsers = async function(workspaceId, userScheduleInfo) {
   /* eslint-disable no-await-in-loop */
   for(let i = 0; i < userScheduleInfo.length; i++) {
     user = userScheduleInfo[i].user;
@@ -150,3 +150,5 @@ customPopulateUsers = async function(workspaceId, userScheduleInfo) {
 // U01341VGSE7 Thomas Limperis
 // U0134PZ89UL Eric Wei
 // U013G97PNFK Ruixan Song
+
+

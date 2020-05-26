@@ -159,7 +159,7 @@ exports.storeNewPairingChannel = async function storeNewPairingChannel(workspace
         collectionPath - path to get to the collection you want to delete.
         batchSize - the max # of documents you want to delete within that collection, I think?
 */
-deleteCollection = function(collectionPath, batchSize) {
+function deleteCollection(collectionPath, batchSize) {
     let collectionRef = db.collection(collectionPath);
     let query = collectionRef.orderBy('__name__').limit(batchSize);
 

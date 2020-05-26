@@ -3,12 +3,17 @@ const assert = require('assert');
 const should = require('chai').should();
 const expect = require('chai').expect;
 const index = require('../index');
+const testUtil = require('./testUtil');
 const app = index.getBolt();
 var generateTaskData = require('../generateTaskData');
 let firestoreFuncs = require('../firestore');
 
+const functions = require('firebase-functions');
+const config = functions.config();
+let token = config.slack.bot_token;
+console.log(token);
 //hardcode the token 
-let token = "xoxb-1109790171392-1110712837169-OxF8igcVuxkFUhbZVuoXxypj";
+//let token = "xoxb-1109790171392-1110712837169-OxF8igcVuxkFUhbZVuoXxypj";
 
 // If it passes, means the function finished and message was scheduled, baseline test
 // Need more rigorous testing using promises of async function and validation from Slack API channel reading
@@ -61,15 +66,16 @@ describe('Pairup', () => {
     let channelId = "C012B6BTVDL";
 
     before(async () => {
-      setupWorkspace(workspaceId);
+      await testUtil.setupWorkspace(workspaceId);
     });
 
-    beforeEach(async () => {
-      return Promise.resolve(firestoreFuncs.storeNewPairingChannel(workspaceId, channelId));
+    beforeEach(async function() {
+      this.timeout(5000) // 5 sec
+      await firestoreFuncs.storeNewPairingChannel(workspaceId, channelId);
     });
 
     afterEach(async () => {
-      await deleteWorkspace(workspaceId);
+      await testUtil.deleteWorkspace(workspaceId);
     }); 
 
     it('Test Pairup with testing channel', async function() {
@@ -229,9 +235,10 @@ describe('Setup Warmup Callbacks', () => {
     ackCalled = true;
   }
 
-  before(async () => {    
+  before(async function() {
+    this.timeout(5000); //5 sec    
     fakeContext = { botToken: token};
-    return setupPairs('T0137P851BJ','C012B6BTVDL').then(response => {
+    return testUtil.setupPairs('T0137P851BJ','C012B6BTVDL').then(response => {
       return app.client.team.info({
         token: token
       }).then( workspaceInfoReturn => {
@@ -269,7 +276,7 @@ describe('Setup Warmup Callbacks', () => {
   });
 
   after(async() => {
-    await deleteWorkspace(workspaceId);
+    await testUtil.deleteWorkspace(workspaceId);
   })
 
   it('handleTypingSelect', () => {  
@@ -316,17 +323,21 @@ describe('App Home tests', () => {
 
     // example of schedule
     let schedule = {'FridayEnd': '10',
-                  'ThursdayEnd': '9',
-                  'WednesdayEnd': '8',
-                  'TuesdayEnd': '7',
-                  'MondayEnd': '6',
-                  'FridayStart': '5',
-                  'ThursdayStart': '4',
-                  'WednesdayStart': '3',
-                  'TuesdayStart': '2', 
+                  'ThursdayEnd': '8',
+                  'WednesdayEnd': '6',
+                  'TuesdayEnd': '4',
+                  'MondayEnd': '2',
+                  'FridayStart': '9',
+                  'ThursdayStart': '7',
+                  'WednesdayStart': '5',
+                  'TuesdayStart': '3', 
                   'MondayStart': '1'};
-    await customPopulateUsers(workspaceId, [{user: userId, schedule: schedule}]);
+    await testUtil.customPopulateUsers(workspaceId, [{user: userId, schedule: schedule}]);
   });
+
+  after(async() => {
+    await testUtil.deleteWorkspace(workspaceId);
+  })
 
   it('Get time zone', async () => {
     var timeZone = await firestoreFuncs.getTimeZone(workspaceId).then((obj)=>{
@@ -353,14 +364,10 @@ describe('App Home tests', () => {
 
   });
 
-  /*
-    This test should be re-designed. 
-    Dependent on the order of values in firebase
-  */
   it('Test getAllTimes function', async () => {
     var res = await appHome.getAllTimes(workspaceId, userId);  
     for (var i = 0; i < 10; i++) {
-      //assert.equal(res[i], i+1);
+      assert.equal(res[i], i+1);
     }
   });
 });
