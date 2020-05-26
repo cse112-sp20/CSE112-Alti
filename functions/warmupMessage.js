@@ -173,10 +173,7 @@ exports.requestCustomSend = async function(ack,body,context) {
 
 exports.customMsgView =  async function(ack, body, view, context, isWarmup) {
 	  // Acknowledge the custom_msg_view event
-  ack({
-	  //clear the modal off the users screen
-	 "response_action": "clear"
-  });
+  ack();
   // get a  reference to the view object's values
   const valuesObject = view['state']['values']
   let msgToSend = ''
@@ -199,7 +196,26 @@ exports.customMsgView =  async function(ack, body, view, context, isWarmup) {
   //console.log(userID + " in " + channelID + " sent the following: " + msgToSend+ "in team:"+ teamID);
   //writes the data collected to the firebase
   let text = "Here's a custom message from your buddy: '" + msgToSend+ "'";
-  firestoreFuncs.storeTypeOfExercise(teamID, userID, isWarmup, text);
+  var storeReturn = firestoreFuncs.storeTypeOfExercise(teamID, userID, isWarmup, text);
+  let confirmationJSON;
+  if ( isWarmup ) {
+	confirmationJSON = createConfirmationView("Alti-Confirmation","*Your buddy will receive the custom message for warmup tomorrow!*");
+  }
+  else {
+	confirmationJSON = createConfirmationView("Alti-Confirmation","*Your buddy will receive the custom message for cooldown tomorrow!*");
+  }
+  try {
+		const result = await app.client.views.open({
+			token: context.botToken,
+			view_id: body.view.id,
+			trigger_id: body.trigger_id,
+			view: JSON.stringify(confirmationJSON)
+		});
+  }
+  catch (error) {
+	console.error(error);
+  }
+  return storeReturn;
 }
 
 
@@ -766,7 +782,7 @@ handlePuzzleSelect = async function(ack,body,context) {
 	var workspaceId = body.team.id;
 	var userId = body.user.id;
 	var storeReturn = firestoreFuncs.storeTypeOfExercise(workspaceId, userId, true, text);
-		let confirmationJSON = createConfirmationView("Alti-Confirmation","*Your buddy will receive the motiviational quote for warmup tomorrow!*");
+		let confirmationJSON = createConfirmationView("Alti-Confirmation","*Your buddy will receive the puzzle for warmup tomorrow!*");
     try {
 		if(body.view.id !== undefined){
 		//push new view above old
@@ -861,6 +877,18 @@ handleArticleSelect = async function(view,ack,body,context) {
 	const userId = body['user']['id'];
 	var text = generateData.generateMessageToSend('article', quoteToSend);
 	var storeReturn = firestoreFuncs.storeTypeOfExercise(workspaceId, userId, true, text);
+	let confirmationJSON = createConfirmationView("Alti-Confirmation","*Your buddy will receive the article for warmup tomorrow!*");
+    try {
+			const result = await app.client.views.open({
+				token: context.botToken,
+				view_id: body.view.id,
+				trigger_id: body.trigger_id,
+				view: JSON.stringify(confirmationJSON)
+			});
+    }
+    catch (error) {
+      console.error(error);
+	}
 	return storeReturn;
 }
 
@@ -888,15 +916,24 @@ handleCooldownArticleSelect = async function(view,ack,body,context) {
 	const userId = body['user']['id'];
 	var text = generateData.generateMessageToSend('cooldownArticle', quoteToSend); //TODO UPDATE
 	var storeReturn = firestoreFuncs.storeTypeOfExercise(workspaceId, userId, false, text);
+	let confirmationJSON = createConfirmationView("Alti-Confirmation","*Your buddy will receive the article for cooldown tomorrow!*");
+    try {
+			const result = await app.client.views.open({
+				token: context.botToken,
+				view_id: body.view.id,
+				trigger_id: body.trigger_id,
+				view: JSON.stringify(confirmationJSON)
+			});
+    }
+    catch (error) {
+      console.error(error);
+	}
 	return storeReturn;
 }
 
 //handles asynchrous handling of confirmation of cooldown video selection
 handleVideoSelect = async function(view,ack,body,context) {
-	ack({
-	  //clear the modal off the users screen
-	 "response_action": "clear"
-	});
+	ack();
 	// get a  reference to the view object's values
 	const valuesObject = view['state']['values']
 	let quoteToSend = ''
@@ -915,6 +952,18 @@ handleVideoSelect = async function(view,ack,body,context) {
 	const userId = body['user']['id'];
 	var text = generateData.generateMessageToSend('video', quoteToSend);
 	var storeReturn = firestoreFuncs.storeTypeOfExercise(workspaceId, userId, false, text);
+	let confirmationJSON = createConfirmationView("Alti-Confirmation","*Your buddy will receive the video for cooldown tomorrow!*");
+    try {
+			const result = await app.client.views.open({
+				token: context.botToken,
+				view_id: body.view.id,
+				trigger_id: body.trigger_id,
+				view: JSON.stringify(confirmationJSON)
+			});
+    }
+    catch (error) {
+      console.error(error);
+	}
 	return storeReturn;
 }
 
