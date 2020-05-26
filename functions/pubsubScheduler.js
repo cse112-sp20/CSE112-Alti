@@ -8,6 +8,8 @@ const generateTaskData = require('./generateTaskData');
 const app = index.getBolt();
 
 var days = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
+// class variable to track dmThreads where prompts have already been sent
+var threads = [];
 
 /* Scheduling Idea:
 / Pair everyone up on Sundays but only create and send the thread on earliest partner's workday start
@@ -81,7 +83,7 @@ async function scheduleDailyHelper() {
     
   }
   
-  // TESTING LINE BELOW
+  // TESTING PURPOSES
   // scheduleDailyWorkspace("T012US11G4X");
   return null;
 }
@@ -121,14 +123,14 @@ async function scheduleDailyWorkspace(workspaceId) {
 
   let memberList = convoObj.members;
   for (var m of memberList) {
-    scheduleDailyUser(workspaceId, m, w_token, day);
+    scheduleDailyUser(workspaceId, m, w_token, day, threads);
   }
 
 }
 
 // Helper function for scheduleDailyWorkspace
-async function scheduleDailyUser(workspaceId, userId, token, day) {
-  // CHANGE TESTING LINE BELOW BEFORE DEPLOYING
+async function scheduleDailyUser(workspaceId, userId, token, day, threads) {
+  // TESTING PURPOSES
   // day = "Monday";
   // console.log("user: " + userId);
   let pairingData = await firestoreFuncs.getUserPairingData(workspaceId, userId);
@@ -150,7 +152,7 @@ async function scheduleDailyUser(workspaceId, userId, token, day) {
     quote = generateTaskData.generateQuote();
     quote = quote.split("-")[1] + "-" + quote.split("-")[2];
     warmupTask = `Your partner sent you a motivational quote to help you start your day right!\n${quote}`;
-    cooldownTask = `Retrospective question`;
+    cooldownTask = `Retrospective question for <@${  userId  }>`;
   }
   else {
     warmupTask = pairingData.warmupTask;
@@ -165,7 +167,7 @@ async function scheduleDailyUser(workspaceId, userId, token, day) {
     warmupTask = `Your partner sent you a motivational quote to help you start your day right!\n${quote}`;
   }
   if (!cooldownTask) {
-    cooldownTask = `Retrospective question`;
+    cooldownTask = `Retrospective question for <@${  userId  }>`;
   }
   console.log(warmupTime);
   console.log(cooldownTime);
@@ -186,7 +188,7 @@ async function scheduleDailyUser(workspaceId, userId, token, day) {
       }
 
       schedule.scheduleMsg(hour, min, warmupTask, dmThreadID, token);
-      // Test
+      // TESTING PURPOSES
       // schedule.scheduleMsg(21, 27, warmupTask, dmThreadID, token);
     }
 
@@ -201,12 +203,19 @@ async function scheduleDailyUser(workspaceId, userId, token, day) {
       }
 
       schedule.scheduleMsg(hour, min, cooldownTask, dmThreadID, token);
-      //schedule.scheduleMsg(21, 23, cooldownTask, dmThreadID, token);
+
+      // TESTING PURPOSES
+       schedule.scheduleMsg(18, 43, cooldownTask, dmThreadID, token);
 		}
-		if (day !== 'Friday') {
+		if (day !== 'Friday' && !threads.includes(dmThreadID)) {
 			schedule.scheduleWarmupChoice(hour, min, dmThreadID, token);
-			schedule.scheduleCooldownChoice(hour, min, dmThreadID, token);
-		}
+      schedule.scheduleCooldownChoice(hour, min, dmThreadID, token);
+      // TESTING PURPOSES
+      //console.log("Schedule prompts");
+      //schedule.scheduleWarmupChoice(18, 43, dmThreadID, token);
+      //schedule.scheduleCooldownChoice(18, 43, dmThreadID, token);
+      threads.push(dmThreadID);
+    }
   }
 
   return null;
