@@ -35,6 +35,7 @@ const pairUp = require('./pairUp');
 const onBoard = require('./onBoard');
 const appHome = require('./appHome');
 const appHomeSchedule = require('./appHomeSchedule');
+const createNewChannel = require('./createNewChannel');
 exports.scheduledPairUp = pubsubScheduler.scheduledPairUp;
 exports.scheduleWarmup = pubsubScheduler.scheduleWarmup;
 
