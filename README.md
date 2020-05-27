@@ -7,6 +7,8 @@
 
 [![codecov](https://codecov.io/gh/cse112-sp20/CSE112-Alti/branch/master/graph/sunburst.svg?token=NT94ZROVG7)](https://codecov.io/gh/cse112-sp20/CSE112-Alti)
 
+![Codecov](https://img.shields.io/codecov/c/github/cse112-sp20/CSE112-Alti?label=master%20coverage&token=NT94ZROVG7)
+
 
 
 
