@@ -12,3 +12,6 @@ firebase.json
 functions/tokens.env
 functions/.env
 ui-debug.log
+functions/ui-debug.log
+.nyc_output/
+coverage/
