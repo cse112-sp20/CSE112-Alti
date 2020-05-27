@@ -33,6 +33,12 @@ jobs:
       run: npm test
       env:
         GOOGLE_APPLICATION_CREDENTIALS: ./serviceAccountKey.json
+    - name: Run Coverage
+      working-directory: ./functions
+      run: npm run coverage
+      env:
+        GOOGLE_APPLICATION_CREDENTIALS: ./serviceAccountKey.json
+        CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
     - uses: w9jds/firebase-action@master
       with:
         args: deploy --only functions
