@@ -301,9 +301,10 @@ describe('Setup Warmup Callbacks', () => {
     });
   });
 
-  beforeEach(async () => {
-    await firestoreFuncs.storeTypeOfExercise(workspaceId, userId2, true, "");
+  beforeEach((done) => {
+    firestoreFuncs.storeTypeOfExercise(workspaceId, userId2, true, "");
     ackCalled = false;
+    setTimeout(done, 1000);
   });
 
   after(async() => {
