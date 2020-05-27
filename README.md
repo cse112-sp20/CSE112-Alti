@@ -12,5 +12,7 @@
 
 [![codecov](https://codecov.io/gh/cse112-sp20/CSE112-Alti/branch/master/graph/sunburst.svg?token=NT94ZROVG7)](https://codecov.io/gh/cse112-sp20/CSE112-Alti)
 
+[![codecov](https://codecov.io/gh/cse112-sp20/CSE112-Alti/branch/master/graph/badge.svg?token=NT94ZROVG7)](https://codecov.io/gh/cse112-sp20/CSE112-Alti)
+
 ## Testing
 Run 'npm test'
