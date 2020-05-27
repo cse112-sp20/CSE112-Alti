@@ -2,8 +2,8 @@
   "name": "functions",
   "description": "Cloud Functions for Firebase",
   "scripts": {
-    "test": "nyc mocha",
-    "coverage": "nyc report --reporter=text-lcov | coveralls",
+    "test": "nyc --reporter=lcov mocha",
+    "coverage": "codecov",
     "lint": "eslint .",
     "serve": "firebase emulators:start --only functions",
     "shell": "firebase functions:shell",
@@ -30,6 +30,7 @@
   "devDependencies": {
     "body-parser": "^1.15.2",
     "chai": "^4.2.0",
+    "codecov": "^3.7.0",
     "coveralls": "^3.1.0",
     "eslint": "^5.12.0",
     "eslint-plugin-promise": "^4.0.1",
