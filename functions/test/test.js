@@ -342,7 +342,6 @@ describe('Setup Warmup Callbacks', () => {
     fakeBody.actions[0].value = 'sudoku';
     let selectPromise = new Promise((resolve, reject) => {
       setTimeout(() => {
-        console.log("1");
         return resolve(handlePuzzleSelect(fakeAck, fakeBody, fakeContext));
       }, 1000);
     });
