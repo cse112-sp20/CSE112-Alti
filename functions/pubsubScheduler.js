@@ -233,7 +233,7 @@ async function scheduleDailyUser(workspaceId, userId, token, day, threads) {
       min = cooldownTime.split(" ")[0].split(":")[1];
       mid = cooldownTime.split(" ")[1];
 
-      if (mid === "PM") {
+      if (mid === "PM" && hour !== "12") {
         hour = String(Number(hour) + 12);
       }
       else if (mid === "AM" && hour === "12") {
@@ -258,7 +258,7 @@ async function scheduleDailyUser(workspaceId, userId, token, day, threads) {
       min = cooldownTime.split(" ")[0].split(":")[1];
       mid = cooldownTime.split(" ")[1];
 
-      if (mid === "PM") {
+      if (mid === "PM" && hour !== "12") {
         hour = String(Number(hour) + 12);
       }
       else if (mid === "AM" && hour === "12") {
