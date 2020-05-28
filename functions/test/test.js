@@ -313,9 +313,18 @@ describe('Setup Warmup Callbacks', () => {
 
   it('handleTypingSelect', () => {  
     fakeBody.actions[0].value = 'java';
-    var exercisePrompt = handleTypingSelect(fakeAck, fakeBody, fakeContext).then( () => {
-      return firestoreFuncs.getExercisePrompt(workspaceId, userId2, true)
-    })
+    var selectPromise = new Promise((resolve, reject) => {
+      setTimeout(() => {
+        return resolve(handleTypingSelect(fakeAck, fakeBody, fakeContext));
+      }, 2000);
+    });
+    var exercisePrompt = selectPromise.then((res) => (firestoreFuncs.getExercisePrompt(workspaceId, userId2, true)));
+    // var exercisePrompt = selectPromise.then( () => {
+    //   return new Promise((resolve, reject) => {
+    //     console.log('c');
+    //     resolve(firestoreFuncs.getExercisePrompt(workspaceId, userId2, true));
+    //   });
+    // })
 
     return exercisePrompt.then( prompt => {
       var expectedString = "Your partner sent you this cool speed coding challenge in java to get your mind and fingers ready for the day!\nComplete it here: ";
@@ -323,20 +332,23 @@ describe('Setup Warmup Callbacks', () => {
       assert.equal(prompt.substring(0,expectedString.length), expectedString);
       return Promise.resolve();
     });
-  });
+  }).timeout(5000); //5 sec    ;
     
   it('handlePuzzleSelect', () => {
     fakeBody.actions[0].value = 'sudoku';
-    var exercisePrompt = handlePuzzleSelect(fakeAck, fakeBody, fakeContext).then( ret => {
-      return firestoreFuncs.getExercisePrompt(workspaceId, userId2, true)
-    })
+    var selectPromise = new Promise((resolve, reject) => {
+      setTimeout(() => {
+        return resolve(handlePuzzleSelect(fakeAck, fakeBody, fakeContext));
+      }, 2000);
+    });
+    var exercisePrompt = selectPromise.then((res) => (firestoreFuncs.getExercisePrompt(workspaceId, userId2, true)));
     return exercisePrompt.then( prompt => {
       var expectedString = "Your partner sent you this sudoku puzzle to help you get those brain juices flowing!\nComplete it here: ";
       assert.equal(ackCalled, true);
       assert.equal(prompt.substring(0,expectedString.length), expectedString);
       return Promise.resolve();
     });
-  });
+  }).timeout(5000);
 });
 
 describe('App Home tests', () => {
