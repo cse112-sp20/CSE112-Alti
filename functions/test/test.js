@@ -323,7 +323,7 @@ describe('Setup Warmup Callbacks', () => {
         return resolve(handleTypingSelect(fakeAck, fakeBody, fakeContext));
       }, 2500);
     });
-    let typingPrompt = selectPromise.then((res) => (firestoreFuncs.getExercisePrompt(workspaceId, userId2, true)));
+    let typingPrompt = selectPromise.then((res) => (firestoreFuncs.getExercisePrompt(workspaceId, userId2, true))).catch(err => console.error(err));
     // var exercisePrompt = selectPromise.then( () => {
     //   return new Promise((resolve, reject) => {
     //     console.log('c');
@@ -348,8 +348,8 @@ describe('Setup Warmup Callbacks', () => {
         return resolve(handlePuzzleSelect(fakeAck, fakeBody, fakeContext));
       }, 2500);
     });
-    let exercisePrompt = selectPromise.then((res) => (firestoreFuncs.getExercisePrompt(workspaceId, userId2, true)));
-    return exercisePrompt.then( prompt => {
+    let puzzlePrompt = selectPromise.then((res) => (firestoreFuncs.getExercisePrompt(workspaceId, userId2, true))).catch(err => console.error(err));
+    return puzzlePrompt.then( prompt => {
       let expectedString = "Your partner sent you this sudoku puzzle to help you get those brain juices flowing!\nComplete it here: ";
       assert.equal(ackCalled, true);
       assert.equal(prompt.substring(0,expectedString.length), expectedString);
