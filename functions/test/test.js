@@ -336,7 +336,7 @@ describe('Setup Warmup Callbacks', () => {
       assert.equal(prompt.substring(0,expectedString.length), expectedString);
       return Promise.resolve();
     });
-  }).timeout(7000); //5 sec    ;
+  }).timeout(7000);
     
   it('handlePuzzleSelect', () => {
     fakeBody.actions[0].value = 'sudoku';
