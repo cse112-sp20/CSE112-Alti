@@ -20,233 +20,233 @@ let token = config.slack.bot_token;
 
 // If it passes, means the function finished and message was scheduled, baseline test
 // Need more rigorous testing using promises of async function and validation from Slack API channel reading
-describe('Scheduler', () => {
+// describe('Scheduler', () => {
  
-  let schedule;
-  before(async () => {
-    schedule = require('../schedule');
-  });
+//   let schedule;
+//   before(async () => {
+//     schedule = require('../schedule');
+//   });
 
-  it('schedule for 2 min after', async function() {
-    this.timeout(5000); // 5 sec
-    let now = new Date();
-    now.setTime(now.getTime() + 120000); 
-    var response = await schedule.scheduleMsg(now.getHours(), now.getMinutes(), 
-                                                    "A reminder", "#testing", token);
+//   it('schedule for 2 min after', async function() {
+//     this.timeout(5000); // 5 sec
+//     let now = new Date();
+//     now.setTime(now.getTime() + 120000); 
+//     var response = await schedule.scheduleMsg(now.getHours(), now.getMinutes(), 
+//                                                     "A reminder", "#testing", token);
     
-    // console.log("RESPONSE: ", response);
-    app.client.chat.deleteScheduledMessage({
-      token: token,
-      channel: "testing",
-      scheduled_message_id: response.scheduled_message_id
-    });
+//     // console.log("RESPONSE: ", response);
+//     app.client.chat.deleteScheduledMessage({
+//       token: token,
+//       channel: "testing",
+//       scheduled_message_id: response.scheduled_message_id
+//     });
                                                     
-    //console.log(response);
-    assert.equal(response.ok, true);
-  });
+//     //console.log(response);
+//     assert.equal(response.ok, true);
+//   });
 
-  it('schedule for 1 min before', async () => {
-    let now = new Date();
-    now.setTime(now.getTime() - 60000); 
-    let response = await schedule.scheduleMsg(now.getHours(), now.getMinutes(), 
-                                                    "A reminder", "#testing");
-    //console.log(response);
-    assert.equal(response.ok, false);
-  });
+//   it('schedule for 1 min before', async () => {
+//     let now = new Date();
+//     now.setTime(now.getTime() - 60000); 
+//     let response = await schedule.scheduleMsg(now.getHours(), now.getMinutes(), 
+//                                                     "A reminder", "#testing");
+//     //console.log(response);
+//     assert.equal(response.ok, false);
+//   });
 
-});
+// });
 
-describe('Pairup', () => {
+// describe('Pairup', () => {
 
-  let pairUp;
+//   let pairUp;
   
-  before(() => {
-    pairUp = require('../pairUp');
-  });
+//   before(() => {
+//     pairUp = require('../pairUp');
+//   });
 
-  describe('Test the pairup function as a whole', () => {
-    let workspaceId = "T0137P851BJ";
-    let channelId = "C012B6BTVDL";
+//   describe('Test the pairup function as a whole', () => {
+//     let workspaceId = "T0137P851BJ";
+//     let channelId = "C012B6BTVDL";
 
-    before(async () => {
-      await testUtil.setupWorkspace(workspaceId);
-    });
+//     before(async () => {
+//       await testUtil.setupWorkspace(workspaceId);
+//     });
 
-    beforeEach(async function() {
-      this.timeout(5000) // 5 sec
-      await firestoreFuncs.storeNewPairingChannel(workspaceId, channelId);
-    });
+//     beforeEach(async function() {
+//       this.timeout(5000) // 5 sec
+//       await firestoreFuncs.storeNewPairingChannel(workspaceId, channelId);
+//     });
 
-    afterEach(async () => {
-      await testUtil.deleteWorkspace(workspaceId);
-    }); 
+//     afterEach(async () => {
+//       await testUtil.deleteWorkspace(workspaceId);
+//     }); 
 
-    it('Test Pairup with testing channel', async function() {
-      this.timeout(180000) // 3 min
+//     it('Test Pairup with testing channel', async function() {
+//       this.timeout(180000) // 3 min
 
-      await pairUp.pairUp(undefined, token);
-      var pairs = await firestoreFuncs.getPairedUsers(workspaceId);
-      //console.log(pairs);
-      /* eslint-disable no-await-in-loop */
-      for(var i = 0; i < pairs.length; i++)
-      {
-        var pair = pairs[i];
-        var m = await app.client.conversations.members({
-          token:token, 
-          channel: pair["dmThreadID"]
-        });
-        //console.log(m.members);
-        //console.log(pair);
+//       await pairUp.pairUp(undefined, token);
+//       var pairs = await firestoreFuncs.getPairedUsers(workspaceId);
+//       //console.log(pairs);
+//       /* eslint-disable no-await-in-loop */
+//       for(var i = 0; i < pairs.length; i++)
+//       {
+//         var pair = pairs[i];
+//         var m = await app.client.conversations.members({
+//           token:token, 
+//           channel: pair["dmThreadID"]
+//         });
+//         //console.log(m.members);
+//         //console.log(pair);
 
-        (((m.members).should).have).lengthOf(3);
-        expect(m.members).to.include.members(pair["users"]);
-      }
-      /* eslint-enable no-await-in-loop */
-    }); 
+//         (((m.members).should).have).lengthOf(3);
+//         expect(m.members).to.include.members(pair["users"]);
+//       }
+//       /* eslint-enable no-await-in-loop */
+//     }); 
 
-    it('Test Pairup random users', async function() {
-      this.timeout(180000);
+//     it('Test Pairup random users', async function() {
+//       this.timeout(180000);
 
-      await pairUp.pairUp(undefined, token);
-      var pairs = await firestoreFuncs.getPairedUsers(workspaceId);
-      //console.log(pairs);
-      /* eslint-disable no-await-in-loop */
+//       await pairUp.pairUp(undefined, token);
+//       var pairs = await firestoreFuncs.getPairedUsers(workspaceId);
+//       //console.log(pairs);
+//       /* eslint-disable no-await-in-loop */
 
-      var partner1 = [];
-      var partner2 = [];
-      var pairChannel = [];
+//       var partner1 = [];
+//       var partner2 = [];
+//       var pairChannel = [];
 
-      for(var i = 0; i < pairs.length; i++)
-      {
-        var pair = pairs[i];
-        var m = await app.client.conversations.members({
-          token:token, 
-          channel: pair["dmThreadID"]
-        });
+//       for(var i = 0; i < pairs.length; i++)
+//       {
+//         var pair = pairs[i];
+//         var m = await app.client.conversations.members({
+//           token:token, 
+//           channel: pair["dmThreadID"]
+//         });
 
-        //console.log(pair);
+//         //console.log(pair);
 
-        partner1.push(pair["users"][0]);
-        partner2.push(pair["users"][1]);
-      }
-      /* eslint-enable no-await-in-loop */
-      // console.log(partner1[0]);
-      // console.log(partner2[0]);
-      // console.log(pairChannel[0]);
+//         partner1.push(pair["users"][0]);
+//         partner2.push(pair["users"][1]);
+//       }
+//       /* eslint-enable no-await-in-loop */
+//       // console.log(partner1[0]);
+//       // console.log(partner2[0]);
+//       // console.log(pairChannel[0]);
 
-      // Waiting on latest pull to firestore
-      // var otherPartner = await firestoreFuncs.getPartner(workspaceId, partner1[0]);
-      // console.log(otherPartner);
-      // assert.equal(otherPartner, partner2[0]);
+//       // Waiting on latest pull to firestore
+//       // var otherPartner = await firestoreFuncs.getPartner(workspaceId, partner1[0]);
+//       // console.log(otherPartner);
+//       // assert.equal(otherPartner, partner2[0]);
 
-      // otherPartner = await firestoreFuncs.getPartner(workspaceId, pairChannel[0], partner2[0]);
-      // assert.equal(otherPartner, partner1[0]);
+//       // otherPartner = await firestoreFuncs.getPartner(workspaceId, pairChannel[0], partner2[0]);
+//       // assert.equal(otherPartner, partner1[0]);
 
-      // var invalidPart = await firestoreFuncs.getPartner(workspaceId, pairChannel[1], "XXXXXXXXXX");
-      // assert.equal(invalidPart, undefined);
-    });  
-  });
+//       // var invalidPart = await firestoreFuncs.getPartner(workspaceId, pairChannel[1], "XXXXXXXXXX");
+//       // assert.equal(invalidPart, undefined);
+//     });  
+//   });
 
-});
+// });
 
-describe('util', () => {
-  describe('Test getChannelIdByName', () => {
-    // helps to find the channel ids
-    let util;
-    before(async () => {
-      util = require('../util');
-    });
+// describe('util', () => {
+//   describe('Test getChannelIdByName', () => {
+//     // helps to find the channel ids
+//     let util;
+//     before(async () => {
+//       util = require('../util');
+//     });
     
-    it('Test with channel general', async function() {
-      this.timeout(5000); // 5 sec
-      var channelId = await util.getChannelIdByName(app, token, "general");
-      assert.equal(channelId, "C012WGXPYC9"); //hardcoded it with console.log
-    });
+//     it('Test with channel general', async function() {
+//       this.timeout(5000); // 5 sec
+//       var channelId = await util.getChannelIdByName(app, token, "general");
+//       assert.equal(channelId, "C012WGXPYC9"); //hardcoded it with console.log
+//     });
 
-    it('Test with channel alti-paring', async function() {
-      this.timeout(5000); // 5 sec
-      var channelId = await util.getChannelIdByName(app, token, "alti-pairing");
-      assert.equal(channelId, "C01391DPZV4"); //hardcoded it with console.log
-    });
+//     it('Test with channel alti-paring', async function() {
+//       this.timeout(5000); // 5 sec
+//       var channelId = await util.getChannelIdByName(app, token, "alti-pairing");
+//       assert.equal(channelId, "C01391DPZV4"); //hardcoded it with console.log
+//     });
 
-    it('Test with channel that doesnt exist', async function () {
-      this.timeout(5000); // 5 sec
-      var channelId = await util.getChannelIdByName(app, token, "should not exist");
-      assert.equal(channelId, undefined); 
-    });
-  });
+//     it('Test with channel that doesnt exist', async function () {
+//       this.timeout(5000); // 5 sec
+//       var channelId = await util.getChannelIdByName(app, token, "should not exist");
+//       assert.equal(channelId, undefined); 
+//     });
+//   });
   
-})
+// })
 
 
-describe('generateCodingChallenge', () => {
-  var url;
-  it('Testing english', () => {
-    //generateCodingChallenge();
-    url = generateTaskData.generateCodingChallenge('english');
-    assert.equal(url,'https://www.typing.com/student/typing-test/1-minute');
+// describe('generateCodingChallenge', () => {
+//   var url;
+//   it('Testing english', () => {
+//     //generateCodingChallenge();
+//     url = generateTaskData.generateCodingChallenge('english');
+//     assert.equal(url,'https://www.typing.com/student/typing-test/1-minute');
 
-    url = generateTaskData.generateCodingChallenge('english',3);
-    assert.equal(url,'https://www.typing.com/student/typing-test/3-minute');
+//     url = generateTaskData.generateCodingChallenge('english',3);
+//     assert.equal(url,'https://www.typing.com/student/typing-test/3-minute');
 
-    url = generateTaskData.generateCodingChallenge('english',10);
-    assert.equal(url,'https://www.typing.com/student/typing-test/5-minute');
-  });
+//     url = generateTaskData.generateCodingChallenge('english',10);
+//     assert.equal(url,'https://www.typing.com/student/typing-test/5-minute');
+//   });
 
-  it('Testing python', () => {
-    url = generateTaskData.generateCodingChallenge('python',5);
-    assert.equal(url.substring(0, 37),'http://www.speedcoder.net/lessons/py/');
-  });
+//   it('Testing python', () => {
+//     url = generateTaskData.generateCodingChallenge('python',5);
+//     assert.equal(url.substring(0, 37),'http://www.speedcoder.net/lessons/py/');
+//   });
 
-  it('Testing javascript', () => {
-    url = generateTaskData.generateCodingChallenge('javascript',1);
-    assert.equal(url.substring(0, 37),'http://www.speedcoder.net/lessons/js/');
-  });
+//   it('Testing javascript', () => {
+//     url = generateTaskData.generateCodingChallenge('javascript',1);
+//     assert.equal(url.substring(0, 37),'http://www.speedcoder.net/lessons/js/');
+//   });
 
-  it('Testing java', () => {
-    url = generateTaskData.generateCodingChallenge('java',2);
-    assert.equal(url.substring(0, 38),'http://www.speedcoder.net/lessons/java');
-  });
+//   it('Testing java', () => {
+//     url = generateTaskData.generateCodingChallenge('java',2);
+//     assert.equal(url.substring(0, 38),'http://www.speedcoder.net/lessons/java');
+//   });
 
-  it('Testing c', () => {
-    url = generateTaskData.generateCodingChallenge('c',3);
-    assert.equal(url.substring(0, 35),'http://www.speedcoder.net/lessons/c');
-  });
+//   it('Testing c', () => {
+//     url = generateTaskData.generateCodingChallenge('c',3);
+//     assert.equal(url.substring(0, 35),'http://www.speedcoder.net/lessons/c');
+//   });
 
-  it('Testing c++', () => {
-    url = generateTaskData.generateCodingChallenge('c++',5);
-    assert.equal(url.substring(0, 37),'http://www.speedcoder.net/lessons/cpp');
-  });
-});
-//tests random generation features
-describe('Testing Random Generation', () => {
-  var numTests = 20;
-  it('Testing Quote Generation', () => {
-    //generate multiple quotes
-		for (let testIterator = 0; testIterator < numTests; testIterator++) {
-			let testQuote = generateTaskData.generateQuote();
-			let quoteArray = testQuote.split("-");
-			let testArray = quoteArray[1].split(" ");
-			let testString = testArray[0];
-			let targetQuote = motivationalQuotes[quoteArray[0]].text;
-			let targetArray = targetQuote.split(/[ -]+/);
-			let targetString = targetArray[0];
-			assert.equal(testString,targetString);
-		}
-  });
-  it('Testing Retro Generation', () => {
-	  	for (let testIterator = 0; testIterator < numTests; testIterator++) {
-			let testRetro = generateTaskData.generateRetro();
-			let retroArray = testRetro.split("-");
-			let testArray = retroArray[1].split(" ");
-			let testString = testArray[0];
-			let targetRetro = retroQuestions[retroArray[0]].retro;
-			let targetArray = targetRetro.split(/[ -]+/);
-			let targetString = targetArray[0];
-			assert.equal(testString,targetString);
-		}
-  });
-});
+//   it('Testing c++', () => {
+//     url = generateTaskData.generateCodingChallenge('c++',5);
+//     assert.equal(url.substring(0, 37),'http://www.speedcoder.net/lessons/cpp');
+//   });
+// });
+// //tests random generation features
+// describe('Testing Random Generation', () => {
+//   var numTests = 20;
+//   it('Testing Quote Generation', () => {
+//     //generate multiple quotes
+// 		for (let testIterator = 0; testIterator < numTests; testIterator++) {
+// 			let testQuote = generateTaskData.generateQuote();
+// 			let quoteArray = testQuote.split("-");
+// 			let testArray = quoteArray[1].split(" ");
+// 			let testString = testArray[0];
+// 			let targetQuote = motivationalQuotes[quoteArray[0]].text;
+// 			let targetArray = targetQuote.split(/[ -]+/);
+// 			let targetString = targetArray[0];
+// 			assert.equal(testString,targetString);
+// 		}
+//   });
+//   it('Testing Retro Generation', () => {
+// 	  	for (let testIterator = 0; testIterator < numTests; testIterator++) {
+// 			let testRetro = generateTaskData.generateRetro();
+// 			let retroArray = testRetro.split("-");
+// 			let testArray = retroArray[1].split(" ");
+// 			let testString = testArray[0];
+// 			let targetRetro = retroQuestions[retroArray[0]].retro;
+// 			let targetArray = targetRetro.split(/[ -]+/);
+// 			let targetString = targetArray[0];
+// 			assert.equal(testString,targetString);
+// 		}
+//   });
+// });
 // This functions assumes that the HandleQuoteSelect function
 // only sets warmups. Needs to be changed when cooldowns are added
 // Does not test the generated url. Only checks the prompt stored in the firestore 
@@ -304,10 +304,14 @@ describe('Setup Warmup Callbacks', () => {
   beforeEach((done) => {
     firestoreFuncs.storeTypeOfExercise(workspaceId, userId2, true, "");
     ackCalled = false;
-    setTimeout(done, 1000);
+    setTimeout(()=>{
+      console.log("0");
+      done();
+    }, 1500);
   });
 
   after(async() => {
+    console.log("3");
     await testUtil.deleteWorkspace(workspaceId);
   })
 
@@ -315,8 +319,9 @@ describe('Setup Warmup Callbacks', () => {
     fakeBody.actions[0].value = 'java';
     var selectPromise = new Promise((resolve, reject) => {
       setTimeout(() => {
+        console.log("1");
         return resolve(handleTypingSelect(fakeAck, fakeBody, fakeContext));
-      }, 2000);
+      }, 2500);
     });
     var exercisePrompt = selectPromise.then((res) => (firestoreFuncs.getExercisePrompt(workspaceId, userId2, true)));
     // var exercisePrompt = selectPromise.then( () => {
@@ -332,14 +337,15 @@ describe('Setup Warmup Callbacks', () => {
       assert.equal(prompt.substring(0,expectedString.length), expectedString);
       return Promise.resolve();
     });
-  }).timeout(5000); //5 sec    ;
+  }).timeout(7000); //5 sec    ;
     
   it('handlePuzzleSelect', () => {
     fakeBody.actions[0].value = 'sudoku';
     var selectPromise = new Promise((resolve, reject) => {
       setTimeout(() => {
+        console.log("2");
         return resolve(handlePuzzleSelect(fakeAck, fakeBody, fakeContext));
-      }, 2000);
+      }, 2500);
     });
     var exercisePrompt = selectPromise.then((res) => (firestoreFuncs.getExercisePrompt(workspaceId, userId2, true)));
     return exercisePrompt.then( prompt => {
@@ -348,70 +354,70 @@ describe('Setup Warmup Callbacks', () => {
       assert.equal(prompt.substring(0,expectedString.length), expectedString);
       return Promise.resolve();
     });
-  }).timeout(5000);
+  }).timeout(7000);
 });
 
-describe('App Home tests', () => {
-  let appHome;
-  let onBoard;
-  let workspaceId;
-  let userId;
-  before(async () => {
-    appHome = require('../appHome'); 
-    onBoard = require('../onBoard');
-    workspaceId = "TestWorkspace";
-    userId = "user1";
-    await firestoreFuncs.setTimeZone(workspaceId, 'LA');
-    await firestoreFuncs.setOwner(workspaceId, userId);
-    await firestoreFuncs.storeNewPairingChannel(workspaceId, "Channel1");
+// describe('App Home tests', () => {
+//   let appHome;
+//   let onBoard;
+//   let workspaceId;
+//   let userId;
+//   before(async () => {
+//     appHome = require('../appHome'); 
+//     onBoard = require('../onBoard');
+//     workspaceId = "TestWorkspace";
+//     userId = "user1";
+//     await firestoreFuncs.setTimeZone(workspaceId, 'LA');
+//     await firestoreFuncs.setOwner(workspaceId, userId);
+//     await firestoreFuncs.storeNewPairingChannel(workspaceId, "Channel1");
 
-    // example of schedule
-    let schedule = {'FridayEnd': '10',
-                  'ThursdayEnd': '8',
-                  'WednesdayEnd': '6',
-                  'TuesdayEnd': '4',
-                  'MondayEnd': '2',
-                  'FridayStart': '9',
-                  'ThursdayStart': '7',
-                  'WednesdayStart': '5',
-                  'TuesdayStart': '3', 
-                  'MondayStart': '1'};
-    await testUtil.customPopulateUsers(workspaceId, [{user: userId, schedule: schedule}]);
-  });
+//     // example of schedule
+//     let schedule = {'FridayEnd': '10',
+//                   'ThursdayEnd': '8',
+//                   'WednesdayEnd': '6',
+//                   'TuesdayEnd': '4',
+//                   'MondayEnd': '2',
+//                   'FridayStart': '9',
+//                   'ThursdayStart': '7',
+//                   'WednesdayStart': '5',
+//                   'TuesdayStart': '3', 
+//                   'MondayStart': '1'};
+//     await testUtil.customPopulateUsers(workspaceId, [{user: userId, schedule: schedule}]);
+//   });
 
-  after(async() => {
-    await testUtil.deleteWorkspace(workspaceId);
-  })
+//   after(async() => {
+//     await testUtil.deleteWorkspace(workspaceId);
+//   })
 
-  it('Get time zone', async () => {
-    var timeZone = await firestoreFuncs.getTimeZone(workspaceId).then((obj)=>{
-      return obj;
-    }).catch((error) => {
-          console.log(error);
-    });
-    assert.equal(timeZone, "LA");
-  });
+//   it('Get time zone', async () => {
+//     var timeZone = await firestoreFuncs.getTimeZone(workspaceId).then((obj)=>{
+//       return obj;
+//     }).catch((error) => {
+//           console.log(error);
+//     });
+//     assert.equal(timeZone, "LA");
+//   });
 
 
-  it('Check Owner', async () => {
-    var t = await appHome.checkOwner(workspaceId, userId);
-    assert.equal(t, true);
-  });
+//   it('Check Owner', async () => {
+//     var t = await appHome.checkOwner(workspaceId, userId);
+//     assert.equal(t, true);
+//   });
 
-  it('Get Pairing Channel', async () => {
-    var channelId = await firestoreFuncs.getPairingChannel(workspaceId).then((obj)=>{
-      return obj;
-    }).catch((error) => {
-          console.log(error);
-      });
-    assert.equal(channelId, "Channel1");
+//   it('Get Pairing Channel', async () => {
+//     var channelId = await firestoreFuncs.getPairingChannel(workspaceId).then((obj)=>{
+//       return obj;
+//     }).catch((error) => {
+//           console.log(error);
+//       });
+//     assert.equal(channelId, "Channel1");
 
-  });
+//   });
 
-  it('Test getAllTimes function', async () => {
-    var res = await appHome.getAllTimes(workspaceId, userId);  
-    for (var i = 0; i < 10; i++) {
-      assert.equal(res[i], i+1);
-    }
-  });
-});
+//   it('Test getAllTimes function', async () => {
+//     var res = await appHome.getAllTimes(workspaceId, userId);  
+//     for (var i = 0; i < 10; i++) {
+//       assert.equal(res[i], i+1);
+//     }
+//   });
+// });
