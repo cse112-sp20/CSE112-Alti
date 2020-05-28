@@ -316,13 +316,13 @@ describe('Setup Warmup Callbacks', () => {
 
   it('handleTypingSelect', () => {  
     fakeBody.actions[0].value = 'java';
-    var selectPromise = new Promise((resolve, reject) => {
+    let selectPromise = new Promise((resolve, reject) => {
       setTimeout(() => {
         console.log("1");
         return resolve(handleTypingSelect(fakeAck, fakeBody, fakeContext));
       }, 2500);
     });
-    var exercisePrompt = selectPromise.then((res) => (firestoreFuncs.getExercisePrompt(workspaceId, userId2, true)));
+    let exercisePrompt = selectPromise.then((res) => (firestoreFuncs.getExercisePrompt(workspaceId, userId2, true)));
     // var exercisePrompt = selectPromise.then( () => {
     //   return new Promise((resolve, reject) => {
     //     console.log('c');
@@ -331,7 +331,7 @@ describe('Setup Warmup Callbacks', () => {
     // })
 
     return exercisePrompt.then( prompt => {
-      var expectedString = "Your partner sent you this cool speed coding challenge in java to get your mind and fingers ready for the day!\nComplete it here: ";
+      let expectedString = "Your partner sent you this cool speed coding challenge in java to get your mind and fingers ready for the day!\nComplete it here: ";
       console.log("3");
       assert.equal(ackCalled, true);
       assert.equal(prompt.substring(0,expectedString.length), expectedString);
@@ -341,15 +341,15 @@ describe('Setup Warmup Callbacks', () => {
     
   it('handlePuzzleSelect', () => {
     fakeBody.actions[0].value = 'sudoku';
-    var selectPromise = new Promise((resolve, reject) => {
+    let selectPromise = new Promise((resolve, reject) => {
       setTimeout(() => {
         console.log("2");
         return resolve(handlePuzzleSelect(fakeAck, fakeBody, fakeContext));
       }, 2500);
     });
-    var exercisePrompt = selectPromise.then((res) => (firestoreFuncs.getExercisePrompt(workspaceId, userId2, true)));
+    let exercisePrompt = selectPromise.then((res) => (firestoreFuncs.getExercisePrompt(workspaceId, userId2, true)));
     return exercisePrompt.then( prompt => {
-      var expectedString = "Your partner sent you this sudoku puzzle to help you get those brain juices flowing!\nComplete it here: ";
+      let expectedString = "Your partner sent you this sudoku puzzle to help you get those brain juices flowing!\nComplete it here: ";
       console.log("3");
       assert.equal(ackCalled, true);
       assert.equal(prompt.substring(0,expectedString.length), expectedString);
