@@ -302,6 +302,7 @@ describe('Setup Warmup Callbacks', () => {
   });
 
   beforeEach((done) => {
+    console.log("-1");
     firestoreFuncs.storeTypeOfExercise(workspaceId, userId2, true, "");
     ackCalled = false;
     setTimeout(()=>{
@@ -332,9 +333,9 @@ describe('Setup Warmup Callbacks', () => {
 
     return exercisePrompt.then( prompt => {
       let expectedString = "Your partner sent you this cool speed coding challenge in java to get your mind and fingers ready for the day!\nComplete it here: ";
-      console.log("2");
       assert.equal(ackCalled, true);
       assert.equal(prompt.substring(0,expectedString.length), expectedString);
+      console.log("2");
       return Promise.resolve();
     });
   }).timeout(7000); //5 sec    ;
@@ -350,9 +351,9 @@ describe('Setup Warmup Callbacks', () => {
     let exercisePrompt = selectPromise.then((res) => (firestoreFuncs.getExercisePrompt(workspaceId, userId2, true)));
     return exercisePrompt.then( prompt => {
       let expectedString = "Your partner sent you this sudoku puzzle to help you get those brain juices flowing!\nComplete it here: ";
-      console.log("2");
       assert.equal(ackCalled, true);
       assert.equal(prompt.substring(0,expectedString.length), expectedString);
+      console.log("2");
       return Promise.resolve();
     });
   }).timeout(7000);
