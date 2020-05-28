@@ -5,6 +5,7 @@ const functions = require('firebase-functions');
 const firestoreFuncs = require('./firestore');
 const warmupMessage = require('./warmupMessage');
 const generateTaskData = require('./generateTaskData');
+const retroQuestions = retros.getRetrosObj();
 const app = index.getBolt();
 
 var days = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
@@ -176,8 +177,10 @@ async function scheduleDailyUser(workspaceId, userId, token, day, threads) {
     //TODO generate hardcoded tasks for monday quote and retrospective
     quote = generateTaskData.generateQuote();
     quote = quote.split("-")[1] + "-" + quote.split("-")[2];
+    var index = Math.floor(Math.random() * retroQuestions.length);
     warmupTask = `Your partner sent you a motivational quote to help you start your day right!\n${quote}`;
-    cooldownTask = `Retrospective question for <@${  userId  }>`;
+    cooldownTask = "Your partner sent you this retro: '" + retroQuestions[index].retro +
+    "' to complete";
   }
   else {
     warmupTask = pairingData.warmupTask;
