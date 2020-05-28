@@ -323,7 +323,7 @@ describe('Setup Warmup Callbacks', () => {
         return resolve(handleTypingSelect(fakeAck, fakeBody, fakeContext));
       }, 2500);
     });
-    let exercisePrompt = selectPromise.then((res) => (firestoreFuncs.getExercisePrompt(workspaceId, userId2, true)));
+    let typingPrompt = selectPromise.then((res) => (firestoreFuncs.getExercisePrompt(workspaceId, userId2, true)));
     // var exercisePrompt = selectPromise.then( () => {
     //   return new Promise((resolve, reject) => {
     //     console.log('c');
@@ -331,7 +331,7 @@ describe('Setup Warmup Callbacks', () => {
     //   });
     // })
 
-    return exercisePrompt.then( prompt => {
+    return typingPrompt.then( prompt => {
       let expectedString = "Your partner sent you this cool speed coding challenge in java to get your mind and fingers ready for the day!\nComplete it here: ";
       assert.equal(ackCalled, true);
       assert.equal(prompt.substring(0,expectedString.length), expectedString);
