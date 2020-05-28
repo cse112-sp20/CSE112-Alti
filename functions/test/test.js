@@ -303,9 +303,9 @@ describe('Setup Warmup Callbacks', () => {
 
   beforeEach((done) => {
     console.log("-1");
-    firestoreFuncs.storeTypeOfExercise(workspaceId, userId1, true, "");
     ackCalled = false;
     setTimeout(()=>{
+      firestoreFuncs.storeTypeOfExercise(workspaceId, userId1, true, "");
       console.log("0");
       done();
     }, 1000);
