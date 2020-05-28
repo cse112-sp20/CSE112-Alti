@@ -5,6 +5,7 @@ const functions = require('firebase-functions');
 const firestoreFuncs = require('./firestore');
 const warmupMessage = require('./warmupMessage');
 const generateTaskData = require('./generateTaskData');
+const retros = require('./retros');
 const retroQuestions = retros.getRetrosObj();
 const app = index.getBolt();
 
