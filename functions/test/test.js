@@ -332,7 +332,7 @@ describe('Setup Warmup Callbacks', () => {
 
     return exercisePrompt.then( prompt => {
       let expectedString = "Your partner sent you this cool speed coding challenge in java to get your mind and fingers ready for the day!\nComplete it here: ";
-      console.log("3");
+      console.log("2");
       assert.equal(ackCalled, true);
       assert.equal(prompt.substring(0,expectedString.length), expectedString);
       return Promise.resolve();
@@ -343,14 +343,14 @@ describe('Setup Warmup Callbacks', () => {
     fakeBody.actions[0].value = 'sudoku';
     let selectPromise = new Promise((resolve, reject) => {
       setTimeout(() => {
-        console.log("2");
+        console.log("1");
         return resolve(handlePuzzleSelect(fakeAck, fakeBody, fakeContext));
       }, 2500);
     });
     let exercisePrompt = selectPromise.then((res) => (firestoreFuncs.getExercisePrompt(workspaceId, userId2, true)));
     return exercisePrompt.then( prompt => {
       let expectedString = "Your partner sent you this sudoku puzzle to help you get those brain juices flowing!\nComplete it here: ";
-      console.log("3");
+      console.log("2");
       assert.equal(ackCalled, true);
       assert.equal(prompt.substring(0,expectedString.length), expectedString);
       return Promise.resolve();
