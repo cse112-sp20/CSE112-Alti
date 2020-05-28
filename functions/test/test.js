@@ -311,7 +311,6 @@ describe('Setup Warmup Callbacks', () => {
   });
 
   after(async() => {
-    console.log("3");
     await testUtil.deleteWorkspace(workspaceId);
   })
 
@@ -333,6 +332,7 @@ describe('Setup Warmup Callbacks', () => {
 
     return exercisePrompt.then( prompt => {
       var expectedString = "Your partner sent you this cool speed coding challenge in java to get your mind and fingers ready for the day!\nComplete it here: ";
+      console.log("3");
       assert.equal(ackCalled, true);
       assert.equal(prompt.substring(0,expectedString.length), expectedString);
       return Promise.resolve();
@@ -350,6 +350,7 @@ describe('Setup Warmup Callbacks', () => {
     var exercisePrompt = selectPromise.then((res) => (firestoreFuncs.getExercisePrompt(workspaceId, userId2, true)));
     return exercisePrompt.then( prompt => {
       var expectedString = "Your partner sent you this sudoku puzzle to help you get those brain juices flowing!\nComplete it here: ";
+      console.log("3");
       assert.equal(ackCalled, true);
       assert.equal(prompt.substring(0,expectedString.length), expectedString);
       return Promise.resolve();
