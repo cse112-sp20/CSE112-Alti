@@ -263,6 +263,8 @@ async function scheduleDailyUser(workspaceId, userId, token, day, threads) {
     }
 
 		if (day !== 'Friday' && !threads.includes(dmThreadID)) {
+      threads.push(dmThreadID);
+
       split = cooldownTime.split(" ");
       hour = cooldownTime.split(" ")[0].split(":")[0];
       min = cooldownTime.split(" ")[0].split(":")[1];
@@ -274,8 +276,6 @@ async function scheduleDailyUser(workspaceId, userId, token, day, threads) {
       else if (mid === "AM" && hour === "12") {
         hour = "0";
       }
-
-      threads.push(dmThreadID);
       
       console.log("Schedule prompts for "+ hour + ":" + min);
 			await schedule.scheduleWarmupChoice(hour, min, dmThreadID, token).catch((error) => {
