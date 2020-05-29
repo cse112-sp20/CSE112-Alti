@@ -188,6 +188,28 @@ async function findUsersChannel(app, token, channelId) {
 
 }
 
+app.event('member_joined_channel', async ({ body, context }) => {
+    console.log("Member joined channel");
+    console.log(body);
+    var activeChannel = await firestoreFuncs.getPairingChannel(body.team_id);
+    if (activeChannel === body.event.channel) {
+        console.log("Member joined pairing channel");
+        // TODO 
+        // 1. DM user with information about being in pairing channel
+        // 2. Store user's info in db
+        //firestoreFuncs.setWarmupTime(team_id, userId, "9:00 AM", day);
+        //firestoreFuncs.setCooldownTime(team_id, userId, "5:00 PM", day);
+    }
+});
+
+app.event('member_left_channel', async ({ body, context }) => {
+    console.log("Member left channel");
+    console.log(body);
+    if (activeChannel === body.event.channel) {
+        console.log("Member left pairing channel");
+    }
+});
+
 
 exports.onBoard = createOnBoardingChannel;
 exports.onBoardExisting = boardExistingChannel;

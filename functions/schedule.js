@@ -27,17 +27,23 @@ const app = index.getBolt();
   */
  exports.scheduleMsg = async function scheduleMsg(hour, minute, text, id, token) {
 	// set up the time
-	reminder = new Date();
-	reminder.setHours(hour);
-	reminder.setMinutes(minute);
-	reminder.setSeconds(0);
+	var reminder = new Date();
+	var localTime = reminder.getTime();
+	var localOffset = reminder.getTimezoneOffset()*60000;
+	var utc = localTime + localOffset;
+	var offset = -7;
+	var cali = (utc + (3600000 * offset));
+	var newDate = new Date(cali);
+	newDate.setHours(hour);
+	newDate.setMinutes(minute);
+	newDate.setSeconds(0);
 	console.log("Schedule msg runs");
 	//call api
 	return app.client.chat.scheduleMessage({
 										token: token,
 										channel: id,
 										text:  text,
-										post_at: reminder.getTime()/1000 // conversion from milli sec to sec
+										post_at: newDate.getTime()/1000 // conversion from milli sec to sec
 								}).catch((error) => {
 									return error.data;
 							});
@@ -46,18 +52,24 @@ const app = index.getBolt();
 
 	exports.scheduleCooldownChoice = async function(hour, minute, targChannelID,token){
 				// set up the time
-		reminder = new Date();
-		reminder.setHours(hour);
-		reminder.setMinutes(minute);
-		reminder.setSeconds(0);
-		const notificationString = "Send a cool-down to your buddy!"
+		var reminder = new Date();
+		var localTime = reminder.getTime();
+		var localOffset = reminder.getTimezoneOffset()*60000;
+		var utc = localTime + localOffset;
+		var offset = -7;
+		var cali = (utc + (3600000 * offset));
+		var newDate = new Date(cali);
+		newDate.setHours(hour);
+		newDate.setMinutes(minute);
+		newDate.setSeconds(0);
+		const notificationString = "Send a cool-down to your buddy!";
 		
 			var res = await app.client.chat.scheduleMessage({
 				token: token,
 				channel: targChannelID,
 				text:  notificationString,
 				blocks: cooldownSelect,
-				post_at: reminder.getTime()/1000
+				post_at: newDate.getTime()/1000
 			}).catch((error) => {
 				console.log(error);
 			});
@@ -65,11 +77,17 @@ const app = index.getBolt();
 	};
 
 	exports.scheduleWarmupChoice = async function(hour, minute,targChannelID,token){
-		reminder = new Date();
-		reminder.setHours(hour);
-		reminder.setMinutes(minute);
-		reminder.setSeconds(0);
-		const notificationString = "Send a warmup to your buddy!"
+		var reminder = new Date();
+		var localTime = reminder.getTime();
+		var localOffset = reminder.getTimezoneOffset()*60000;
+		var utc = localTime + localOffset;
+		var offset = -7;
+		var cali = (utc + (3600000 * offset));
+		var newDate = new Date(cali);
+		newDate.setHours(hour);
+		newDate.setMinutes(minute);
+		newDate.setSeconds(0);
+		const notificationString = "Send a warmup to your buddy!";
 		
 		//try function logic
 		var res = await app.client.chat.scheduleMessage({
@@ -77,7 +95,7 @@ const app = index.getBolt();
 			channel: targChannelID,
 			text:  notificationString,
 			blocks: warmupSelect,
-			post_at: reminder.getTime()/1000 
+			post_at: newDate.getTime()/1000 
 		}).catch((error) => {
 			console.log(error);
 		});
@@ -86,11 +104,17 @@ const app = index.getBolt();
 
 
 	exports.scheduleEndOfDay = async function(hour, minute, text, targChannelID,token){
-			// set up the time
-		reminder = new Date();
-		reminder.setHours(hour);
-		reminder.setMinutes(minute);
-		reminder.setSeconds(0);
+		// set up the time
+		var reminder = new Date();
+		var localTime = reminder.getTime();
+		var localOffset = reminder.getTimezoneOffset()*60000;
+		var utc = localTime + localOffset;
+		var offset = -7;
+		var cali = (utc + (3600000 * offset));
+		var newDate = new Date(cali);
+		newDate.setHours(hour);
+		newDate.setMinutes(minute);
+		newDate.setSeconds(0);
 		console.log("Schedule msg runs");
 		//call api
 		return app.client.chat.scheduleMessage({
@@ -98,7 +122,7 @@ const app = index.getBolt();
 											channel: id,
 											text:  text,
 											blocks: warmupSelect + cooldownSelect,
-											post_at: reminder.getTime()/1000 // conversion from milli sec to sec
+											post_at: newDate.getTime()/1000 // conversion from milli sec to sec
 									}).catch((error) => {
 										return error.data;
 								});
