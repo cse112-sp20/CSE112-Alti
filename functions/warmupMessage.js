@@ -12,123 +12,18 @@ const app = index.getBolt();
 const firestoreFuncs = require('./firestore');
 const motivationalQuotes = quotes.getQuotesObj();
 const generateData = require('./generateTaskData');
-exports.sendSelectChoice = async function(targChannelID,app,token){
-	const notificationString = "Send a warmup to your buddy!"
+sendSelectWarmupChoice = async function(ack,body,context){
 	//warmup selection message json
-	const warmupSelect = [
-			{
-				"type": "section",
-				"text": {
-					"type": "plain_text",
-					"emoji": true,
-					"text": "Hey there, pick a warmup for your buddy!"
-				}
-			},
-			{
-				"type": "divider"
-			},
-			{
-				"type": "section",
-				"text": {
-					"type": "mrkdwn",
-					"text": "*Pick a content type:*"
-				}
-			},
-			{
-				"type": "section",
-				"text": {
-					"type": "mrkdwn",
-					"text": "*Speed Typing Test*"
-				},
-				"accessory": {
-					"action_id": "warmup_coding_select",
-					"type": "button",
-					"text": {
-						"type": "plain_text",
-						"emoji": true,
-						"text": "Choose"
-					},
-					"value": "select_test"
-				}
-			},
-			{
-				"type": "section",
-				"text": {
-					"type": "mrkdwn",
-					"text": "*Tech Article*"
-				},
-				"accessory": {
-					"action_id": "warmup_article_select",
-					"type": "button",
-					"text": {
-						"type": "plain_text",
-						"emoji": true,
-						"text": "Choose"
-					},
-					"value": "select_article"
-				}
-			},
-			{
-				"type": "section",
-				"text": {
-					"type": "mrkdwn",
-					"text": "*Easy Online Puzzle*"
-				},
-				"accessory": {
-					"action_id": "warmup_puzzle_select",
-					"type": "button",
-					"text": {
-						"type": "plain_text",
-						"emoji": true,
-						"text": "Choose"
-					},
-					"value": "select_puzzle"
-				}
-			},
-			{
-				"type": "section",
-				"text": {
-					"type": "mrkdwn",
-					"text": "*Motivational Quote*"
-				},
-				"accessory": {
-					"action_id": "warmup_quote_select", 
-					"type": "button",
-					"text": {
-						"type": "plain_text",
-						"emoji": true,
-						"text": "Choose"
-					},
-					"value": "select_quote"
-				}
-			},
-			 {
-				"type": "section",
-				"text": {
-					"type": "mrkdwn",
-					"text": "*Custom Message*"
-				},
-				"accessory": {
-					"action_id": "request_custom_send", 
-					"type": "button",
-					"text": {
-						"type": "plain_text",
-						"emoji": true,
-						"text": "Choose"
-					},
-					"value": "select_custom"
-				}
-			}
-		];
+	let warmupView = createSelectionView(true);
+
 	//try function logic
 	try {
 		//make a call to the web api to post message in targ channel
-		const result = await app.client.chat.postMessage({
+		const result = await app.client.views.open({
 		  // The token you used to initialize your app is stored in the `context` object
-		  token: token,
-		  channel: targChannelID,
-		  text: notificationString,
-		  blocks: warmupSelect
+			token: context.botToken,
+			trigger_id: body.trigger_id,
+			view: JSON.stringify(warmupView)
 		});
 	}
 	//catch any errors
@@ -141,9 +36,10 @@ exports.requestCustomSend = async function(ack,body,context) {
 	await ack();
 	//console.log(body.channel.id);
     try {
-      const result = await app.client.views.open({
+      const result = await app.client.views.update({
         token: context.botToken,
 		trigger_id: body.trigger_id,
+		view_id: body.view.id,
         view: {
 			type: 'modal',
 			// View identifier
@@ -155,7 +51,7 @@ exports.requestCustomSend = async function(ack,body,context) {
 			blocks: [
 			  {
 				type: 'input',
-				block_id: body.channel.id,
+				block_id: "num",
 				label: {
 				  type: 'plain_text',
 				  text: 'Enter your custom message here below.'
@@ -181,7 +77,7 @@ exports.requestCustomSend = async function(ack,body,context) {
 
 exports.customMsgView =  async function(ack, body, view, context, isWarmup) {
 	  // Acknowledge the custom_msg_view event
-  ack();
+ await ack();
   // get a  reference to the view object's values
   const valuesObject = view['state']['values']
   let msgToSend = ''
@@ -193,7 +89,6 @@ exports.customMsgView =  async function(ack, body, view, context, isWarmup) {
 	  if (counter === 0) {
 		msgToSend += valuesObject[key]['input_text']['value'];
 		counter++;
-		channelID=key;
 	  }
   }
   //gets teamID from the action which functions as workspace id
@@ -205,17 +100,10 @@ exports.customMsgView =  async function(ack, body, view, context, isWarmup) {
   //writes the data collected to the firebase
   let text = "Here's a custom message from your buddy: '" + msgToSend+ "'";
   var storeReturn = firestoreFuncs.storeTypeOfExercise(teamID, userID, isWarmup, text);
-  let confirmationJSON;
-  if ( isWarmup ) {
-	confirmationJSON = createConfirmationView("Alti-Confirmation","*Your buddy will receive the custom message for warmup tomorrow!*");
-  }
-  else {
-	confirmationJSON = createConfirmationView("Alti-Confirmation","*Your buddy will receive the custom message for cooldown tomorrow!*");
-  }
+  let confirmationJSON = createConfirmationView("Alti-Confirmation","*Your buddy will receive the custom message tomorrow!*");
   try {
 		const result = await app.client.views.open({
 			token: context.botToken,
-			view_id: body.view.id,
 			trigger_id: body.trigger_id,
 			view: JSON.stringify(confirmationJSON)
 		});
@@ -407,9 +295,10 @@ exports.cooldownVideoSelect = async function(ack,body,context) {
 exports.cooldownArticleSelect = async function(ack,body,context) {
 	await ack();
     try {
-      const result = await app.client.views.open({
+      const result = await app.client.views.update({
         token: context.botToken,
 		trigger_id: body.trigger_id,
+		view_id: body.view.id,
         view: {
 			type: 'modal',
 			// View identifier
@@ -449,9 +338,10 @@ exports.requestCustomSendCooldown = async function(ack,body,context) {
 	await ack();
 	//console.log(body.channel.id);
     try {
-      const result = await app.client.views.open({
+      const result = await app.client.views.update({
         token: context.botToken,
 		trigger_id: body.trigger_id,
+		view_id: body.view.id,
         view: {
 			type: 'modal',
 			// View identifier
@@ -463,7 +353,7 @@ exports.requestCustomSendCooldown = async function(ack,body,context) {
 			blocks: [
 			  {
 				type: 'input',
-				block_id: body.channel.id,
+				block_id: "num",
 				label: {
 				  type: 'plain_text',
 				  text: 'Enter your custom message here below.'
@@ -488,14 +378,16 @@ exports.requestCustomSendCooldown = async function(ack,body,context) {
 }
 
 exports.warmupCodingSelect = async function(ack,body,context) {
-	await ack();
+await ack({	 "response_action": "clear" });
+	console.log(body);
 	let thisView = createModalView("Alti","generic_close","warmup_typing_selected_ack","Nice, warmup typing challenges are awesome!",
-											"Pick a language",body.channel.id,["Python","JS","C++","C","Java", "English"],
+											"Pick a language","num",["Python","JS","C++","C","Java", "English"],
 											["python","javascript", "c++","c","java","english"]);
     try {
-      const result = await app.client.views.open({
+      const result = await app.client.views.update({
         token: context.botToken,
 		trigger_id: body.trigger_id,
+		view_id: body.view.id,
         view: JSON.stringify(thisView)
       });
     }
@@ -505,11 +397,12 @@ exports.warmupCodingSelect = async function(ack,body,context) {
 }
 
 exports.warmupPuzzleSelect = async function(ack,body,context) {
-	await ack();
-	let thisView = createModalView("Alti","generic_close","warmup_puzzle_selected_ack","Awesome puzzles are fun!","Pick a puzzle",body.channel.id,["Hitori","Sudoku","Calcudoku", "3 in a Row"],["hitori","sudoku", "calcudoku", "3inarow"]);
+	await ack({ "response_action": "clear"});
+	let thisView = createModalView("Alti","generic_close","warmup_puzzle_selected_ack","Awesome puzzles are fun!","Pick a puzzle","num",["Hitori","Sudoku","Calcudoku", "3 in a Row"],["hitori","sudoku", "calcudoku", "3inarow"]);
     try {
-      const result = await app.client.views.open({
+      const result = await app.client.views.update({
         token: context.botToken,
+		view_id: body.view.id,
 		trigger_id: body.trigger_id,
         view: JSON.stringify(thisView)
       });
@@ -520,11 +413,12 @@ exports.warmupPuzzleSelect = async function(ack,body,context) {
 }
 
 exports.warmupArticleSelect = async function(ack,body,context) {
-	await ack();
+	await ack({ "response_action": "clear"});
     try {
-      const result = await app.client.views.open({
+      const result = await app.client.views.update({
         token: context.botToken,
 		trigger_id: body.trigger_id,
+		view_id: body.view.id,
         view: {
 			type: 'modal',
 			// View identifier
@@ -536,7 +430,7 @@ exports.warmupArticleSelect = async function(ack,body,context) {
 			blocks: [
 			  {
 				type: 'input',
-				block_id: body.channel.id,
+				block_id: "num",
 				label: {
 				  type: 'plain_text',
 				  text: 'Submit your article link below!'
@@ -562,7 +456,7 @@ exports.warmupArticleSelect = async function(ack,body,context) {
 
 
 exports.warmupQuoteSelect = async function(ack,body,context) {
-	ack();
+	ack({ "response_action": "clear"});
 	let refArray = []; //array with quote author names
 	let valArray = []; //array with quote values
 	let amountOfQuotes = 6; 
@@ -576,12 +470,13 @@ exports.warmupQuoteSelect = async function(ack,body,context) {
 	}
 	
 	//generate values for above array
-	let thisView = createModalView("Alti","generic_close","warmup_quote_selected_ack","Great choice quotes are fun!","Pick an author",body.channel.id,refArray,valArray);
+	let thisView = createModalView("Alti","generic_close","warmup_quote_selected_ack","Great choice quotes are fun!","Pick an author","num",refArray,valArray);
 	// console.log(JSON.stringify(thisView));
     try {
-      const result = await app.client.views.open({
+      const result = await app.client.views.update({
         token: context.botToken,
 		trigger_id: body.trigger_id,
+		view_id: body.view.id,
         view: JSON.stringify(thisView)
 	  });
     }
@@ -609,6 +504,140 @@ exports.sendExercisePrompt = async function(workspaceId, userId, dmThreadID, isW
 	}
 }
 
+
+createSelectionView = function(isWarmupSelection){
+	let newView = {};
+	//begin populating view object with properties
+	newView["type"] = "modal";
+	if (isWarmupSelection) {
+		newView["callback_id"] = "closedSelectionWarmup";
+	}
+	
+	
+	//create title of view properties
+	let titleObj = {};
+	titleObj["type"] = "plain_text";
+	if (isWarmupSelection) {
+		titleObj["text"] = "Warmup Selection";
+	}
+	titleObj["emoji"] = true;
+	newView["title"] = titleObj;
+	
+	let closeObj = {};
+	closeObj["type"] = "plain_text";
+	closeObj["text"] = "Close";
+	closeObj["emoji"] = true;
+	
+	newView["close"] = closeObj;
+	
+	newView["blocks"] = [
+			{
+				"type": "section",
+				"text": {
+					"type": "plain_text",
+					"emoji": true,
+					"text": "Hey there, pick a warmup for your buddy!"
+				}
+			},
+			{
+				"type": "divider"
+			},
+			{
+				"type": "section",
+				"text": {
+					"type": "mrkdwn",
+					"text": "*Pick a content type:*"
+				}
+			},
+			{
+				"type": "section",
+				"text": {
+					"type": "mrkdwn",
+					"text": "*Speed Typing Test*"
+				},
+				"accessory": {
+					"action_id": "warmup_coding_select",
+					"type": "button",
+					"text": {
+						"type": "plain_text",
+						"emoji": true,
+						"text": "Choose"
+					},
+					"value": "select_test"
+				}
+			},
+			{
+				"type": "section",
+				"text": {
+					"type": "mrkdwn",
+					"text": "*Tech Article*"
+				},
+				"accessory": {
+					"action_id": "warmup_article_select",
+					"type": "button",
+					"text": {
+						"type": "plain_text",
+						"emoji": true,
+						"text": "Choose"
+					},
+					"value": "select_article"
+				}
+			},
+			{
+				"type": "section",
+				"text": {
+					"type": "mrkdwn",
+					"text": "*Easy Online Puzzle*"
+				},
+				"accessory": {
+					"action_id": "warmup_puzzle_select",
+					"type": "button",
+					"text": {
+						"type": "plain_text",
+						"emoji": true,
+						"text": "Choose"
+					},
+					"value": "select_puzzle"
+				}
+			},
+			{
+				"type": "section",
+				"text": {
+					"type": "mrkdwn",
+					"text": "*Motivational Quote*"
+				},
+				"accessory": {
+					"action_id": "warmup_quote_select", 
+					"type": "button",
+					"text": {
+						"type": "plain_text",
+						"emoji": true,
+						"text": "Choose"
+					},
+					"value": "select_quote"
+				}
+			},
+			 {
+				"type": "section",
+				"text": {
+					"type": "mrkdwn",
+					"text": "*Custom Message*"
+				},
+				"accessory": {
+					"action_id": "request_custom_send", 
+					"type": "button",
+					"text": {
+						"type": "plain_text",
+						"emoji": true,
+						"text": "Choose"
+					},
+					"value": "select_custom"
+				}
+			}
+		];
+	
+	return newView;
+}
 /*
 createModalView
 Creates a json modal view with specified arguments.
@@ -711,8 +740,8 @@ createConfirmationView = function(title,confirmationText) {
 	let newView = {};
 	//begin populating view object with properties
 	newView["type"] = "modal";
-	
-	//create title of view properties
+	newView["callback_id"] = "confirmation";
+	//create title of veiew properties
 	let titleObj = {};
 	titleObj["type"] = "plain_text";
 	titleObj["text"] = title;
@@ -726,7 +755,6 @@ createConfirmationView = function(title,confirmationText) {
 	closeObj["type"] = "plain_text";
 	closeObj["text"] = "Close";
 	closeObj["emoji"] = true;
-	
 	newView["close"] = closeObj;
 	
 	let blocksObj = [];
@@ -749,7 +777,7 @@ createConfirmationView = function(title,confirmationText) {
  
 //handles asynchrounous handling of confirmation for selection 
 handleQuoteSelect = async function(ack,body,context) {
-	await ack();
+	await ack({ "response_action": "clear"});
 	// console.log(body.actions[0]);
 	let quoteID = body.actions[0].value;
 	let quoteText = motivationalQuotes[quoteID].text;
@@ -781,7 +809,7 @@ handleQuoteSelect = async function(ack,body,context) {
 }
 
 handlePuzzleSelect = async function(ack,body,context) {
-	await ack();
+	await ack({ "response_action": "clear"});
 	var action = body.actions[0];
 	var puzzleType = action.value;
 	var text = generateData.generateMessageToSend('puzzle', puzzleType);
@@ -807,7 +835,7 @@ handlePuzzleSelect = async function(ack,body,context) {
 	return storeReturn;
 }
 handleTypingSelect = async function(ack,body,context) {
-	await ack();
+	await ack({ "response_action": "clear"});
 	var action = body.actions[0];
 	var language = action.value;
 
@@ -998,4 +1026,56 @@ app.action('warmup_quote_selected_ack', ({ ack, body, context }) => {
  app.view('cooldown_video_selected_ack', ({ view, ack, body, context }) => {
 	handleVideoSelect(view,ack,body,context);
  });
+
+exports.sendWarmupButton = async function(targChannelID,app,token){
+	const notificationString = "Alert to send a warmup to your buddy!";
+		const warmupButton = [
+		{
+			"type": "actions",
+			"elements": [
+				{
+					"action_id": "sendWarmupButtonClick",
+					"type": "button",
+					"text": {
+						"type": "plain_text",
+						"text": "Send A Warmup",
+						"emoji": true
+					}
+				}
+			]
+		}
+	];
+	//try function logic
+	try {
+		//make a call to the web api to post message in targ channel
+		const result = await app.client.chat.postMessage({
+		  // The token you used to initialize your app is stored in the `context` object
+		  token: token,
+		  channel: targChannelID,
+		  text: notificationString,
+		  blocks: warmupButton
+		});
+	}
+	//catch any errors
+	catch(error) {
+		console.log(error);
+	}
+}	
+
+sendWarmupHandler = async function(ack,body,context) {
+	ack();
+	sendSelectWarmupChoice(ack,body, context);
+}
+
+app.action('sendCooldownButtonClick', ({ ack, body, context }) => {
+	sendWarmupHandler(ack,body,context);
+});
  
+app.action('sendWarmupButtonClick', ({ ack, body, context }) => {
+	sendWarmupHandler(ack,body,context);
+});
+app.action('confirmation', ({view, ack, body, context }) => {
+	ack({
+		 "response_action": "clear"
+	});
+});

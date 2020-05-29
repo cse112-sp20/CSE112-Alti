@@ -97,7 +97,7 @@ app.command('/setupwarmup', async ({ command, ack, say, context}) => {
     // Acknowledge command request
     ack();
 	//send Warmup prompts to the channel that this command was called from
-    warmupMessage.sendSelectChoice(command.channel_id,app, context.botToken);
+    warmupMessage.sendWarmupButton(command.channel_id,app, context.botToken);
 });
 
 // Handle '/getwarmup' command invocations
