@@ -188,7 +188,7 @@ async function findUsersChannel(app, token, channelId) {
 
 }
 
-/*
+
 app.event('member_joined_channel', async ({ body, context }) => {
     console.log("Member joined channel");
     console.log(body);
@@ -210,7 +210,7 @@ app.event('member_left_channel', async ({ body, context }) => {
         console.log("Member left pairing channel");
     }
 });
-*/
+
 
 exports.onBoard = createOnBoardingChannel;
 exports.onBoardExisting = boardExistingChannel;

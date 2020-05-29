@@ -29,6 +29,7 @@ describe('Scheduler', () => {
 
   it('schedule for 4 min after', async function() {
     this.timeout(5000); // 5 sec
+    // Submit hours and minutes that are in pst to schedule msg
     let now = new Date();
     let localTime = now.getTime();
     let localOffset = now.getTimezoneOffset()*60000;

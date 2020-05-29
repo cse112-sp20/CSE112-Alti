@@ -27,7 +27,7 @@ const app = index.getBolt();
   */
  exports.scheduleMsg = async function scheduleMsg(hour, minute, text, id, token) {
 	// set up the time
-	
+	// convert to utc then to pst to set correct hour and minutes, then back to utc for correct timestamp
 	var reminder = new Date();
 	var localTime = reminder.getTime();
 	var localOffset = reminder.getTimezoneOffset()*60000;
@@ -39,6 +39,9 @@ const app = index.getBolt();
 	newDate.setHours(hour);
 	newDate.setMinutes(minute);
 	newDate.setSeconds(0);
+
+	newDate = new Date(newDate.getTime() - (3600000 * offset));
+
 	console.log("Schedule msg runs");
 	//call api
 	return await app.client.chat.scheduleMessage({
