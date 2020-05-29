@@ -18,8 +18,8 @@ const functions = require('firebase-functions');
 const config = functions.config();
 let token = config.slack.bot_token;
 
-// If it passes, means the function finished and message was scheduled, baseline test
-// Need more rigorous testing using promises of async function and validation from Slack API channel reading
+// // If it passes, means the function finished and message was scheduled, baseline test
+// // Need more rigorous testing using promises of async function and validation from Slack API channel reading
 describe('Scheduler', () => {
  
   let schedule;
@@ -109,44 +109,44 @@ describe('Pairup', () => {
 
       await pairUp.pairUp(undefined, token);
       var pairs = await firestoreFuncs.getPairedUsers(workspaceId);
-      //console.log(pairs);
-      /* eslint-disable no-await-in-loop */
+      
+      var partner1 = pairs[0]["users"][0];
+      var partner2 = pairs[0]["users"][1];
 
-      var partner1 = [];
-      var partner2 = [];
-      var pairChannel = [];
+      var randomNum = Math.floor(Math.random() * (pairs.length-1));
 
-      for(var i = 0; i < pairs.length; i++)
-      {
-        var pair = pairs[i];
-        var m = await app.client.conversations.members({
-          token:token, 
-          channel: pair["dmThreadID"]
-        });
+      var randompartner1 = pairs[randomNum]["users"][0];
+      var randompartner2 = pairs[randomNum]["users"][1];
 
-        //console.log(pair);
+      var lastpartner1 = pairs[pairs.length-1]["users"][0];
+      var lastpartner2 = pairs[pairs.length-1]["users"][1];
 
-        partner1.push(pair["users"][0]);
-        partner2.push(pair["users"][1]);
-      }
-      /* eslint-enable no-await-in-loop */
-      // console.log(partner1[0]);
-      // console.log(partner2[0]);
-      // console.log(pairChannel[0]);
+      // Checking first partner group
+      var otherPartner = await firestoreFuncs.getPartner(workspaceId, channelId, partner1);
+      assert.equal(otherPartner, partner2);
 
-      // Waiting on latest pull to firestore
-      // var otherPartner = await firestoreFuncs.getPartner(workspaceId, partner1[0]);
-      // console.log(otherPartner);
-      // assert.equal(otherPartner, partner2[0]);
+      otherPartner = await firestoreFuncs.getPartner(workspaceId, channelId, partner2);
+      assert.equal(otherPartner, partner1);
 
-      // otherPartner = await firestoreFuncs.getPartner(workspaceId, pairChannel[0], partner2[0]);
-      // assert.equal(otherPartner, partner1[0]);
+      // Checking random partner group
+      otherPartner = await firestoreFuncs.getPartner(workspaceId, channelId, randompartner1);
+      assert.equal(otherPartner, randompartner2);
 
-      // var invalidPart = await firestoreFuncs.getPartner(workspaceId, pairChannel[1], "XXXXXXXXXX");
-      // assert.equal(invalidPart, undefined);
+      otherPartner = await firestoreFuncs.getPartner(workspaceId, channelId, randompartner2);
+      assert.equal(otherPartner, randompartner1);
+
+      // Checking last partner group
+      otherPartner = await firestoreFuncs.getPartner(workspaceId, channelId, lastpartner1);
+      assert.equal(otherPartner, lastpartner2);
+
+      otherPartner = await firestoreFuncs.getPartner(workspaceId, channelId, lastpartner2);
+      assert.equal(otherPartner, lastpartner1);
+
+      // Checking invalid response
+      var invalidPart = await firestoreFuncs.getPartner(workspaceId, channelId, "XXXXXXXXXX");
+      assert.equal(invalidPart, undefined);
     });  
   });
-
 });
 
 describe('util', () => {
