@@ -11,7 +11,7 @@ let firestoreFuncs = require('../firestore');
 const functions = require('firebase-functions');
 const config = functions.config();
 let token = config.slack.bot_token;
-console.log(token);
+//console.log(token);
 //hardcode the token 
 //let token = "xoxb-1109790171392-1110712837169-OxF8igcVuxkFUhbZVuoXxypj";
 
