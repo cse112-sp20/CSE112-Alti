@@ -35,7 +35,7 @@ describe('Scheduler', () => {
     assert.equal(offset, 420);
     var response = await schedule.scheduleMsg(now.getHours(), now.getMinutes(), 
                                                     "A reminder", "#testing", token);
-    
+    assert.equal(response.ok, true);
     console.log("RESPONSE: ", response);
     app.client.chat.deleteScheduledMessage({
       token: token,
