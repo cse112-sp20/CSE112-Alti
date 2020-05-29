@@ -27,17 +27,26 @@ describe('Scheduler', () => {
     schedule = require('../schedule');
   });
 
-  it('schedule for 2 min after', async function() {
+  it('schedule for 4 min after', async function() {
     this.timeout(5000); // 5 sec
+    // Submit hours and minutes that are in pst to schedule msg
     let now = new Date();
-    now.setTime(now.getTime() + 120000); 
+    let localTime = now.getTime();
+    let localOffset = now.getTimezoneOffset()*60000;
+    let utc = localTime + localOffset;
+    let offset = -7;
+    let cali = (utc + (3600000 * offset));
+    let newDate = new Date(cali);
+    now = newDate;
+    now.setTime(now.getTime() + 240000); 
     var response = await schedule.scheduleMsg(now.getHours(), now.getMinutes(), 
                                                     "A reminder", "#testing", token);
-    
-    // console.log("RESPONSE: ", response);
+    assert.equal(response.error, undefined);                                                
+    assert.equal(response.ok, true);
+    console.log("RESPONSE: ", response);
     app.client.chat.deleteScheduledMessage({
       token: token,
-      channel: "testing",
+      channel: "#testing",
       scheduled_message_id: response.scheduled_message_id
     });
                                                     

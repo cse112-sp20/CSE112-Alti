@@ -5,6 +5,8 @@ const functions = require('firebase-functions');
 const firestoreFuncs = require('./firestore');
 const warmupMessage = require('./warmupMessage');
 const generateTaskData = require('./generateTaskData');
+const retros = require('./retros');
+const retroQuestions = retros.getRetrosObj();
 const app = index.getBolt();
 
 var days = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
@@ -78,10 +80,10 @@ exports.scheduleDaily = functions.pubsub
 // Helper function for scheduleDaily- Iterate through workspaces
 async function scheduleDailyHelper() {
   let workspaces = await firestoreFuncs.getAllWorkspaces();
+  threads = [];
   
   for (var w of workspaces) {
     var p = scheduleDailyWorkspace(w);
-    
   }
   
   // TESTING PURPOSES
@@ -93,7 +95,11 @@ async function scheduleDailyHelper() {
 async function scheduleDailyWorkspace(workspaceId) {
   var d = new Date();
   var n = d.getDay();
+  if (n < 1 || n > 5) {
+    return;
+  }
   var day = days[n];
+  console.log("Day: " + day);
 
   var keyObj = await firestoreFuncs.getAPIPair(workspaceId);
   if (!keyObj) {
@@ -127,13 +133,39 @@ async function scheduleDailyWorkspace(workspaceId) {
     scheduleDailyUser(workspaceId, m, w_token, day, threads);
   }
 
+  if (workspaceId === "T012US11G4X") {
+    var offset = new Date().getTimezoneOffset();
+    app.client.chat.postMessage({
+      token: w_token,
+      channel: channel,
+      text: "Timezone offset: " + offset + " minutes"
+    });
+  }
+  /*
+  // TESTING PURPOSES
+  var temp = await app.client.chat.scheduledMessages.list({
+    token: w_token,
+    channel: channel
+  });
+  console.log("List of scheduled messages");
+  console.log(temp);
+  
+  var l = temp.scheduled_messages;
+  for (var i = 0; i < l.length; i++) {
+    app.client.chat.deleteScheduledMessage({
+      token: w_token,
+      channel: l[i].channel_id,
+      scheduled_message_id: l[i].id
+    });
+  }
+  */
+  
 }
 
 // Helper function for scheduleDailyWorkspace- Iterate through single user
 async function scheduleDailyUser(workspaceId, userId, token, day, threads) {
   // TESTING PURPOSES
-  // day = "Monday";
-  // console.log("user: " + userId);
+  console.log("user: " + userId);
   let pairingData = await firestoreFuncs.getUserPairingData(workspaceId, userId);
   let warmupTime = await firestoreFuncs.getWarmupTime(workspaceId, userId, day);
   let cooldownTime = await firestoreFuncs.getCooldownTime(workspaceId, userId, day);
@@ -152,8 +184,10 @@ async function scheduleDailyUser(workspaceId, userId, token, day, threads) {
     //TODO generate hardcoded tasks for monday quote and retrospective
     quote = generateTaskData.generateQuote();
     quote = quote.split("-")[1] + "-" + quote.split("-")[2];
+    var index = Math.floor(Math.random() * retroQuestions.length);
     warmupTask = `Your partner sent you a motivational quote to help you start your day right!\n${quote}`;
-    cooldownTask = `Retrospective question for <@${  userId  }>`;
+    cooldownTask = "Your partner sent you this retro: '" + retroQuestions[index].retro +
+    "' to complete";
   }
   else {
     warmupTask = pairingData.warmupTask;
@@ -187,10 +221,20 @@ async function scheduleDailyUser(workspaceId, userId, token, day, threads) {
       if (mid === "PM") {
         hour = String(Number(hour) + 12);
       }
+      else if (mid === "AM" && hour === "12") {
+        hour = "0";
+      }
 
-      schedule.scheduleMsg(hour, min, warmupTask, dmThreadID, token);
+      console.log("Schedule warm up message for " + hour + ":" + min);
+      await schedule.scheduleMsg(hour, min, warmupTask, dmThreadID, token).catch((error) => {
+        console.log(error);
+      }); 
+
       // TESTING PURPOSES
-      // schedule.scheduleMsg(21, 27, warmupTask, dmThreadID, token);
+      // schedule.scheduleMsg(17, 50, warmupTask, dmThreadID, token);
+    }
+    else {
+      console.log("No warmup task");
     }
 
     if (cooldownTask) {
@@ -199,23 +243,54 @@ async function scheduleDailyUser(workspaceId, userId, token, day, threads) {
       min = cooldownTime.split(" ")[0].split(":")[1];
       mid = cooldownTime.split(" ")[1];
 
-      if (mid === "PM") {
+      if (mid === "PM" && hour !== "12") {
         hour = String(Number(hour) + 12);
       }
+      else if (mid === "AM" && hour === "12") {
+        hour = "0";
+      }
 
-      await schedule.scheduleMsg(hour, min, cooldownTask, dmThreadID, token);
+      console.log("Schedule cooldown message for " + hour + ":" + min);
+      await schedule.scheduleMsg(hour, min, cooldownTask, dmThreadID, token).catch((error) => {
+        console.log(error);
+      });
 
       // TESTING PURPOSES
-      // await schedule.scheduleMsg(19, 17, cooldownTask, dmThreadID, token);
-		}
+      // await schedule.scheduleMsg(17, 50, cooldownTask, dmThreadID, token);
+    }
+    else {
+      console.log("No cooldown task");
+    }
+
 		if (day !== 'Friday' && !threads.includes(dmThreadID)) {
       threads.push(dmThreadID);
-			await schedule.scheduleWarmupChoice(hour, min, dmThreadID, token);
-      schedule.scheduleCooldownChoice(hour, min, dmThreadID, token);
+
+      split = cooldownTime.split(" ");
+      hour = cooldownTime.split(" ")[0].split(":")[0];
+      min = cooldownTime.split(" ")[0].split(":")[1];
+      mid = cooldownTime.split(" ")[1];
+
+      if (mid === "PM" && hour !== "12") {
+        hour = String(Number(hour) + 12);
+      }
+      else if (mid === "AM" && hour === "12") {
+        hour = "0";
+      }
+      
+      console.log("Schedule prompts for "+ hour + ":" + min);
+			await schedule.scheduleWarmupChoice(hour, min, dmThreadID, token).catch((error) => {
+        console.log(error);
+      });
+      await schedule.scheduleCooldownChoice(hour, min, dmThreadID, token).catch((error) => {
+        console.log(error);
+      });
+      
       // TESTING PURPOSES
-      //console.log("Schedule prompts");
-      //await schedule.scheduleWarmupChoice(19, 17, dmThreadID, token);
-      //schedule.scheduleCooldownChoice(19, 17, dmThreadID, token);
+      // await schedule.scheduleWarmupChoice(17, 50, dmThreadID, token);
+      // await schedule.scheduleCooldownChoice(17, 50, dmThreadID, token);
+    }
+    else {
+      console.log("Prompting not run");
     }
   }
 
