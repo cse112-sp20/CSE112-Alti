@@ -141,7 +141,24 @@ async function scheduleDailyWorkspace(workspaceId) {
       text: "Timezone offset: " + offset + " minutes"
     });
   }
- 
+  /*
+  // TESTING PURPOSES
+  var temp = await app.client.chat.scheduledMessages.list({
+    token: w_token,
+    channel: channel
+  });
+  console.log("List of scheduled messages");
+  console.log(temp);
+  
+  var l = temp.scheduled_messages;
+  for (var i = 0; i < l.length; i++) {
+    app.client.chat.deleteScheduledMessage({
+      token: w_token,
+      channel: l[i].channel_id,
+      scheduled_message_id: l[i].id
+    });
+  }
+  */
   
 }
 
