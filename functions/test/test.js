@@ -301,9 +301,12 @@ describe('Setup Warmup Callbacks', () => {
     });
   });
 
-  beforeEach(async () => {
-    await firestoreFuncs.storeTypeOfExercise(workspaceId, userId2, true, "");
+  beforeEach((done) => {
     ackCalled = false;
+    setTimeout(()=>{
+      firestoreFuncs.storeTypeOfExercise(workspaceId, userId1, true, "");
+      done();
+    }, 1000);
   });
 
   after(async() => {
@@ -312,30 +315,52 @@ describe('Setup Warmup Callbacks', () => {
 
   it('handleTypingSelect', () => {  
     fakeBody.actions[0].value = 'java';
-    var exercisePrompt = handleTypingSelect(fakeAck, fakeBody, fakeContext).then( () => {
-      return firestoreFuncs.getExercisePrompt(workspaceId, userId2, true)
-    })
+    let selectPromise = new Promise((resolve, reject) => {
+      setTimeout(() => {
+        return resolve(handleTypingSelect(fakeAck, fakeBody, fakeContext));
+      }, 1000);
+    });
+    
+    let typingPrompt = selectPromise.then((res) => {
+      let ret = new Promise((resolve, reject) => {
+        setTimeout(() => {
+          return resolve(firestoreFuncs.getExercisePrompt(workspaceId, userId2, true));
+        }, 1000);
+      });
+      return ret;
+    });
 
-    return exercisePrompt.then( prompt => {
-      var expectedString = "Your partner sent you this cool speed coding challenge in java to get your mind and fingers ready for the day!\nComplete it here: ";
+    return typingPrompt.then( prompt => {
+      let expectedString = "Your partner sent you this cool speed coding challenge in java to get your mind and fingers ready for the day!\nComplete it here: ";
       assert.equal(ackCalled, true);
       assert.equal(prompt.substring(0,expectedString.length), expectedString);
       return Promise.resolve();
     });
-  });
+  }).timeout(7000);
     
   it('handlePuzzleSelect', () => {
     fakeBody.actions[0].value = 'sudoku';
-    var exercisePrompt = handlePuzzleSelect(fakeAck, fakeBody, fakeContext).then( ret => {
-      return firestoreFuncs.getExercisePrompt(workspaceId, userId2, true)
-    })
-    return exercisePrompt.then( prompt => {
-      var expectedString = "Your partner sent you this sudoku puzzle to help you get those brain juices flowing!\nComplete it here: ";
+    let selectPromise = new Promise((resolve, reject) => {
+      setTimeout(() => {
+        return resolve(handlePuzzleSelect(fakeAck, fakeBody, fakeContext));
+      }, 1000);
+    });
+
+    let puzzlePrompt = selectPromise.then((res) => {
+      let ret = new Promise((resolve, reject) => {
+        setTimeout(() => {
+          return resolve(firestoreFuncs.getExercisePrompt(workspaceId, userId2, true));
+        }, 1000);
+      });
+      return ret;
+    });
+    return puzzlePrompt.then( prompt => {
+      let expectedString = "Your partner sent you this sudoku puzzle to help you get those brain juices flowing!\nComplete it here: ";
       assert.equal(ackCalled, true);
       assert.equal(prompt.substring(0,expectedString.length), expectedString);
       return Promise.resolve();
     });
-  });
+  }).timeout(7000);
 });
 
 describe('App Home tests', () => {
