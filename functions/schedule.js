@@ -67,6 +67,8 @@ const app = index.getBolt();
 		newDate.setHours(hour);
 		newDate.setMinutes(minute);
 		newDate.setSeconds(0);
+		newDate = new Date(newDate.getTime() - (3600000 * offset));
+
 		const notificationString = "Send a cool-down to your buddy!";
 		
 			var res = await app.client.chat.scheduleMessage({
@@ -92,6 +94,8 @@ const app = index.getBolt();
 		newDate.setHours(hour);
 		newDate.setMinutes(minute);
 		newDate.setSeconds(0);
+		newDate = new Date(newDate.getTime() - (3600000 * offset));
+
 		const notificationString = "Send a warmup to your buddy!";
 		
 		//try function logic
