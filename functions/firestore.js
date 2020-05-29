@@ -5,7 +5,7 @@ const request = require('request');
 // dotenv.config();
 
 // console.log(typeof(process.env.FUNCTIONS_EMULATOR));
-if(process.env.FUNCTIONS_EMULATOR === "true"){
+if(process.env.FUNCTIONS_EMULATOR !== "true"){
     
     var serviceAccount = require('./serviceAccountKey.json');
     

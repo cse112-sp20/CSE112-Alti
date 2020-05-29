@@ -31,13 +31,15 @@ describe('Scheduler', () => {
     this.timeout(5000); // 5 sec
     let now = new Date();
     now.setTime(now.getTime() + 120000); 
+    var offset = new Date().getTimezoneOffset();
+    assert.equal(offset, 420);
     var response = await schedule.scheduleMsg(now.getHours(), now.getMinutes(), 
                                                     "A reminder", "#testing", token);
     
     console.log("RESPONSE: ", response);
     app.client.chat.deleteScheduledMessage({
       token: token,
-      channel: response.channel,
+      channel: "#testing",
       scheduled_message_id: response.scheduled_message_id
     });
                                                     

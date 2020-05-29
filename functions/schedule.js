@@ -27,7 +27,7 @@ const app = index.getBolt();
   */
  exports.scheduleMsg = async function scheduleMsg(hour, minute, text, id, token) {
 	// set up the time
-	/*
+	
 	var reminder = new Date();
 	var localTime = reminder.getTime();
 	var localOffset = reminder.getTimezoneOffset()*60000;
@@ -35,8 +35,7 @@ const app = index.getBolt();
 	var offset = -7;
 	var cali = (utc + (3600000 * offset));
 	var newDate = new Date(cali);
-	*/
-	var newDate = new Date();
+	
 	newDate.setHours(hour);
 	newDate.setMinutes(minute);
 	newDate.setSeconds(0);
