@@ -30,7 +30,7 @@ describe('Scheduler', () => {
   it('schedule for 2 min after', async function() {
     this.timeout(5000); // 5 sec
     let now = new Date();
-
+    assert.equal(now.getHours(), 9);
     let localTime = now.getTime();
     let localOffset = now.getTimezoneOffset()*60000;
     let utc = localTime + localOffset;
