@@ -84,7 +84,6 @@ async function scheduleDailyHelper() {
   
   for (var w of workspaces) {
     var p = scheduleDailyWorkspace(w);
-    
   }
   
   // TESTING PURPOSES
