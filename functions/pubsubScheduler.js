@@ -210,7 +210,7 @@ async function scheduleDailyUser(workspaceId, userId, token, day, threads) {
   */
 
   if (dmThreadID) {
-    var hour, min, mid, split;
+    var hour, min, mid;
 
     if (warmupTask) {
 
