@@ -27,17 +27,17 @@ describe('Scheduler', () => {
     schedule = require('../schedule');
   });
 
-  it('schedule for 3 min after', async function() {
+  it('schedule for 2 min after', async function() {
     this.timeout(5000); // 5 sec
     let now = new Date();
-    now.setTime(now.getTime() + 180000); 
+    now.setTime(now.getTime() + 120000); 
     var response = await schedule.scheduleMsg(now.getHours(), now.getMinutes(), 
                                                     "A reminder", "#testing", token);
     
     console.log("RESPONSE: ", response);
     app.client.chat.deleteScheduledMessage({
       token: token,
-      channel: "testing",
+      channel: response.channel,
       scheduled_message_id: response.scheduled_message_id
     });
                                                     
