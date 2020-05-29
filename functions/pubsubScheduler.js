@@ -86,7 +86,7 @@ async function scheduleDailyHelper() {
     var p = scheduleDailyWorkspace(w);
   }
   
-  // TESTING PURPOSESS
+  // TESTING PURPOSES
   // scheduleDailyWorkspace("T012US11G4X");
   return null;
 }
