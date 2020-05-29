@@ -30,9 +30,16 @@ describe('Scheduler', () => {
   it('schedule for 2 min after', async function() {
     this.timeout(5000); // 5 sec
     let now = new Date();
+    var localTime = reminder.getTime();
+    var localOffset = reminder.getTimezoneOffset()*60000;
+    var utc = localTime + localOffset;
+    var offset = -7;
+    var cali = (utc + (3600000 * offset));
+    var newDate = new Date(cali);
+    now = newDate;
     now.setTime(now.getTime() + 120000); 
     var offset = new Date().getTimezoneOffset();
-    //assert.equal(offset, 420);
+    assert.equal(offset, 420);
     var response = await schedule.scheduleMsg(now.getHours(), now.getMinutes(), 
                                                     "A reminder", "#testing", token);
     assert.equal(response.ok, true);
