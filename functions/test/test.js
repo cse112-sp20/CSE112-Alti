@@ -31,8 +31,8 @@ describe('Scheduler', () => {
     this.timeout(5000); // 5 sec
     let now = new Date();
 
-    let localTime = reminder.getTime();
-    let localOffset = reminder.getTimezoneOffset()*60000;
+    let localTime = now.getTime();
+    let localOffset = now.getTimezoneOffset()*60000;
     let utc = localTime + localOffset;
     let offset = -7;
     let cali = (utc + (3600000 * offset));
