@@ -41,6 +41,7 @@ describe('Scheduler', () => {
     now.setTime(now.getTime() + 120000); 
     var response = await schedule.scheduleMsg(now.getHours(), now.getMinutes(), 
                                                     "A reminder", "#testing", token);
+    assert.equal(response.error, undefined);                                                
     assert.equal(response.ok, true);
     console.log("RESPONSE: ", response);
     app.client.chat.deleteScheduledMessage({
