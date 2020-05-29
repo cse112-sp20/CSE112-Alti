@@ -27,7 +27,7 @@ describe('Scheduler', () => {
     schedule = require('../schedule');
   });
 
-  it('schedule for 2 min after', async function() {
+  it('schedule for 4 min after', async function() {
     this.timeout(5000); // 5 sec
     let now = new Date();
     let localTime = now.getTime();
@@ -37,8 +37,7 @@ describe('Scheduler', () => {
     let cali = (utc + (3600000 * offset));
     let newDate = new Date(cali);
     now = newDate;
-    now.setTime(now.getTime() + 120000); 
-    assert.equal(now.getHours(), 22);
+    now.setTime(now.getTime() + 240000); 
     var response = await schedule.scheduleMsg(now.getHours(), now.getMinutes(), 
                                                     "A reminder", "#testing", token);
     assert.equal(response.error, undefined);                                                
