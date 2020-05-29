@@ -39,7 +39,7 @@ const app = index.getBolt();
 	newDate.setSeconds(0);
 	console.log("Schedule msg runs");
 	//call api
-	return app.client.chat.scheduleMessage({
+	return await app.client.chat.scheduleMessage({
 										token: token,
 										channel: id,
 										text:  text,
