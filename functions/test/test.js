@@ -5,15 +5,18 @@ const expect = require('chai').expect;
 const index = require('../index');
 const testUtil = require('./testUtil');
 const app = index.getBolt();
-var generateTaskData = require('../generateTaskData');
+
+var generateTaskData = require ('../generateTaskData');
+const quotes = require('../quotes');
+const retros = require('../retros');
+const motivationalQuotes = quotes.getQuotesObj();
+const retroQuestions = retros.getRetrosObj();
+
 let firestoreFuncs = require('../firestore');
 
 const functions = require('firebase-functions');
 const config = functions.config();
 let token = config.slack.bot_token;
-//console.log(token);
-//hardcode the token 
-//let token = "xoxb-1109790171392-1110712837169-OxF8igcVuxkFUhbZVuoXxypj";
 
 // If it passes, means the function finished and message was scheduled, baseline test
 // Need more rigorous testing using promises of async function and validation from Slack API channel reading
@@ -215,7 +218,35 @@ describe('generateCodingChallenge', () => {
     assert.equal(url.substring(0, 37),'http://www.speedcoder.net/lessons/cpp');
   });
 });
-
+//tests random generation features
+describe('Testing Random Generation', () => {
+  var numTests = 20;
+  it('Testing Quote Generation', () => {
+    //generate multiple quotes
+		for (let testIterator = 0; testIterator < numTests; testIterator++) {
+			let testQuote = generateTaskData.generateQuote();
+			let quoteArray = testQuote.split("-");
+			let testArray = quoteArray[1].split(" ");
+			let testString = testArray[0];
+			let targetQuote = motivationalQuotes[quoteArray[0]].text;
+			let targetArray = targetQuote.split(/[ -]+/);
+			let targetString = targetArray[0];
+			assert.equal(testString,targetString);
+		}
+  });
+  it('Testing Retro Generation', () => {
+	  	for (let testIterator = 0; testIterator < numTests; testIterator++) {
+			let testRetro = generateTaskData.generateRetro();
+			let retroArray = testRetro.split("-");
+			let testArray = retroArray[1].split(" ");
+			let testString = testArray[0];
+			let targetRetro = retroQuestions[retroArray[0]].retro;
+			let targetArray = targetRetro.split(/[ -]+/);
+			let targetString = targetArray[0];
+			assert.equal(testString,targetString);
+		}
+  });
+});
 // This functions assumes that the HandleQuoteSelect function
 // only sets warmups. Needs to be changed when cooldowns are added
 // Does not test the generated url. Only checks the prompt stored in the firestore 
@@ -270,9 +301,12 @@ describe('Setup Warmup Callbacks', () => {
     });
   });
 
-  beforeEach(async () => {
-    await firestoreFuncs.storeTypeOfExercise(workspaceId, userId2, true, "");
+  beforeEach((done) => {
     ackCalled = false;
+    setTimeout(()=>{
+      firestoreFuncs.storeTypeOfExercise(workspaceId, userId1, true, "");
+      done();
+    }, 1000);
   });
 
   after(async() => {
@@ -281,30 +315,52 @@ describe('Setup Warmup Callbacks', () => {
 
   it('handleTypingSelect', () => {  
     fakeBody.actions[0].value = 'java';
-    var exercisePrompt = handleTypingSelect(fakeAck, fakeBody, fakeContext).then( () => {
-      return firestoreFuncs.getExercisePrompt(workspaceId, userId2, true)
-    })
+    let selectPromise = new Promise((resolve, reject) => {
+      setTimeout(() => {
+        return resolve(handleTypingSelect(fakeAck, fakeBody, fakeContext));
+      }, 1000);
+    });
+    
+    let typingPrompt = selectPromise.then((res) => {
+      let ret = new Promise((resolve, reject) => {
+        setTimeout(() => {
+          return resolve(firestoreFuncs.getExercisePrompt(workspaceId, userId2, true));
+        }, 1000);
+      });
+      return ret;
+    });
 
-    return exercisePrompt.then( prompt => {
-      var expectedString = "Your partner sent you this cool speed coding challenge in java to get your mind and fingers ready for the day!\nComplete it here: ";
+    return typingPrompt.then( prompt => {
+      let expectedString = "Your partner sent you this cool speed coding challenge in java to get your mind and fingers ready for the day!\nComplete it here: ";
       assert.equal(ackCalled, true);
       assert.equal(prompt.substring(0,expectedString.length), expectedString);
       return Promise.resolve();
     });
-  });
+  }).timeout(7000);
     
   it('handlePuzzleSelect', () => {
     fakeBody.actions[0].value = 'sudoku';
-    var exercisePrompt = handlePuzzleSelect(fakeAck, fakeBody, fakeContext).then( ret => {
-      return firestoreFuncs.getExercisePrompt(workspaceId, userId2, true)
-    })
-    return exercisePrompt.then( prompt => {
-      var expectedString = "Your partner sent you this sudoku puzzle to help you get those brain juices flowing!\nComplete it here: ";
+    let selectPromise = new Promise((resolve, reject) => {
+      setTimeout(() => {
+        return resolve(handlePuzzleSelect(fakeAck, fakeBody, fakeContext));
+      }, 1000);
+    });
+
+    let puzzlePrompt = selectPromise.then((res) => {
+      let ret = new Promise((resolve, reject) => {
+        setTimeout(() => {
+          return resolve(firestoreFuncs.getExercisePrompt(workspaceId, userId2, true));
+        }, 1000);
+      });
+      return ret;
+    });
+    return puzzlePrompt.then( prompt => {
+      let expectedString = "Your partner sent you this sudoku puzzle to help you get those brain juices flowing!\nComplete it here: ";
       assert.equal(ackCalled, true);
       assert.equal(prompt.substring(0,expectedString.length), expectedString);
       return Promise.resolve();
     });
-  });
+  }).timeout(7000);
 });
 
 describe('App Home tests', () => {

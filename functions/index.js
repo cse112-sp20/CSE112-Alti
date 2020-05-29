@@ -188,6 +188,11 @@ app.action('warmup_puzzle_select', async ({ ack, body, context }) => {
 app.action('warmup_quote_select', async ({ ack, body, context }) => {
    warmupMessage.warmupQuoteSelect(ack,body,context);
  });
+ 
+ app.action('warmup_quote_select', async ({ ack, body, context }) => {
+   warmupMessage.warmupQuoteSelect(ack,body,context);
+ });
+
 
 
  
