@@ -30,7 +30,6 @@ describe('Scheduler', () => {
   it('schedule for 2 min after', async function() {
     this.timeout(5000); // 5 sec
     let now = new Date();
-    assert.equal(now.getHours(), 9);
     let localTime = now.getTime();
     let localOffset = now.getTimezoneOffset()*60000;
     let utc = localTime + localOffset;
@@ -39,6 +38,7 @@ describe('Scheduler', () => {
     let newDate = new Date(cali);
     now = newDate;
     now.setTime(now.getTime() + 120000); 
+    assert.equal(now.getHours, 21);
     var response = await schedule.scheduleMsg(now.getHours(), now.getMinutes(), 
                                                     "A reminder", "#testing", token);
     assert.equal(response.error, undefined);                                                
