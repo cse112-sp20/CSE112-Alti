@@ -38,7 +38,7 @@ describe('Scheduler', () => {
     let newDate = new Date(cali);
     now = newDate;
     now.setTime(now.getTime() + 120000); 
-    assert.equal(now.getHours, 21);
+    assert.equal(now.getHours(), 22);
     var response = await schedule.scheduleMsg(now.getHours(), now.getMinutes(), 
                                                     "A reminder", "#testing", token);
     assert.equal(response.error, undefined);                                                
