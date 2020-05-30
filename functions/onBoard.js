@@ -206,9 +206,11 @@ app.event('member_joined_channel', async ({ body, context }) => {
 app.event('member_left_channel', async ({ body, context }) => {
     console.log("Member left channel");
     console.log(body);
+    console.log(context);
     if (activeChannel === body.event.channel) {
         console.log("Member left pairing channel");
     }
+    
 });
 
 

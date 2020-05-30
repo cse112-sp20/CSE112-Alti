@@ -29,19 +29,31 @@ const app = index.getBolt();
 	// set up the time
 	// convert to utc then to pst to set correct hour and minutes, then back to utc for correct timestamp
 	var reminder = new Date();
+	console.log("Current date");
+	console.log(reminder);
+	console.log(reminder.getTime());
+	console.log(reminder.getTime() - (3600000 * (-7)));
+	console.log("Current date's offset: " + reminder.getTimezoneOffset());
 	var localTime = reminder.getTime();
 	var localOffset = reminder.getTimezoneOffset()*60000;
 	var utc = localTime + localOffset;
 	var offset = -7;
 	var cali = (utc + (3600000 * offset));
 	var newDate = new Date(cali);
-	
+	console.log("Date in pst before setting");
+	console.log(newDate);
+	console.log(newDate.getTime());
 	newDate.setHours(hour);
 	newDate.setMinutes(minute);
 	newDate.setSeconds(0);
 
+	console.log("Date in pst");
+	console.log(newDate);
+	console.log(newDate.getTime());
 	newDate = new Date(newDate.getTime() - (3600000 * offset));
-
+	console.log("Date in utc");
+	console.log(newDate);
+	console.log(newDate.getTime());
 	console.log("Schedule msg runs");
 	//call api
 	return await app.client.chat.scheduleMessage({

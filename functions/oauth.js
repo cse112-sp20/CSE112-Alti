@@ -28,7 +28,6 @@ exports.oAuthFunction = functions.https.onRequest(async (req, res) => {
 
     request(options, (error, response, body) => {
       var JSONresponse = JSON.parse(body)
-      console.log(JSONresponse);
       if (!JSONresponse.ok){
           res.send("Error encountered: \n"+JSON.stringify(JSONresponse)).status(200).end()
       }else{
