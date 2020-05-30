@@ -92,7 +92,7 @@ exports.sendSelectChoice = async function(targChannelID,app,token){
 					"text": "*Motivational Quote*"
 				},
 				"accessory": {
-					"action_id": "warmup_quote_select", 
+					"action_id": "warmup_quote_select",
 					"type": "button",
 					"text": {
 						"type": "plain_text",
@@ -109,7 +109,7 @@ exports.sendSelectChoice = async function(targChannelID,app,token){
 					"text": "*Custom Message*"
 				},
 				"accessory": {
-					"action_id": "request_custom_send", 
+					"action_id": "request_custom_send",
 					"type": "button",
 					"text": {
 						"type": "plain_text",
@@ -187,7 +187,7 @@ exports.customMsgView =  async function(ack, body, view, context, isWarmup) {
   let msgToSend = ''
   let counter = 0;
   let channelID = "";
-  //obtain the first key in the values object and use it to grab the user input 
+  //obtain the first key in the values object and use it to grab the user input
   //as well as the channel the user wants to send the input to
   for (key in valuesObject) {
 	  if (counter === 0) {
@@ -307,7 +307,7 @@ exports.sendSelectCooldownChoice = async function(targChannelID,app,token){
 					"text": "*Non-tech Video*"
 				},
 				"accessory": {
-					"action_id": "cooldown_video_select", 
+					"action_id": "cooldown_video_select",
 					"type": "button",
 					"text": {
 						"type": "plain_text",
@@ -339,12 +339,12 @@ exports.cooldownRetroSelect = async function(ack,body,context) {
 	ack();
 	let refArray = []; //array with quote author names
 	let valArray = []; //array with quote values
-	let amountOfRetros = 6; 
+	let amountOfRetros = 6;
 	for (var retroGenerationIter = 0; retroGenerationIter < amountOfRetros; retroGenerationIter++) {
 		let retroGenerated = generateData.generateRetro();
 		//cut the index out of the quote generated
-		let index = retroGenerated.substr(0, retroGenerated.indexOf('-')); 
-		retroGenerated = retroGenerated.substr(retroGenerated.indexOf('-')); 
+		let index = retroGenerated.substr(0, retroGenerated.indexOf('-'));
+		retroGenerated = retroGenerated.substr(retroGenerated.indexOf('-'));
 		valArray[retroGenerationIter] = index;
 		refArray[retroGenerationIter] = retroGenerated;
 	}
@@ -565,16 +565,16 @@ exports.warmupQuoteSelect = async function(ack,body,context) {
 	ack();
 	let refArray = []; //array with quote author names
 	let valArray = []; //array with quote values
-	let amountOfQuotes = 6; 
+	let amountOfQuotes = 6;
 	for (var quoteGenerationIter = 0; quoteGenerationIter < amountOfQuotes; quoteGenerationIter++) {
 		let quoteGenerated = generateData.generateQuote();
 		//cut the index out of the quote generated
-		let index = quoteGenerated.substr(0, quoteGenerated.indexOf('-')); 
-		quoteGenerated = quoteGenerated.substr(quoteGenerated.indexOf('-')); 
+		let index = quoteGenerated.substr(0, quoteGenerated.indexOf('-'));
+		quoteGenerated = quoteGenerated.substr(quoteGenerated.indexOf('-'));
 		valArray[quoteGenerationIter] = index;
 		refArray[quoteGenerationIter] = quoteGenerated;
 	}
-	
+
 	//generate values for above array
 	let thisView = createModalView("Alti","generic_close","warmup_quote_selected_ack","Great choice quotes are fun!","Pick an author",body.channel.id,refArray,valArray);
 	// console.log(JSON.stringify(thisView));
@@ -623,7 +623,7 @@ choiceRepArray (array of strings) - an array of the names of options the user ca
 choiceValueArray (array of strings) - an array of the values of the options the user can choose from
 
 example for the last two arguments, the choiceRepArray would contain names of puzzles, the  choiceValueArray
-would contain strings with links to said puzzle types. 
+would contain strings with links to said puzzle types.
 
 returns (json)
 
@@ -633,38 +633,38 @@ createModalView = function(title,callbackID,actionID,responseText,choiceText,cha
 	//begin populating view object with properties
 	newView["type"] = "modal";
 	newView["callback_id"] = callbackID;
-	
+
 	//create title of view properties
 	let titleObj = {};
 	titleObj["type"] = "plain_text";
 	titleObj["text"] = title;
 	titleObj["emoji"] = true;
-	
+
 	newView["title"] = titleObj;
-	
-	
+
+
 	//create close view properties
 	let closeObj = {};
 	closeObj["type"] = "plain_text";
 	closeObj["text"] = "Close";
 	closeObj["emoji"] = true;
-	
+
 	newView["close"] = closeObj;
-	
+
 	let blocksObj = [];
-	
+
 	let descriptionBlock = {};
 	descriptionBlock["type"] = "section"
 	descrTextObj = {};
 	descrTextObj["type"] = "mrkdwn";
 	descrTextObj["text"] = responseText;
-	
+
 	descriptionBlock["text"] = descrTextObj;
 	descriptionBlock["block_id"] = channelID;
-	
+
 	//push this block onto blocks obj
 	blocksObj.push(descriptionBlock);
-	
+
 	//iterate through arrays to generate options
 	var amountOfChoices = choiceRepArray.length;
 	for (var choiceIterator = 0; choiceIterator < amountOfChoices; choiceIterator++) {
@@ -673,29 +673,29 @@ createModalView = function(title,callbackID,actionID,responseText,choiceText,cha
 		let newText = {};
 		newText["type"] = "plain_text";
 		newText["text"] = choiceRepArray[choiceIterator];
-		
+
 		let newAccessory = {};
 		newAccessory["action_id"]= actionID;
 		newAccessory["type"]= "button";
 		newAccessory["value"]= choiceValueArray[choiceIterator];
-		
+
 		let newAccessoryText = {};
 		newAccessoryText["type"] = "plain_text";
 		newAccessoryText["text"] = "Choose";
-		
+
 		newAccessory["text"] = newAccessoryText;
-		
+
 		newBlock["text"] = newText;
 		newBlock["accessory"] = newAccessory;
-		
+
 		blocksObj.push(newBlock);
 	}
 	//place blocks object into view
 	newView["blocks"] = blocksObj;
-	
+
 	return newView;
-}	
-    
+}
+
 /*
 createConfirmationView
 Creates a json modal view with specified arguments.
@@ -711,43 +711,43 @@ createConfirmationView = function(title,confirmationText) {
 	let newView = {};
 	//begin populating view object with properties
 	newView["type"] = "modal";
-	
+
 	//create title of view properties
 	let titleObj = {};
 	titleObj["type"] = "plain_text";
 	titleObj["text"] = title;
 	titleObj["emoji"] = true;
-	
+
 	newView["title"] = titleObj;
-	
-	
+
+
 	//create close view properties
 	let closeObj = {};
 	closeObj["type"] = "plain_text";
 	closeObj["text"] = "Close";
 	closeObj["emoji"] = true;
-	
+
 	newView["close"] = closeObj;
-	
+
 	let blocksObj = [];
-	
+
 	let descriptionBlock = {};
 	descriptionBlock["type"] = "section"
 	descrTextObj = {};
 	descrTextObj["type"] = "mrkdwn";
 	descrTextObj["text"] = confirmationText;
-	
+
 	descriptionBlock["text"] = descrTextObj;
 
 	//push this block onto blocks obj
 	blocksObj.push(descriptionBlock);
 
 	newView["blocks"] = blocksObj;
-	
+
 	return newView;
-}	
- 
-//handles asynchrounous handling of confirmation for selection 
+}
+
+//handles asynchrounous handling of confirmation for selection
 handleQuoteSelect = async function(ack,body,context) {
 	await ack();
 	// console.log(body.actions[0]);
@@ -763,7 +763,7 @@ handleQuoteSelect = async function(ack,body,context) {
 	var userId = body.user.id;
 	firestoreFuncs.storeTypeOfExercise(workspaceId, userId, true, text);
 
-	
+
 	let confirmationJSON = createConfirmationView("Alti-Confirmation","*Your buddy will receive the motiviational quote for warmup tomorrow!*");
     try {
 		if(body.view.id !== undefined){
@@ -778,6 +778,7 @@ handleQuoteSelect = async function(ack,body,context) {
     catch (error) {
       console.error(error);
     }
+		firestoreFuncs.setPoints(workspaceId,userId);
 }
 
 handlePuzzleSelect = async function(ack,body,context) {
@@ -804,6 +805,7 @@ handlePuzzleSelect = async function(ack,body,context) {
     catch (error) {
       console.error(error);
 	}
+	firestoreFuncs.setPoints(workspaceId,userId);
 	return storeReturn;
 }
 handleTypingSelect = async function(ack,body,context) {
@@ -830,9 +832,10 @@ handleTypingSelect = async function(ack,body,context) {
     catch (error) {
       console.error(error);
 	}
+	firestoreFuncs.setPoints(workspaceId,userId);
 	return storeReturn;
 }
- 
+
 handleRetroSelect = async function(ack,body,context) {
 	await ack();
 	var action = body.actions[0];
@@ -857,10 +860,11 @@ handleRetroSelect = async function(ack,body,context) {
     catch (error) {
       console.error(error);
 	}
+	firestoreFuncs.setPoints(workspaceId,userId);
 	return storeReturn;
 }
- 
- 
+
+
 //handles asynchrous handling of confirmation of article selection
 handleArticleSelect = async function(view,ack,body,context) {
 	ack({
@@ -870,8 +874,8 @@ handleArticleSelect = async function(view,ack,body,context) {
 	// get a  reference to the view object's values
 	const valuesObject = view['state']['values']
 	let quoteToSend = ''
-	let counter = 0; 
-	//obtain the first key in the values object and use it to grab the user input 
+	let counter = 0;
+	//obtain the first key in the values object and use it to grab the user input
 	//as well as the channel the user wants to send the input to
 	for (key in valuesObject) {
 	  if (counter === 0) {
@@ -897,6 +901,7 @@ handleArticleSelect = async function(view,ack,body,context) {
     catch (error) {
       console.error(error);
 	}
+	firestoreFuncs.setPoints(workspaceId,userId);
 	return storeReturn;
 }
 
@@ -909,8 +914,8 @@ handleCooldownArticleSelect = async function(view,ack,body,context) {
 	// get a  reference to the view object's values
 	const valuesObject = view['state']['values']
 	let quoteToSend = ''
-	let counter = 0; 
-	//obtain the first key in the values object and use it to grab the user input 
+	let counter = 0;
+	//obtain the first key in the values object and use it to grab the user input
 	//as well as the channel the user wants to send the input to
 	for (key in valuesObject) {
 	  if (counter === 0) {
@@ -945,8 +950,8 @@ handleVideoSelect = async function(view,ack,body,context) {
 	// get a  reference to the view object's values
 	const valuesObject = view['state']['values']
 	let quoteToSend = ''
-	let counter = 0; 
-	//obtain the first key in the values object and use it to grab the user input 
+	let counter = 0;
+	//obtain the first key in the values object and use it to grab the user input
 	//as well as the channel the user wants to send the input to
 	for (key in valuesObject) {
 	  if (counter === 0) {
@@ -998,4 +1003,3 @@ app.action('warmup_quote_selected_ack', ({ ack, body, context }) => {
  app.view('cooldown_video_selected_ack', ({ view, ack, body, context }) => {
 	handleVideoSelect(view,ack,body,context);
  });
- 

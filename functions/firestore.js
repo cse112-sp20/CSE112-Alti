@@ -6,9 +6,9 @@ const request = require('request');
 
 // console.log(typeof(process.env.FUNCTIONS_EMULATOR));
 if(process.env.FUNCTIONS_EMULATOR === "true"){
-    
+
     var serviceAccount = require('./serviceAccountKey.json');
-    
+
     admin.initializeApp({
         credential: admin.credential.cert(serviceAccount),
         databaseURL: "https://altitest-5f53d.firebaseio.com"
@@ -21,76 +21,83 @@ else{
 let db = admin.firestore();
 
 
-/* 
-    storeAPIPair(team_id, api_key): 
+/*
+    storeAPIPair(team_id, api_key):
 
-    Stores the API keys from the database by team_id. 
+    Stores the API keys from the database by team_id.
 
-    @@PARAMS 
-    team_id: same thing as workspace id 
+    @@PARAMS
+    team_id: same thing as workspace id
 
-    store the API-tokens/id's in the format: 
-        { 
+    store the API-tokens/id's in the format:
+        {
             botToken: "xxxxxxxxxxxxx",
             botId: "Bxxxxxxxxx",
             botUserId: "Uxxxxxxxxx"
         })
  */
-exports.storeAPIPair = (team_id, api_key) => { 
+exports.storeAPIPair = (team_id, api_key) => {
 
     let setValue = {
         botToken: api_key.botToken,
         botId: api_key.botId,
         botUserId: api_key.botUserId
-    }; 
+    };
 
     console.log("Team ID: " + team_id);
-    console.log("API Keys: Copy/Paste this" + JSON.stringify(setValue, null, 1)); 
+    console.log("API Keys: Copy/Paste this" + JSON.stringify(setValue, null, 1));
     db.collection('api_keys').doc(team_id).set(setValue);
 };
 
-/* 
+/*
     getAPIPair(team_id):
 
-    Gets the API keys from the database by team_id. 
+    Gets the API keys from the database by team_id.
 
-    @@PARAMS 
-    team_id: same thing as workspace id 
+    @@PARAMS
+    team_id: same thing as workspace id
 
-    return the API-tokens/id's in the format: 
-        { 
+    return the API-tokens/id's in the format:
+        {
             botToken: "xxxxxxxxxxxxx",
             botId: "Bxxxxxxxxx",
             botUserId: "Uxxxxxxxxx"
         })
  */
-exports.getAPIPair = (team_id) => { 
+exports.getAPIPair = (team_id) => {
         return db.collection('api_keys').doc(team_id).get().then((doc) => {
-            if (!(doc && doc.exists)) {	
+            if (!(doc && doc.exists)) {
 
                 //verbose debug message
-                
+
                 if(process.env.FUNCTIONS_EMULATOR === "true") {
-                    console.log(" Your API_Key is not in the firestore db. " + 
+                    console.log(" Your API_Key is not in the firestore db. " +
                     "\nRemember that data does not save after restart."+
                     "\n You may have to reinstall your app again if you are using the emulator.");
 
-                } else { 
-                    console.log("Your API_Key is not in the firestore db. "); 
+                } else {
+                    console.log("Your API_Key is not in the firestore db. ");
                 }
-                return null;	
+                return null;
             }
-            
-            //returns the fetched value here 
+
+            //returns the fetched value here
             return doc.data();
-        }).catch(() => {	
+        }).catch(() => {
             //return null if there was an error in fetching the data
             return null;
         });
 };
+exports.setPoints = function setPoints(workspaceID, userID) {
+  let userDocRef = db.collection('workspaces').doc(workspaceID).collection('users').doc(userID);
+  //let userDocRef = db.collection('workspaces').doc(workspaceID);
+  userDocRef.update({weeklyPoints:admin.firestore.FieldValue.increment(1)}).then(res => {
+  });
+
+};
 
 
-/* 
+/*
     Stores the new pairings (DM thread ids + partnerIDs) in the corresponding place (with the corresponding
     workspace and channel) in cloud firestore.
     ASSUMPTION: pairedUsers length is always 2
@@ -104,7 +111,7 @@ exports.storeNewPairing = async function storeNewPairing(workspace, dmThreadID, 
     let usersRef = db.collection('workspaces').doc(workspace)
                            .collection('activeChannels').doc(channelID)
                            .collection('pairedUsers');
-    
+
     usersRef.doc(pairedUsers[0]).set({
         dmThreadID: dmThreadID,
         partnerID: pairedUsers[1],
@@ -127,7 +134,7 @@ exports.writeMsgToDB = function writeMsgToDB(teamId, userID, channelID,msgToSend
         This function will store a newly designated pairing channel under the 'activeChannels' collection.
         In addition, it will delete the currently designated pairing channel and all data associated with it.
         We do this to enforce one pairing channel per workspace (for now).
-    Input: 
+    Input:
         workspaceID - workspace id
         channelID - channel id of the new channel designated as the pairing channel
 */
@@ -139,7 +146,7 @@ exports.storeNewPairingChannel = async function storeNewPairingChannel(workspace
 
     if (currChannel === undefined) {
         db.collection('workspaces').doc(workspaceID).set({}, {merge: true});
-        db.collection("workspaces").doc(workspaceID).collection('activeChannels').doc(newChannel).set({}, {merge: true}); 
+        db.collection("workspaces").doc(workspaceID).collection('activeChannels').doc(newChannel).set({}, {merge: true});
     }
     else {
         // To avoid the "ghost document" problem on the workspace
@@ -154,7 +161,7 @@ exports.storeNewPairingChannel = async function storeNewPairingChannel(workspace
 /*
     Description:
         Recursively deletes a specified collection from the db.
-    
+
     Input:
         collectionPath - path to get to the collection you want to delete.
         batchSize - the max # of documents you want to delete within that collection, I think?
@@ -167,7 +174,7 @@ function deleteCollection(collectionPath, batchSize) {
       deleteQueryBatch(query, resolve, reject);
     });
   }
-  
+
 /*
     Description:
         Helper function for deleteCollection
@@ -179,14 +186,14 @@ function deleteQueryBatch(query, resolve, reject) {
         if (snapshot.size === 0) {
             return 0;
         }
-  
+
         // Delete documents in a batch
         let batch = db.batch();
         snapshot.docs.forEach((doc) => {
           batch.delete(doc.ref);
           //console.log(doc.ref);
         });
-  
+
         // eslint-disable-next-line promise/no-nesting
         return batch.commit().then(() => {
           return snapshot.size;
@@ -196,7 +203,7 @@ function deleteQueryBatch(query, resolve, reject) {
           resolve();
           return;
         }
-  
+
         // Recurse on the next process tick, to avoid
         // exploding the stack.
         process.nextTick(() => {
@@ -207,11 +214,11 @@ function deleteQueryBatch(query, resolve, reject) {
       })
       .catch(reject);
 }
- 
+
 /*
     Description:
         This function will retrieve the single pairing channel (id) corresponding to a workspace
-    
+
     Input:
         workspaceID: workspace id you're trying to get the pairing channel for.
 */
@@ -223,13 +230,13 @@ exports.getPairingChannel = async function getPairingChannel(workspaceID) {
     return allChannels[0];
 };
 
-/* 
+/*
     Description:
         This function gets called when a user picks an exercise for their pair's warmup or cooldown activity.
         The activity task prompt gets stored in the user's partner's warmup or cooldown task field.
         This function needs to determine the given user's partner as a part of the functionality which can
-        be found in the entry for that user in teammatePairings collection. 
-    Input: 
+        be found in the entry for that user in teammatePairings collection.
+    Input:
         workspaceID - workspace id
         userID - user id of user who selected this task for their partner
         isWarmup - (boolean) true if warmup, false if cooldown
@@ -266,7 +273,7 @@ exports.getExercisePrompt = async function getExercisePrompt(workspaceID, userID
     let channelID = await this.getPairingChannel(workspaceID);
     let userRef = db.collection("workspaces").doc(workspaceID).collection("activeChannels")
                     .doc(channelID).collection('pairedUsers').doc(userID);
-    
+
     return userRef.get()
         .then(doc => {
             if (!doc.exists) {
@@ -291,19 +298,19 @@ exports.getExercisePrompt = async function getExercisePrompt(workspaceID, userID
 /*
     Description:
         Given a user within a pairing channel, return its partner's userID.
-    
+
     Input:
         workspaceID - workspace id
         channelID - channel id over channel from which pairing was created
         userID - user id of user who you want to find their respective partner
-    
+
     Returns:
         partner's userID, or undefined if error or cannot find the user passed in
 */
 exports.getPartner = function getPartner(workspaceID, channelID, userID) {
     let userRef = db.collection("workspaces").doc(workspaceID).collection("activeChannels")
                     .doc(channelID).collection('pairedUsers').doc(userID);
-    
+
     return userRef.get()
         .then(doc => {
             if (!doc.exists) {
@@ -324,10 +331,10 @@ exports.getPartner = function getPartner(workspaceID, channelID, userID) {
     Description:
         Given a workspace and pairing channel id, return a list of objects, where
         each object contains the paired users, and the DM thread id they are paired within.
-    
-    Input: 
+
+    Input:
         workspaceID - workspace id
-    
+
     Return:
         If u1 is paired with u2 (in dm thread 'd1'), and u3 paired with u4 (in dm thread 'd2'),
         this function will return:
@@ -337,7 +344,7 @@ exports.getPairedUsers = async function getPairedUsers(workspaceID) {
     let channelID = await this.getPairingChannel(workspaceID);
     let userRef = db.collection("workspaces").doc(workspaceID).collection("activeChannels")
                     .doc(channelID).collection('pairedUsers');
-    
+
     return userRef.get().then((querySnapshot) => {
         let partnerIDs = [];
         let pairings = [];
@@ -351,12 +358,12 @@ exports.getPairedUsers = async function getPairedUsers(workspaceID) {
         return pairings;
     });
 };
- 
+
 /*
     Description:
         Sets the warmup time (when they will receive their warmup task) for
         a particular user in the worskpace.
-    
+
     Inputs:
         workspaceID - workspace id of where time is getting set
         userID - user id for which the time/day is getting set
@@ -380,7 +387,7 @@ exports.setWarmupTime = function setWarmupTime(workspaceID, userID, time, day) {
     Inputs:
         workspaceID - workspace id of where time is getting retrieved
         userID - user id for which the time/day is getting retrieved
-        day - the day of the week this time is getting retrieved for 
+        day - the day of the week this time is getting retrieved for
               for ex: 'monday', 'tuesday', 'wednesday', etc.
 */
 exports.getWarmupTime = function getWarmupTime(workspaceID, userID, day) {
@@ -406,7 +413,7 @@ exports.getWarmupTime = function getWarmupTime(workspaceID, userID, day) {
     Description:
         Sets the cooldown time (when they will receive their cooldown task) for
         a particular user in the worskpace.
-    
+
     Inputs:
         workspaceID - workspace id of where time is getting set
         userID - user id for which the time/day is getting set
@@ -430,7 +437,7 @@ exports.setCooldownTime = function setWarmupTime(workspaceID, userID, time, day)
     Inputs:
         workspaceID - workspace id of where time is getting retrieved
         userID - user id for which the time/day is getting retrieved
-        day - the day of the week this time is getting retrieved for 
+        day - the day of the week this time is getting retrieved for
               for ex: 'monday', 'tuesday', 'wednesday', etc.
 */
 exports.getCooldownTime = function getWarmupTime(workspaceID, userID, day) {
@@ -456,7 +463,7 @@ exports.getCooldownTime = function getWarmupTime(workspaceID, userID, day) {
     Description:
         Gets the current workspace 'owner'
         Returns a promise that you have to 'await'
-    
+
     Input:
         workspaceID - workspace id that you want to get owner of
 */
@@ -482,7 +489,7 @@ exports.getOwner = function getOwner(workspaceID) {
 /*
     Description:
         Sets the owner associated with a given workspace
-    
+
     Inputs:
         workspaceID - workspace id of the workspace you want to set owner of
         userID - user id of the new owner
@@ -500,7 +507,7 @@ exports.setOwner = function updateOwner(workspaceID, userID) {
         Gets timezone associated with the given workspace and the schedules of
         everyone paired up within the designated pairing-channel in that workspace.
         Returns a promise that you have to 'await'
-    
+
     Input:
         workspaceID - workspace id that you want the associated timezone of
 */
@@ -526,7 +533,7 @@ exports.getTimeZone = function getTimezone(workspaceID) {
 /*
     Description:
         Sets the timezone associated with a given workspace
-    
+
     Inputs:
         workspaceID - workspace id of the workspace you want to set timezone for
         timeZone - new timezone you want to set, in abbreviated format, ex: "PST"
@@ -542,7 +549,7 @@ exports.setTimeZone = function updateTimeZone(workspaceID, timeZone) {
 /*
     Description:
         Retrieves all workspace ids
-    Returns: 
+    Returns:
         list of workspace ids, for ex: ['T123452324', 'T62345234', 'T6762342342']
 */
 exports.getAllWorkspaces = async function getAllWorkspaces() {
@@ -555,11 +562,11 @@ exports.getAllWorkspaces = async function getAllWorkspaces() {
 /*
     Description:
         Gets all pairing data associated with a particular user
-    
+
     Inputs:
         workspaceID - the workspace the user you're querying about is in
         userID - the user id of the user you want the pairing data for
-    
+
     Returns:
         Returns a Promise that resolves into an object with the following keys:
         (obj) - {
