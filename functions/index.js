@@ -150,7 +150,7 @@ app.command('/setupcooldown', async ({ command, ack, say, context }) => {
     // Acknowledge command request
     ack();
 	//send Warmup prompts to the channel that this command was called from
-    warmupMessage.sendSelectCooldownChoice(command.channel_id,app, context.botToken);
+    warmupMessage.sendCooldownButton(command.channel_id,app, context.botToken);
 });
 
 app.action('cooldown_video_select', async ({ ack, body, context }) => {

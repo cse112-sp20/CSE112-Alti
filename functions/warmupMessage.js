@@ -115,106 +115,17 @@ exports.customMsgView =  async function(ack, body, view, context, isWarmup) {
 }
 
 
-exports.sendSelectCooldownChoice = async function(targChannelID,app,token){
-	const notificationString = "Send a cool-down to your buddy!"
-	//warmup selection message json
-	const cooldownSelect = [
-			{
-				"type": "section",
-				"text": {
-					"type": "plain_text",
-					"emoji": true,
-					"text": 'Which cool-down would you like to send your buddy to get them out of "the zone" this afternoon?'
-				}
-			},
-			{
-				"type": "divider"
-			},
-			{
-				"type": "section",
-				"text": {
-					"type": "mrkdwn",
-					"text": "*Options:*"
-				}
-			},
-			{
-				"type": "section",
-				"text": {
-					"type": "mrkdwn",
-					"text": "*Custom Message*"
-				},
-				"accessory": {
-					"action_id": "cooldown_custom_select",
-					"type": "button",
-					"text": {
-						"type": "plain_text",
-						"emoji": true,
-						"text": "Choose"
-					},
-					"value": "select_custom"
-				}
-			},
-			{
-				"type": "section",
-				"text": {
-					"type": "mrkdwn",
-					"text": "*Retrospective Questions*"
-				},
-				"accessory": {
-					"action_id": "cooldown_retro_select",
-					"type": "button",
-					"text": {
-						"type": "plain_text",
-						"emoji": true,
-						"text": "Choose"
-					},
-					"value": "select_retro"
-				}
-			},
-			{
-				"type": "section",
-				"text": {
-					"type": "mrkdwn",
-					"text": "*Non-tech Article*"
-				},
-				"accessory": {
-					"action_id": "cooldown_article_select",
-					"type": "button",
-					"text": {
-						"type": "plain_text",
-						"emoji": true,
-						"text": "Choose"
-					},
-					"value": "select_article"
-				}
-			},
-			{
-				"type": "section",
-				"text": {
-					"type": "mrkdwn",
-					"text": "*Non-tech Video*"
-				},
-				"accessory": {
-					"action_id": "cooldown_video_select", 
-					"type": "button",
-					"text": {
-						"type": "plain_text",
-						"emoji": true,
-						"text": "Choose"
-					},
-					"value": "select_video"
-				}
-			}
-		];
+sendSelectCooldownChoice = async function(ack,body,context){
+	//try function logic
+	let cooldownView = createSelectionView(false);
 	//try function logic
 	try {
 		//make a call to the web api to post message in targ channel
-		const result = await app.client.chat.postMessage({
+		const result = await app.client.views.open({
 		  // The token you used to initialize your app is stored in the `context` object
-		  token: token,
-		  channel: targChannelID,
-		  text: notificationString,
-		  blocks: cooldownSelect
+			token: context.botToken,
+			trigger_id: body.trigger_id,
+			view: JSON.stringify(cooldownView)
 		});
 	}
 	//catch any errors
@@ -236,11 +147,12 @@ exports.cooldownRetroSelect = async function(ack,body,context) {
 		valArray[retroGenerationIter] = index;
 		refArray[retroGenerationIter] = retroGenerated;
 	}
-	let thisView = createModalView("Alti","generic_close","cooldown_retro_selected_ack","Nice, retros are fun!","Pick an article type",body.channel.id,refArray,valArray);
+	let thisView = createModalView("Alti","generic_close","cooldown_retro_selected_ack","Nice, retros are fun!","Pick an article type","num",refArray,valArray);
     try {
-      const result = await app.client.views.open({
+      const result = await app.client.views.update({
         token: context.botToken,
 		trigger_id: body.trigger_id,
+		view_id: body.view.id,
          view: JSON.stringify(thisView)
       });
     }
@@ -253,9 +165,10 @@ exports.cooldownRetroSelect = async function(ack,body,context) {
 exports.cooldownVideoSelect = async function(ack,body,context) {
 	await ack();
     try {
-      const result = await app.client.views.open({
+      const result = await app.client.views.update({
         token: context.botToken,
 		trigger_id: body.trigger_id,
+		view_id: body.view.id,
         view: {
 			type: 'modal',
 			// View identifier
@@ -267,7 +180,7 @@ exports.cooldownVideoSelect = async function(ack,body,context) {
 			blocks: [
 			  {
 				type: 'input',
-				block_id: body.channel.id,
+				block_id: 'num',
 				label: {
 				  type: 'plain_text',
 				  text: 'Submit your non-tech video link below!'
@@ -310,7 +223,7 @@ exports.cooldownArticleSelect = async function(ack,body,context) {
 			blocks: [
 			  {
 				type: 'input',
-				block_id: body.channel.id,
+				block_id: 'num',
 				label: {
 				  type: 'plain_text',
 				  text: 'Submit your non-tech article link below!'
@@ -512,6 +425,9 @@ createSelectionView = function(isWarmupSelection){
 	if (isWarmupSelection) {
 		newView["callback_id"] = "closedSelectionWarmup";
 	}
+	else {
+		newView["callback_id"] = "closedSelectionCooldown";
+	}
 	
 	
 	//create title of view properties
@@ -519,6 +435,8 @@ createSelectionView = function(isWarmupSelection){
 	titleObj["type"] = "plain_text";
 	if (isWarmupSelection) {
 		titleObj["text"] = "Warmup Selection";
+	} else {
+		titleObj["text"] = "Cooldown Selection";
 	}
 	titleObj["emoji"] = true;
 	newView["title"] = titleObj;
@@ -530,13 +448,120 @@ createSelectionView = function(isWarmupSelection){
 	
 	newView["close"] = closeObj;
 	
-	newView["blocks"] = [
+	if (isWarmupSelection) {
+		newView["blocks"] = [
+				{
+					"type": "section",
+					"text": {
+						"type": "plain_text",
+						"emoji": true,
+						"text": "Hey there, pick a warmup for your buddy!"
+					}
+				},
+				{
+					"type": "divider"
+				},
+				{
+					"type": "section",
+					"text": {
+						"type": "mrkdwn",
+						"text": "*Pick a content type:*"
+					}
+				},
+				{
+					"type": "section",
+					"text": {
+						"type": "mrkdwn",
+						"text": "*Speed Typing Test*"
+					},
+					"accessory": {
+						"action_id": "warmup_coding_select",
+						"type": "button",
+						"text": {
+							"type": "plain_text",
+							"emoji": true,
+							"text": "Choose"
+						},
+						"value": "select_test"
+					}
+				},
+				{
+					"type": "section",
+					"text": {
+						"type": "mrkdwn",
+						"text": "*Tech Article*"
+					},
+					"accessory": {
+						"action_id": "warmup_article_select",
+						"type": "button",
+						"text": {
+							"type": "plain_text",
+							"emoji": true,
+							"text": "Choose"
+						},
+						"value": "select_article"
+					}
+				},
+				{
+					"type": "section",
+					"text": {
+						"type": "mrkdwn",
+						"text": "*Easy Online Puzzle*"
+					},
+					"accessory": {
+						"action_id": "warmup_puzzle_select",
+						"type": "button",
+						"text": {
+							"type": "plain_text",
+							"emoji": true,
+							"text": "Choose"
+						},
+						"value": "select_puzzle"
+					}
+				},
+				{
+					"type": "section",
+					"text": {
+						"type": "mrkdwn",
+						"text": "*Motivational Quote*"
+					},
+					"accessory": {
+						"action_id": "warmup_quote_select", 
+						"type": "button",
+						"text": {
+							"type": "plain_text",
+							"emoji": true,
+							"text": "Choose"
+						},
+						"value": "select_quote"
+					}
+				},
+				 {
+					"type": "section",
+					"text": {
+						"type": "mrkdwn",
+						"text": "*Custom Message*"
+					},
+					"accessory": {
+						"action_id": "request_custom_send", 
+						"type": "button",
+						"text": {
+							"type": "plain_text",
+							"emoji": true,
+							"text": "Choose"
+						},
+						"value": "select_custom"
+					}
+				}
+			];
+	} else {
+		newView["blocks"] = [
 			{
 				"type": "section",
 				"text": {
 					"type": "plain_text",
 					"emoji": true,
-					"text": "Hey there, pick a warmup for your buddy!"
+					"text": 'Which cool-down would you like to send your buddy to get them out of "the zone" this afternoon?'
 				}
 			},
 			{
@@ -546,34 +571,51 @@ createSelectionView = function(isWarmupSelection){
 				"type": "section",
 				"text": {
 					"type": "mrkdwn",
-					"text": "*Pick a content type:*"
+					"text": "*Options:*"
 				}
 			},
 			{
 				"type": "section",
 				"text": {
 					"type": "mrkdwn",
-					"text": "*Speed Typing Test*"
+					"text": "*Custom Message*"
 				},
 				"accessory": {
-					"action_id": "warmup_coding_select",
+					"action_id": "cooldown_custom_select",
 					"type": "button",
 					"text": {
 						"type": "plain_text",
 						"emoji": true,
 						"text": "Choose"
 					},
-					"value": "select_test"
+					"value": "select_custom"
 				}
 			},
 			{
 				"type": "section",
 				"text": {
 					"type": "mrkdwn",
-					"text": "*Tech Article*"
+					"text": "*Retrospective Questions*"
 				},
 				"accessory": {
-					"action_id": "warmup_article_select",
+					"action_id": "cooldown_retro_select",
+					"type": "button",
+					"text": {
+						"type": "plain_text",
+						"emoji": true,
+						"text": "Choose"
+					},
+					"value": "select_retro"
+				}
+			},
+			{
+				"type": "section",
+				"text": {
+					"type": "mrkdwn",
+					"text": "*Non-tech Article*"
+				},
+				"accessory": {
+					"action_id": "cooldown_article_select",
 					"type": "button",
 					"text": {
 						"type": "plain_text",
@@ -587,54 +629,21 @@ createSelectionView = function(isWarmupSelection){
 				"type": "section",
 				"text": {
 					"type": "mrkdwn",
-					"text": "*Easy Online Puzzle*"
+					"text": "*Non-tech Video*"
 				},
 				"accessory": {
-					"action_id": "warmup_puzzle_select",
+					"action_id": "cooldown_video_select", 
 					"type": "button",
 					"text": {
 						"type": "plain_text",
 						"emoji": true,
 						"text": "Choose"
 					},
-					"value": "select_puzzle"
-				}
-			},
-			{
-				"type": "section",
-				"text": {
-					"type": "mrkdwn",
-					"text": "*Motivational Quote*"
-				},
-				"accessory": {
-					"action_id": "warmup_quote_select", 
-					"type": "button",
-					"text": {
-						"type": "plain_text",
-						"emoji": true,
-						"text": "Choose"
-					},
-					"value": "select_quote"
-				}
-			},
-			 {
-				"type": "section",
-				"text": {
-					"type": "mrkdwn",
-					"text": "*Custom Message*"
-				},
-				"accessory": {
-					"action_id": "request_custom_send", 
-					"type": "button",
-					"text": {
-						"type": "plain_text",
-						"emoji": true,
-						"text": "Choose"
-					},
-					"value": "select_custom"
+					"value": "select_video"
 				}
 			}
-		];
+		];	
+	}
 	
 	return newView;
 }
@@ -930,10 +939,7 @@ handleArticleSelect = async function(view,ack,body,context) {
 
 //handles asynchrous handling of confirmation of cooldown article selection
 handleCooldownArticleSelect = async function(view,ack,body,context) {
-	ack({
-	  //clear the modal off the users screen
-	 "response_action": "clear"
-	});
+	ack();
 	// get a  reference to the view object's values
 	const valuesObject = view['state']['values']
 	let quoteToSend = ''
@@ -971,7 +977,7 @@ handleCooldownArticleSelect = async function(view,ack,body,context) {
 handleVideoSelect = async function(view,ack,body,context) {
 	ack();
 	// get a  reference to the view object's values
-	const valuesObject = view['state']['values']
+	const valuesObject = view['state']['values'];
 	let quoteToSend = ''
 	let counter = 0; 
 	//obtain the first key in the values object and use it to grab the user input 
@@ -1062,13 +1068,53 @@ exports.sendWarmupButton = async function(targChannelID,app,token){
 	}
 }	
 
+exports.sendCooldownButton = async function(targChannelID,app,token){
+	const notificationString = "Alert to send a cooldown to your buddy!";
+		const warmupButton = [
+		{
+			"type": "actions",
+			"elements": [
+				{
+					"action_id": "sendCooldownButtonClick",
+					"type": "button",
+					"text": {
+						"type": "plain_text",
+						"text": "Send A Cooldown",
+						"emoji": true
+					}
+				}
+			]
+		}
+	];
+	//try function logic
+	try {
+		//make a call to the web api to post message in targ channel
+		const result = await app.client.chat.postMessage({
+		  // The token you used to initialize your app is stored in the `context` object
+		  token: token,
+		  channel: targChannelID,
+		  text: notificationString,
+		  blocks: warmupButton
+		});
+	}
+	//catch any errors
+	catch(error) {
+		console.log(error);
+	}
+}	
+
 sendWarmupHandler = async function(ack,body,context) {
 	ack();
 	sendSelectWarmupChoice(ack,body, context);
 }
 
+sendCooldownHandler = async function(ack,body,context) {
+	ack();
+	sendSelectCooldownChoice(ack,body, context);
+}
+
 app.action('sendCooldownButtonClick', ({ ack, body, context }) => {
-	sendWarmupHandler(ack,body,context);
+	sendCooldownHandler(ack,body,context);
 });
  
 app.action('sendWarmupButtonClick', ({ ack, body, context }) => {
