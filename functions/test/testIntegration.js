@@ -34,9 +34,9 @@ describe('Integration Testing', () => {
       let now = new Date();
       now.setTime(now.getTime() + 120000); 
       var response = await schedule.scheduleMsg(now.getHours(), now.getMinutes(), 
-                                                      "A reminder", "#general", token);
+                                                      "A reminder", "#testing", token);
       
-      // console.log("RESPONSE: ", response);
+      console.log("RESPONSE: ", response);
       app.client.chat.deleteScheduledMessage({
         token: token,
         channel: "testing",
@@ -51,7 +51,7 @@ describe('Integration Testing', () => {
       let now = new Date();
       now.setTime(now.getTime() - 60000); 
       let response = await schedule.scheduleMsg(now.getHours(), now.getMinutes(), 
-                                                      "A reminder", "#general");
+                                                      "A reminder", "#testing");
       //console.log(response);
       assert.equal(response.ok, false);
     });
@@ -69,7 +69,7 @@ describe('Integration Testing', () => {
     now = newDate;
     now.setTime(now.getTime() + 240000); 
     var response = await schedule.scheduleMsg(now.getHours(), now.getMinutes(), 
-                                                    "A reminder", "#general", token);
+                                                    "A reminder", "#testing", token);
     assert.equal(response.error, undefined);                                                
     assert.equal(response.ok, true);
     //console.log("RESPONSE: ", response);
