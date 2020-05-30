@@ -12,7 +12,10 @@ const firestoreFuncs = require('./firestore');
 const index = require('./index');
 const app = index.getBolt();
 const util = require('./util');
-// Triggers the pairing up of all people in a given channel.
+
+// Triggers the pairing up of all people in a given channel. Cleans all the previous pairing information
+// under the active pairing channel before starting to pair. If the number of people in the active channel
+// is an odd number, pairs the last group of 3 people in a circle.  (user0 -> user1 -> user2 -> user0)
 exports.pairUp = async function pairUp(context=undefined, botToken=undefined){
     
     if(context === undefined && botToken === undefined){
@@ -25,7 +28,6 @@ exports.pairUp = async function pairUp(context=undefined, botToken=undefined){
         else{
             token = botToken;
         }
-        // TODO: Take this out of this function and pass it in as a parameter ideally
         const workspaceInfo = await app.client.team.info({
             token: token
         });
@@ -48,8 +50,12 @@ exports.pairUp = async function pairUp(context=undefined, botToken=undefined){
                     channel:id
             });
         });
+        // Clean the previous pairings in case someone has left the channel after last pairup
+        const deletePairingResponse = channelId.then( id => {
+            return firestoreFuncs.deletePairings(workspaceInfo.team.id, id);
+        });
         
-        const usersInfo = await Promise.all([allUsers, members]).then(data => {
+        const usersInfo = await Promise.all([allUsers, members, deletePairingResponse]).then(data => {
             const allUsers = data[0];
             const members = data[1];
             if(!allUsers.ok){
@@ -85,11 +91,21 @@ exports.pairUp = async function pairUp(context=undefined, botToken=undefined){
         }); 
         //Pairing people up randomly and saving the response containing the paired channel information
         conversationInfos = []
-        for (i = 0; i < ids.length/2; i++) {
+
+        // If the number of people in the channel is even, pair them normally.
+        // If not, pair a random group of 3 people in the same chat.
+        for (i = 0; i < Math.floor(ids.length/2); i++) {
+            const j = Math.floor((ids.length/2) + i);
+            var users;
+            if( (ids.length % 2 !== 0) && (j === ids.length - 2) ){
+                users = ids[i]+','+ids[j]+','+ids[j+1];
+            }else{
+                users = ids[i]+','+ids[j];
+            }
             var responsePromise = app.client.conversations.open({
                 token: token,
                 return_im: false,
-                users: ids[i]+','+ids[Math.floor((ids.length/2) + i)]
+                users: users
             })
             conversationInfos.push(responsePromise);
         }
@@ -138,7 +154,21 @@ async function handlePairingResponse(response, app, token, workspaceInfo, pairin
     }
     /* eslint-enable no-await-in-loop */
 
-    return firestoreFuncs.storeNewPairing(workspaceInfo.team.id, response.channel.id, pairedUsers);
+    // If the number of people in the channel is even, pair them normally.
+    // If not, pair a random group of 3 people in a circle where user0 -> user1 -> user2 -> user0.
+    if(pairedUsers.length % 2 === 0){
+        return firestoreFuncs.storeNewPairing(workspaceInfo.team.id, response.channel.id, pairedUsers);
+    }
+    else{
+        if(pairedUsers.length !== 3){
+            console.error("handlePairingResponse has been passed in an odd number of users that is not 3.");
+        }
+        // Shuffle so that when the same 3 people get matched, the direction of the matchings alternate
+        shuffle(pairedUsers);
+        firestoreFuncs.storeDirectedPairing(workspaceInfo.team.id, response.channel.id, [pairedUsers[0],pairedUsers[1]]);
+        firestoreFuncs.storeDirectedPairing(workspaceInfo.team.id, response.channel.id, [pairedUsers[1],pairedUsers[2]]);
+        return firestoreFuncs.storeDirectedPairing(workspaceInfo.team.id, response.channel.id, [pairedUsers[2],pairedUsers[0]]);
+    }
 }
 
 
