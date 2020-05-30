@@ -97,6 +97,7 @@ exports.setPoints = function setPoints(workspaceID, userID) {
 };
 
 
+
 /*
     Stores the new pairings (DM thread ids + partnerIDs) in the corresponding place (with the corresponding
     workspace and channel) in cloud firestore.
