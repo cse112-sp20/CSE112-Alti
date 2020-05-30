@@ -70,9 +70,11 @@ describe('Integration Testing', () => {
     now.setTime(now.getTime() + 240000); 
     var response = await schedule.scheduleMsg(now.getHours(), now.getMinutes(), 
                                                     "A reminder", "#testing", token);
+
+    //console.log("RESPONSE: ", response);
     assert.equal(response.error, undefined);                                                
     assert.equal(response.ok, true);
-    //console.log("RESPONSE: ", response);
+    
     app.client.chat.deleteScheduledMessage({
       token: token,
       channel: "#testing",
