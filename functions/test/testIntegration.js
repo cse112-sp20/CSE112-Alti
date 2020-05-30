@@ -22,6 +22,7 @@ let token = config.slack.bot_token;
 describe('Integration Testing', () => {
   // If it passes, means the function finished and message was scheduled, baseline test
   // Need more rigorous testing using promises of async function and validation from Slack API channel reading
+  /*
   describe('Scheduler', () => {
    
     let schedule;
@@ -89,6 +90,7 @@ describe('Integration Testing', () => {
       assert.equal(response.ok, true);
     });
   });
+  */
 
 
   describe('Pairup', () => {
