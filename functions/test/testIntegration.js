@@ -71,7 +71,7 @@ describe('Integration Testing', () => {
     var response = await schedule.scheduleMsg(now.getHours(), now.getMinutes(), 
                                                     "A reminder", "#testing", token);
 
-    //console.log("RESPONSE: ", response);
+    console.log("RESPONSE: ", response);
     assert.equal(response.error, undefined);                                                
     assert.equal(response.ok, true);
     
