@@ -833,6 +833,7 @@ handleTypingSelect = async function(ack,body,context) {
       console.error(error);
 	}
 	firestoreFuncs.setPoints(workspaceId,userId);
+	//firestoreFuncs.leaderboard(workspaceId); testing
 	return storeReturn;
 }
 
@@ -860,7 +861,6 @@ handleRetroSelect = async function(ack,body,context) {
     catch (error) {
       console.error(error);
 	}
-	firestoreFuncs.setPoints(workspaceId,userId);
 	return storeReturn;
 }
 

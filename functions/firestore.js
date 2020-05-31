@@ -93,9 +93,42 @@ exports.setPoints = function setPoints(workspaceID, userID) {
   //let userDocRef = db.collection('workspaces').doc(workspaceID);
   userDocRef.update({weeklyPoints:admin.firestore.FieldValue.increment(1)}).then(res => {
   });
+};
+exports.leaderboard = function leaderboard(workspaceID)
+{
+ let rankings = [];
+ db.collection('workspaces').doc(workspaceID).collection('users').get().then(function(querySnapshot)
+ {
+     querySnapshot.forEach(function(doc)
+     {
+       rankings.push(doc.data());
+     });
+    console.log(rankings);
+
+  function compare(a, b)
+  {
+
+    if (a.weeklyPoints <= b.weeklyPointsB)
+    {
+      comparison = 1;
+    }
+    else
+    {
+      comparison = -1;
+    }
+    return comparison;
+  }
+rankings.sort(compare);
+console.log(rankings);
+
+
+
+ });
+
+
+
 
 };
-
 
 
 
