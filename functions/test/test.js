@@ -17,7 +17,6 @@ let firestoreFuncs = require('../firestore');
 const functions = require('firebase-functions');
 const config = functions.config();
 let token = config.slack.bot_token;
-
 // Unit Tests  go Here
 describe('Unit Testing', () => {
   describe('util', () => {
