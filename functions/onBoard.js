@@ -195,22 +195,84 @@ app.event('member_joined_channel', async ({ body, context }) => {
     var activeChannel = await firestoreFuncs.getPairingChannel(body.team_id);
     if (activeChannel === body.event.channel) {
         console.log("Member joined pairing channel");
-        // TODO 
-        // 1. DM user with information about being in pairing channel
-        // 2. Store user's info in db
-        //firestoreFuncs.setWarmupTime(team_id, userId, "9:00 AM", day);
-        //firestoreFuncs.setCooldownTime(team_id, userId, "5:00 PM", day);
+
+        var keyObj = await firestoreFuncs.getAPIPair(body.team_id);
+        if (!keyObj) {
+          console.error("No API key");
+          return;
+        }
+        var w_token = keyObj.botToken;
+        if (!w_token) {
+          console.error("No workspace token");
+          return;
+        }
+
+        var conversation = await app.client.conversations.open({
+            token: w_token,
+            users: body.event.user
+        }).catch((error) => {
+            console.log(error);
+        });
+
+        if(!conversation.ok) {
+            console.log("Open DM failed!");
+            return;
+        }
+
+        var result = await app.client.chat.postMessage({
+            token: w_token,
+            channel: conversation.channel.id,
+            text: "You have joined the alti pairing channel! Your default warmup time is 9:00 AM and cooldown time is 5:00 PM."
+        }).catch((error) => {
+            console.log(error);
+        });
+
+
+
+        for (var day of days) {
+            promises.push(firestoreFuncs.setWarmupTime(team_id, userId, "9:00 AM", day));
+            promises.push(firestoreFuncs.setCooldownTime(team_id, userId, "5:00 PM", day));
+        }
     }
 });
 
 app.event('member_left_channel', async ({ body, context }) => {
     console.log("Member left channel");
-    console.log(body);
-    console.log(context);
+    var activeChannel = await firestoreFuncs.getPairingChannel(body.team_id);
     if (activeChannel === body.event.channel) {
         console.log("Member left pairing channel");
     }
-    
+
+    var keyObj = await firestoreFuncs.getAPIPair(body.team_id);
+        if (!keyObj) {
+          console.error("No API key");
+          return;
+        }
+        var w_token = keyObj.botToken;
+        if (!w_token) {
+          console.error("No workspace token");
+          return;
+        }
+
+        var conversation = await app.client.conversations.open({
+            token: w_token,
+            users: body.event.user
+        }).catch((error) => {
+            console.log(error);
+        });
+
+        if(!conversation.ok) {
+            console.log("Open DM failed!");
+            return;
+        }
+
+        var result = await app.client.chat.postMessage({
+            token: w_token,
+            channel: conversation.channel.id,
+            text: "You have left the alti pairing channel! You will not be paired in next week."
+        }).catch((error) => {
+            console.log(error);
+        });
 });
 
 
