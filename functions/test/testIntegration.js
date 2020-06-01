@@ -143,9 +143,12 @@ describe('Integration Testing', () => {
       it('Test Pairup random users', async function() {
         this.timeout(180000);
 
-        let test = await Promise.all(await pairUp.pairUp(undefined, token));
+        let pairupReturn = await pairUp.pairUp(undefined, token);
+        console.log("pairupReturn: " + pairupReturn);
+        let test = await Promise.all(pairupReturn);
+        console.log("test: " + test);
         var pairs = await firestoreFuncs.getPairedUsers(workspaceId);
-        //console.log(pairs);
+        console.log("Pairs: " + pairs);
 
         var partner1 = pairs[0]["users"][0];
         var partner2 = pairs[0]["users"][1];
