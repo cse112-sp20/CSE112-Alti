@@ -164,12 +164,14 @@ async function handlePairingResponse(response, app, token, workspaceInfo, pairin
     // If the number of people in the channel is even, pair them normally.
     // If not, pair a random group of 3 people in a circle where user0 -> user1 -> user2 -> user0.
     if(pairedUsers.length % 2 === 0){
+        console.log("Even numbered channel");
         return await firestoreFuncs.storeNewPairing(workspaceInfo.team.id, response.channel.id, pairedUsers);
     }
     else{
         if(pairedUsers.length !== 3){
             console.error("handlePairingResponse has been passed in an odd number of users that is not 3.");
         }
+        console.log("Odd numbered channel");
         // Shuffle so that when the same 3 people get matched, the direction of the matchings alternate
         shuffle(pairedUsers);
         directedPairings = []
