@@ -778,7 +778,6 @@ handleQuoteSelect = async function(ack,body,context) {
     catch (error) {
       console.error(error);
     }
-		firestoreFuncs.setPoints(workspaceId,userId);
 }
 
 handlePuzzleSelect = async function(ack,body,context) {
@@ -805,7 +804,6 @@ handlePuzzleSelect = async function(ack,body,context) {
     catch (error) {
       console.error(error);
 	}
-	firestoreFuncs.setPoints(workspaceId,userId);
 	return storeReturn;
 }
 handleTypingSelect = async function(ack,body,context) {
@@ -832,9 +830,6 @@ handleTypingSelect = async function(ack,body,context) {
     catch (error) {
       console.error(error);
 	}
-	//firestoreFuncs.resetPoints(workspaceId,userId);
-	firestoreFuncs.setPoints(workspaceId,userId);
-	firestoreFuncs.leaderboard(workspaceId); testing
 	return storeReturn;
 }
 
@@ -902,7 +897,6 @@ handleArticleSelect = async function(view,ack,body,context) {
     catch (error) {
       console.error(error);
 	}
-	firestoreFuncs.setPoints(workspaceId,userId);
 	return storeReturn;
 }
 

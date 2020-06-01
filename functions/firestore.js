@@ -1,6 +1,7 @@
 const functions = require('firebase-functions');
 const admin = require('firebase-admin');
 const request = require('request');
+const firestoreFuncs = require('./firestore');
 // const dotenv = require('dotenv');
 // dotenv.config();
 
@@ -90,25 +91,27 @@ exports.getAPIPair = (team_id) => {
 };
 
 //Whenever a user completes a cooldown/warmup increase weeklyPoints by 1
-exports.setPoints = function setPoints(workspaceID, userID) {
-  let userDocRef = db.collection('workspaces').doc(workspaceID).collection('users').doc(userID);
-  userDocRef.update({weeklyPoints:admin.firestore.FieldValue.increment(1)}).then(res => {
+exports.setPoints = function setPoints(channelId, userID) {
+//  worskpace.workid.activechannels.teamid.pairedusers
+  let userDocRef = db.collection('workspaces').doc(channelId).collection('users').doc(userID);
+  userDocRef.update({
+    weeklyPoints:admin.firestore.FieldValue.increment(1),
+    monthlyPoints:admin.firestore.FieldValue.increment(1)
+  }).then(res => {
   });
 };
 //Always reset points at the beginning of running this app, and at the end of the month
-exports.resetPoints = function resetPoints(workspaceID, userID) {
-  let userDocRef = db.collection('workspaces').doc(workspaceID).collection('users').doc(userID);
+exports.resetPoints = function resetPoints(team_id, userID) {
+  let userDocRef = db.collection('workspaces').doc(team_id).collection('users').doc(userID);
   userDocRef.set
   ({
       weeklyPoints: 0,
       monthlyPoints: 0
   }, {merge: true});
 };
-
 /*
-  1. Store weeklyPoints into array
-  2. Add weeklyPoints to monthlyPoints, then reset weeklyPoints to 0
-  3. Sort the array by points
+  1. Store id/points into array
+  2. Sort the array by points
   4. Output in nice format (not done)
 */
 exports.leaderboard = function leaderboard(workspaceID)
@@ -118,20 +121,8 @@ exports.leaderboard = function leaderboard(workspaceID)
  {
      querySnapshot.forEach(function(doc)
      {
-       var pair  =
-       {
-         "id" : "weeklyPoints"
-       };
-       pair['id'] = doc.id;
-       pair['weeklyPoints'] = doc.data().weeklyPoints;
-       rankings.push(pair);
-       console.log(pair);
-       let userDocRef = db.collection('workspaces').doc(workspaceID).collection('users').doc(pair['id']);
-       userDocRef.update
-       ({
-           weeklyPoints: 0,
-           monthlyPoints: doc.data().monthlyPoints + pair['weeklyPoints']
-       }, {merge: true});
+       var user = {id:doc.id, weeklyPoints:doc.data().weeklyPoints, monthlyPoints:doc.data().monthlyPoints};
+       rankings.push(user);
      });
   function compare(a, b)
   {
@@ -313,6 +304,9 @@ exports.storeTypeOfExercise = async function storeTypeOfExercise(workspaceID, us
     else {
         setResult = await partnerRef.set({'cooldownTask': exercisePrompt}, {merge: true});
     }
+
+    console.log(workspaceID + "   " + userID);
+    firestoreFuncs.setPoints(workspaceID,userID);
     return setResult;
 }
 
