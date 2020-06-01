@@ -15,7 +15,7 @@ let defaultDocInfo = {'botToken':'fake_token', 'note': 'this is Alti-Test',
 exports.deleteWorkspace = async function(workspaceId) {
   let snapshot = await db.collection('workspaces').get();
   let batch = db.batch();
-  snapshot.docs.forEach((doc) => {
+  await snapshot.docs.forEach((doc) => {
     if(doc.id === workspaceId)
     {
       //console.log(doc.id);
@@ -23,7 +23,7 @@ exports.deleteWorkspace = async function(workspaceId) {
     }
     //console.log(doc.ref);
   });
-  await batch.commit();
+  return await batch.commit();
 }
 
 /*
