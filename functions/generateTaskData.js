@@ -51,22 +51,33 @@ exports.generatePuzzle =function generatePuzzle(typeOfPuzzle) {
     // Hardcoded difficulty, can be changed but also need to
     // hardcode the upper limit for each game in that case
     const difficulty = "1";
-    //var difficulty = Math.floor(Math.random() * 3) + 1 
     // Hardcode the start of the url
     var url = `https://brainbashers.com/show${typeOfPuzzle}.asp?`;
 
     // Append the query parameters based on the type of game
     switch(typeOfPuzzle){
         case "sudoku":
+            //For consideration:
+            //var difficulty = Math.floor(Math.random() * 5) + 1 
+            //difficulty = difficulty.toString();
             url += generateSudokuParameters(difficulty);
             break;
         case "3inarow":
+            //For consideration:
+            //var difficulty = Math.floor(Math.random() * 2) + 1 
+            //difficulty = difficulty.toString();
             url += generate3inarowParameters(difficulty);
             break;
         case "calcudoku":
+            //For consideration:
+            //var difficulty = Math.floor(Math.random() * 3) + 1 
+            //difficulty = difficulty.toString();
             url += generateCalcudokuParameters(difficulty);
             break;
         case "hitori":
+            //For consideration:
+            //var difficulty = Math.floor(Math.random() * 3) + 1 
+            //difficulty = difficulty.toString();
             url += generateHitoriParameters(difficulty);
             break;
         default:
