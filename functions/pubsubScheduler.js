@@ -21,11 +21,7 @@ var threads = [];
 / prompt for their warmup and cooldown selection for their partner in the evening too.
 / (Morning = start of workday, Evening = end of workday)
 */
-function handlePairupError(err, workspace){
-  console.error("Could not pair up workspace "+workspace);
-  console.error(err);
-  return Promise.resolve();
-}
+
 exports.scheduledPairUp = functions.pubsub
 														.schedule('every sunday 13:00')
 														.timeZone('America/Los_Angeles')
@@ -36,7 +32,6 @@ exports.scheduledPairUp = functions.pubsub
 	for( i=0; i<allWorkspaces.length; i++){
     let workspace = allWorkspaces[i];
 		// if (  workspace === "T0137P851BJ" || workspace === "T0132EDC3M4"  ){
-      // console.log("====PAIRING UP WORKSPACE "+workspace);
       promise = promise.then(res => {
         return firestoreFuncs.getAPIPair(workspace);
       },rej => {
@@ -47,7 +42,6 @@ exports.scheduledPairUp = functions.pubsub
       });
     // }
   }
-
 	return null;
 });
 

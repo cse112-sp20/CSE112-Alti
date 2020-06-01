@@ -118,8 +118,6 @@ exports.pairUp = async function pairUp(context=undefined, botToken=undefined){
         await conversationInfos.map( conversationInfo => {
             return conversationInfo
                 .then( response => {
-                    //TODO: REMOVE
-                    console.log("====pairingChannelIdVal: " + pairingChannelIdVal + "---" + workspaceInfo.team.id);
                     return handlePairingResponse(response, app, token, workspaceInfo, pairingChannelIdVal);
                 })
                 .catch(err => {
