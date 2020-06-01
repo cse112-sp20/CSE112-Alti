@@ -119,7 +119,7 @@ exports.resetPoints = function resetPoints(team_id, userID) {
 */
 exports.getRankings = function getRankings(workspaceID) {
     try {
-        let rankings = [];
+        var rankings = [];
         db.collection('workspaces').doc(workspaceID).collection('users').get().then(function(querySnapshot)
         {
             querySnapshot.forEach(function(doc)
@@ -136,12 +136,9 @@ exports.getRankings = function getRankings(workspaceID) {
             }
             return comparison;
         }
-        rankings.sort(compare);
-       for (var i = 0; i < rankings.length; i++)
-       {
-        console.log(i+1 + ")" + rankings[i]['id'] + " " + "points: " + rankings[i]['weeklyPoints']);
-      }
-      //return rankings;
+      rankings.sort(compare);
+      console.log(rankings);
+      return rankings;
       });
 
     } catch (error) {
@@ -308,7 +305,6 @@ exports.storeTypeOfExercise = async function storeTypeOfExercise(workspaceID, us
 
     console.log(workspaceID + "   " + userID);
     firestoreFuncs.setPoints(workspaceID,userID);
-    //firestoreFuncs.getRankings(workspaceID); //testing the rankings function
     return setResult;
 }
 
