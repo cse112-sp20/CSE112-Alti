@@ -17,7 +17,7 @@ let firestoreFuncs = require('../firestore');
 const functions = require('firebase-functions');
 const config = functions.config();
 let token = config.slack.bot_token;
-
+/*
 // Integration Testing goes here
 describe('Integration Testing', () => {
   // If it passes, means the function finished and message was scheduled, baseline test
@@ -101,7 +101,7 @@ describe('Integration Testing', () => {
       assert.equal(response.ok, true);
     });
   });
-  
+  */
 
 
   describe('Pairup', () => {
