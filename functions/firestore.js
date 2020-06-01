@@ -105,12 +105,12 @@ exports.storeNewPairing = async function storeNewPairing(workspace, dmThreadID, 
                            .collection('activeChannels').doc(channelID)
                            .collection('pairedUsers');
     
-    await usersRef.doc(pairedUsers[0]).set({
+    usersRef.doc(pairedUsers[0]).set({
         dmThreadID: dmThreadID,
         partnerID: pairedUsers[1],
     }, {merge: true});
 
-    await usersRef.doc(pairedUsers[1]).set({
+    usersRef.doc(pairedUsers[1]).set({
         dmThreadID: dmThreadID,
         partnerID: pairedUsers[0],
     }, {merge: true});
@@ -131,7 +131,7 @@ exports.storeDirectedPairing = async function storeDirectedPairing(workspace, dm
                            .collection('activeChannels').doc(channelID)
                            .collection('pairedUsers');
     
-    await usersRef.doc(pairedUsers[0]).set({
+    usersRef.doc(pairedUsers[0]).set({
         dmThreadID: dmThreadID,
         partnerID: pairedUsers[1],
     }, {merge: true});
@@ -369,7 +369,6 @@ exports.getPairedUsers = async function getPairedUsers(workspaceID) {
         querySnapshot.forEach((doc) => {
             let partner = doc.data().partnerID;
             if (!partnerIDs.includes(doc.id)) {
-                console.log('pushed');
                 pairings.push({users: [doc.id, partner], dmThreadID: doc.data().dmThreadID});
                 partnerIDs.push(partner);
             }

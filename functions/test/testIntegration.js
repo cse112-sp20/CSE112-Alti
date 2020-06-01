@@ -145,7 +145,7 @@ describe('Integration Testing', () => {
 
         let test = await Promise.all(await pairUp.pairUp(undefined, token));
         var pairs = await firestoreFuncs.getPairedUsers(workspaceId);
-        console.log(pairs);
+        // console.log(pairs);
         
         var partner1 = pairs[0]["users"][0];
         var partner2 = pairs[0]["users"][1];
