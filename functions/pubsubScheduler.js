@@ -21,39 +21,43 @@ var threads = [];
 / prompt for their warmup and cooldown selection for their partner in the evening too.
 / (Morning = start of workday, Evening = end of workday)
 */
-
+function handlePairupError(err, workspace){
+  console.error("Could not pair up workspace "+workspace);
+  console.error(err);
+  return Promise.resolve();
+}
 exports.scheduledPairUp = functions.pubsub
 														.schedule('every sunday 13:00')
 														.timeZone('America/Los_Angeles')
 														.onRun(async (context) =>  {
 
-	const allWorkspaces = await firestoreFuncs.getAllWorkspaces();
-
+  const allWorkspaces = await firestoreFuncs.getAllWorkspaces();
+  let promise = Promise.resolve();
 	for( i=0; i<allWorkspaces.length; i++){
-		timedTask(i, allWorkspaces);
-	}
+    let workspace = allWorkspaces[i];
+		// if (  workspace === "T0137P851BJ" || workspace === "T0132EDC3M4"  ){
+      // console.log("====PAIRING UP WORKSPACE "+workspace);
+      promise = promise.then(res => {
+        return firestoreFuncs.getAPIPair(workspace);
+      },rej => {
+        return firestoreFuncs.getAPIPair(workspace);
+      });
+      promise = promise.then(res => {
+        return handleWorkspacePairup(workspace, res)
+      });
+    // }
+  }
+
 	return null;
 });
 
-function timedTask(i, allWorkspaces){
-	setTimeout(() => {
-		const workspace = allWorkspaces[i];
-		// if (  workspace !== "T0132A75VD3" && workspace !== "T0132A75VD3" ){
-		//   return;
-		// }
-		firestoreFuncs.getAPIPair(workspace)
-		.then( res => {
-			return handleWorkspacePairup(workspace, res);
-		}).catch(err => console.error(err));
-	}, 3000 * i)
-}
 async function handleWorkspacePairup(workspace, apiPair){
 				if(apiPair !== null){
 					const botToken = apiPair.botToken;
 					try{
-						const pairUpResult = pairUp.pairUp(undefined, botToken);
-						// console.log("Paired up workspace " + workspace)
-						return pairUpResult;
+						const pairUpResult = await pairUp.pairUp(undefined, botToken);
+						console.log("Paired up workspace " + workspace)
+						return Promise.resolve();
 					}catch(error){
 						console.error("Could not schedule pair up for workspace " + workspace +
 						". This may be because the pairing channel might not be set up in firestore.")
@@ -64,7 +68,7 @@ async function handleWorkspacePairup(workspace, apiPair){
 					console.error("Could not schedule pair up for workspace " + workspace +
 												" because the api pair is not stored in firestore.")
 				}
-				return Promise.resolve();
+				return Promise.reject(new Error("Workspace "+workspace+" has not been paired"));
 }
 
 exports.scheduleDaily = functions.pubsub
