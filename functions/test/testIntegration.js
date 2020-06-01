@@ -118,27 +118,7 @@ describe('Integration Testing', () => {
         await testUtil.deleteWorkspace(workspaceId);
       }); 
 
-      it('Test Pairup with testing channel', async function() {
-        this.timeout(180000) // 3 min
 
-        let test = await Promise.all(await pairUp.pairUp(undefined, token));
-        var pairs = await firestoreFuncs.getPairedUsers(workspaceId);
-        /* eslint-disable no-await-in-loop */
-        for(var i = 0; i < pairs.length; i++)
-        {
-          var pair = pairs[i];
-          var m = await app.client.conversations.members({
-            token:token, 
-            channel: pair["dmThreadID"]
-          });
-          //console.log(m.members);
-          //console.log(pair);
-
-          (((m.members).should).have).lengthOf(3);
-          expect(m.members).to.include.members(pair["users"]);
-        }
-        /* eslint-enable no-await-in-loop */
-      }); 
 
       it('Test Pairup random users', async function() {
         this.timeout(180000);
@@ -183,6 +163,28 @@ describe('Integration Testing', () => {
         var invalidPart = await firestoreFuncs.getPartner(workspaceId, channelId, "XXXXXXXXXX");
         assert.equal(invalidPart, undefined);
       });  
+
+      it('Test Pairup with testing channel', async function() {
+        this.timeout(180000) // 3 min
+
+        let test = await Promise.all(await pairUp.pairUp(undefined, token));
+        var pairs = await firestoreFuncs.getPairedUsers(workspaceId);
+        /* eslint-disable no-await-in-loop */
+        for(var i = 0; i < pairs.length; i++)
+        {
+          var pair = pairs[i];
+          var m = await app.client.conversations.members({
+            token:token, 
+            channel: pair["dmThreadID"]
+          });
+          //console.log(m.members);
+          //console.log(pair);
+
+          (((m.members).should).have).lengthOf(3);
+          expect(m.members).to.include.members(pair["users"]);
+        }
+        /* eslint-enable no-await-in-loop */
+      }); 
     });
   });
 
