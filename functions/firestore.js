@@ -4,7 +4,7 @@ const request = require('request');
 const firestoreFuncs = require('./firestore');
 // const dotenv = require('dotenv');
 // dotenv.config();
-
+var rankings = [];
 // console.log(typeof(process.env.FUNCTIONS_EMULATOR));
 if(process.env.FUNCTIONS_EMULATOR === "true"){
 
@@ -117,9 +117,8 @@ exports.resetPoints = function resetPoints(team_id, userID) {
   2. Sort the array by points
   3. Return sorted array
 */
-exports.getRankings = function getRankings(workspaceID) {
+exports.getRankings = async function getRankings(workspaceID) {
     try {
-        var rankings = [];
         db.collection('workspaces').doc(workspaceID).collection('users').get().then(function(querySnapshot)
         {
             querySnapshot.forEach(function(doc)
@@ -127,9 +126,10 @@ exports.getRankings = function getRankings(workspaceID) {
             var user = {id:doc.id, weeklyPoints:doc.data().weeklyPoints, monthlyPoints:doc.data().monthlyPoints};
             rankings.push(user);
         });
-
-        function compare(a, b) {
-            if (a.weeklyPoints <= b.weeklyPoints) {
+        function compare(a, b)
+        {
+            if (a.weeklyPoints <= b.weeklyPoints)
+            {
                 comparison = 1;
             } else {
                 comparison = -1;

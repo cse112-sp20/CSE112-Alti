@@ -3,6 +3,7 @@ const app = index.getBolt();
 const firestoreFuncs = require('./firestore');
 const functions = require('firebase-functions');
 //const myWorkspaceID = "T012WBGBVM5";
+var rankings = [];
 
 exports.scheduledLeaderboard =
     functions.pubsub
@@ -60,6 +61,7 @@ exports.sendLeaderboardMessage = async (app, token, workspaceID) => {
 function getLeaderboardBlock(workspaceID) {
     // get sorted array of IDs and their points
     const rankingsArr = firestoreFuncs.getRankings(workspaceID);
+    console.log(rankingsArr);
     if (rankingsArr === undefined) {
         return [
             {
