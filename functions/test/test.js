@@ -92,22 +92,22 @@ describe('Unit Testing', () => {
     it('Testing sudoku', () => {
       //generatePuzzle();
       url = generateTaskData.generatePuzzle('sudoku');
-      assert.equal(url.substring(0,40),'https://brainbashers.com/showsudoku.asp?');
+      assert.equal(url.substring(0,35),'https://brainbashers.com/showsudoku');
     });
 
     it('Testing 3 in a row', () => {
       url = generateTaskData.generatePuzzle('3inarow');
-      assert.equal(url.substring(0,41),'https://brainbashers.com/show3inarow.asp?');
+      assert.equal(url.substring(0,36),'https://brainbashers.com/show3inarow');
     });
 
     it('Testing calcudoku', () => {
       url = generateTaskData.generatePuzzle('calcudoku');
-      assert.equal(url.substring(0, 42),'https://brainbashers.com/showcalcudoku.asp?');
+      assert.equal(url.substring(0, 37),'https://brainbashers.com/showcalcudoku');
     });
 
     it('Testing hitori', () => {
       url = generateTaskData.generatePuzzle('hitori');
-      assert.equal(url.substring(0, 40),'https://brainbashers.com/showhitori.asp?');
+      assert.equal(url.substring(0, 35),'https://brainbashers.com/showhitori');
     });
 
   });
