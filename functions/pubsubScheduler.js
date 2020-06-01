@@ -28,10 +28,14 @@ exports.scheduledPairUp = functions.pubsub
 														.onRun(async (context) =>  {
 
   const allWorkspaces = await firestoreFuncs.getAllWorkspaces();
+  // allWorkspaces.push("T0132EDC3M4");
+  // console.log(allWorkspaces);
   let promise = Promise.resolve();
+  // console.log(allWorkspaces);
 	for( i=0; i<allWorkspaces.length; i++){
     let workspace = allWorkspaces[i];
-		// if (  workspace === "T0137P851BJ" || workspace === "T0132EDC3M4"  ){
+		// if ( workspace !== "T011H6FAPV4" ){
+      // console.log("AT: " + workspace);
       promise = promise.then(res => {
         return firestoreFuncs.getAPIPair(workspace);
       },rej => {
@@ -42,7 +46,8 @@ exports.scheduledPairUp = functions.pubsub
       });
     // }
   }
-	return null;
+  promise.catch(err => console.error(err));
+  await promise;
 });
 
 async function handleWorkspacePairup(workspace, apiPair){
