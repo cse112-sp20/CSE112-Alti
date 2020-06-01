@@ -138,8 +138,8 @@ async function boardExistingChannel(app, token, team_id, channelId) {
             for (var day of days) {
                 promises.push(firestoreFuncs.setWarmupTime(team_id, userId, "9:00 AM", day));
                 promises.push(firestoreFuncs.setCooldownTime(team_id, userId, "5:00 PM", day));
-                firestoreFuncs.resetPoints(team_id,userId);
             }
+            firestoreFuncs.resetPoints(team_id,userId);
         }
         Promise.all(promises).catch((error) => {
             console.log(error);

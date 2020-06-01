@@ -14,7 +14,7 @@ const app = index.getBolt();
 const util = require('./util');
 // Triggers the pairing up of all people in a given channel.
 exports.pairUp = async function pairUp(context=undefined, botToken=undefined){
-    
+
     if(context === undefined && botToken === undefined){
         throw new Exception("Both the context and bot token is undefined. Cannot pair up.")
     }
@@ -39,7 +39,7 @@ exports.pairUp = async function pairUp(context=undefined, botToken=undefined){
 
         const members = channelId.then( id => {
             if(id === undefined){
-                return Promise.reject(new Error("Could not pair channel " + workspaceInfo.team.id + 
+                return Promise.reject(new Error("Could not pair channel " + workspaceInfo.team.id +
                                                 ". Pairing channel could not be retrieved."));
             }
             pairingChannelIdVal = id;
@@ -48,16 +48,16 @@ exports.pairUp = async function pairUp(context=undefined, botToken=undefined){
                     channel:id
             });
         });
-        
+
         const usersInfo = await Promise.all([allUsers, members]).then(data => {
             const allUsers = data[0];
             const members = data[1];
             if(!allUsers.ok){
-                return Promise.reject(new Error("Could not get all users for workspace " + workspaceInfo.team.id + 
+                return Promise.reject(new Error("Could not get all users for workspace " + workspaceInfo.team.id +
                                                 ". (app.client.users.list)"));
             }
             if(!members.ok){
-                return Promise.reject(new Error("Could not get pairing channel members for workspace " + workspaceInfo.team.id + 
+                return Promise.reject(new Error("Could not get pairing channel members for workspace " + workspaceInfo.team.id +
                                                 ". (app.client.users.list)"));
             }
             const membersList = members.members;
@@ -82,7 +82,7 @@ exports.pairUp = async function pairUp(context=undefined, botToken=undefined){
             // Randomize the order of people
             shuffle(ids);
             return ids
-        }); 
+        });
         //Pairing people up randomly and saving the response containing the paired channel information
         conversationInfos = []
         for (i = 0; i < ids.length/2; i++) {
@@ -101,7 +101,7 @@ exports.pairUp = async function pairUp(context=undefined, botToken=undefined){
                 .catch(err => {
                     return console.error(err.message+"\n Could not open conversation at workspace " + workspaceInfo.team.id + ".");
             });
-        });    
+        });
     }
     catch(error){
         console.error(error);
@@ -137,7 +137,6 @@ async function handlePairingResponse(response, app, token, workspaceInfo, pairin
         }
     }
     /* eslint-enable no-await-in-loop */
-
     return firestoreFuncs.storeNewPairing(workspaceInfo.team.id, response.channel.id, pairedUsers);
 }
 
