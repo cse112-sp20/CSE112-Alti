@@ -61,6 +61,31 @@ app.error(console.log);
 // });
 
 
+// TEST LEADERBOARD
+app.message(async ({ context }) => {
+    try {
+        console.log("HELLO! It is Friday, and the time is 5 PM.");
+
+        // get bot token
+        token = context.botToken;
+
+        // get workspace info
+        const workspaceInfo = await app.client.team.info({
+            token: token
+        });
+
+        // get workspace id
+        const workspaceID = workspaceInfo.team.id;
+    
+    // send message!
+    leaderboard.sendLeaderboardMessage(app, token, workspaceID);
+
+    } catch (error) {
+        console.log(error);
+    }
+});
+
+
 app.message(async ({ message, context }) => {
     try{
         if(message.channel_type === 'im'){
