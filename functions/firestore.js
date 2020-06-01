@@ -145,6 +145,7 @@ exports.getRankings = async function getRankings(workspaceID) {
         console.log(error);
     }
 };
+
 /*
     Stores the new pairings (DM thread ids + partnerIDs) in the corresponding place (with the corresponding
     workspace and channel) in cloud firestore.
@@ -305,6 +306,7 @@ exports.storeTypeOfExercise = async function storeTypeOfExercise(workspaceID, us
 
     console.log(workspaceID + "   " + userID);
     firestoreFuncs.setPoints(workspaceID,userID);
+
     return setResult;
 }
 
@@ -645,4 +647,81 @@ exports.getUserPairingData = async function getUserData(workspaceID, userID) {
             console.log('Error getting user document: ', err);
             return undefined;
         });
+}
+
+/*
+    setPoints(workspaceID, userID)
+
+    Increments a user's weeklyPoints and monthlyPoints by 1.
+    Called when a user sends either a warmup or cooldown to their partner.
+    PARAMS:
+        workspaceID - current workspace ID
+        userID      - ID of user whose points will be incremented
+*/
+exports.setPoints = function setPoints(workspaceID, userID) {
+    let userDocRef = db.collection('workspaces')
+                    .doc(workspaceID)
+                    .collection('users')
+                    .doc(userID);
+    userDocRef.update({
+        weeklyPoints:admin.firestore.FieldValue.increment(1),
+        monthlyPoints:admin.firestore.FieldValue.increment(1)
+    });
+};
+
+/*
+    resetPoints(workspaceID, userID)
+
+    Resets a user's weeklyPoints and monthlyPoints to 0.
+    Called when a new user joins the pairing channel AND
+    at the end of the month.
+    PARAMS:
+        workspaceID - current workspace ID
+        userID      - ID of user whose points will be reset
+*/
+exports.resetPoints = function resetPoints(workspaceID, userID) {
+    let userDocRef = db.collection('workspaces')
+                    .doc(workspaceID)
+                    .collection('users')
+                    .doc(userID);
+    userDocRef.set({
+        weeklyPoints: 0,
+        monthlyPoints: 0
+    }, {merge: true});
+  };
+
+/*
+    getRankings(workspaceID)
+
+    Returns an array of all users in the pairing channel, 
+    along with their weekly points and monthly points.
+    PARAMS:
+        workspaceID - current workspace ID
+*/
+exports.getRankings = async function getRankings(workspaceID) {
+    let rankings = [];
+    let users = db.collection('workspaces')
+                .doc(workspaceID)
+                .collection('users');
+    return users.get().then((querySnapshot) => {
+        querySnapshot.forEach((doc) => {
+            let ranking = {id:doc.id, weeklyPoints:doc.data().weeklyPoints, monthlyPoints:doc.data().monthlyPoints};
+            rankings.push(ranking);
+        });
+        //rankings.sort(compare);
+        rankings.sort(compare);
+        for (var i = 0; i < rankings.length; i++) {
+            console.log(i+1 + ")" + rankings[i]['id'] + " " + "points: " + rankings[i]['weeklyPoints']);
+        }
+        return rankings;
+    });
+};
+
+function compare(a, b) {
+    if (a.weeklyPoints <= b.weeklyPoints) {
+        comparison = 1;
+    } else {
+        comparison = -1;
+    }
+    return comparison;
 }
