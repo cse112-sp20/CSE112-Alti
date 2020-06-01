@@ -92,7 +92,7 @@ describe('Unit Testing', () => {
     it('Testing sudoku', () => {
       //generatePuzzle();
       url = generateTaskData.generatePuzzle('sudoku');
-      assert.equal(url.substring(0,40),'https://brainbashers.com/showsudoku.asp?');
+      assert.equal(url.substring(0,41),'https://brainbashers.com/showsudoku.asp?');
     });
 
     it('Testing 3 in a row', () => {
