@@ -102,6 +102,7 @@ async function createOnBoardingChannel(app, token, team_id, channelName) {
                     promises.push(firestoreFuncs.setCooldownTime(team_id, userId, "5:00 PM", day));
                 }
             }
+            firestoreFuncs.resetPoints(team_id,userId);
             Promise.all(promises).catch((error) => {
                 console.log(error);
             });
