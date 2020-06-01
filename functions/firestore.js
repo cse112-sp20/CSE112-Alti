@@ -107,38 +107,37 @@ exports.resetPoints = function resetPoints(team_id, userID) {
   2. Sort the array by points
   3. Return sorted array
 */
-exports.getRankings = function getRankings(workspaceID)
-{
- let rankings = [];
- db.collection('workspaces').doc(workspaceID).collection('users').get().then(function(querySnapshot)
- {
-     querySnapshot.forEach(function(doc)
-     {
-       var user = {id:doc.id, weeklyPoints:doc.data().weeklyPoints, monthlyPoints:doc.data().monthlyPoints};
-       rankings.push(user);
-     });
-  function compare(a, b)
-  {
+exports.getRankings = function getRankings(workspaceID) {
+    try {
+        let rankings = [];
+        db.collection('workspaces').doc(workspaceID).collection('users').get().then(function(querySnapshot)
+        {
+            querySnapshot.forEach(function(doc)
+        {
+            var user = {id:doc.id, weeklyPoints:doc.data().weeklyPoints, monthlyPoints:doc.data().monthlyPoints};
+            rankings.push(user);
+        });
 
-    if (a.weeklyPoints <= b.weeklyPoints)
-    {
-      comparison = 1;
+        function compare(a, b) {
+            if (a.weeklyPoints <= b.weeklyPoints) {
+                comparison = 1;
+            } else {
+                comparison = -1;
+            }
+            return comparison;
+        }
+        rankings.sort(compare);
+    //   for (var i = 0; i < rankings.length; i++)
+    //   {
+    //     console.log(i+1 + ")" + rankings[i]['id'] + " " + "points: " + rankings[i]['weeklyPoints']);
+    //   }
+      return rankings;
+      });
+
+    } catch (error) {
+        console.log(error);
     }
-    else
-    {
-      comparison = -1;
-    }
-    return comparison;
-  }
-  rankings.sort(compare);
-//   for (var i = 0; i < rankings.length; i++)
-//   {
-//     console.log(i+1 + ")" + rankings[i]['id'] + " " + "points: " + rankings[i]['weeklyPoints']);
-//   }
-  return rankings;
-  });
 };
-
 
 
 /*
