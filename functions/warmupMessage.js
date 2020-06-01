@@ -832,8 +832,9 @@ handleTypingSelect = async function(ack,body,context) {
     catch (error) {
       console.error(error);
 	}
+	//firestoreFuncs.resetPoints(workspaceId,userId);
 	firestoreFuncs.setPoints(workspaceId,userId);
-	//firestoreFuncs.leaderboard(workspaceId); testing
+	firestoreFuncs.leaderboard(workspaceId); testing
 	return storeReturn;
 }
 

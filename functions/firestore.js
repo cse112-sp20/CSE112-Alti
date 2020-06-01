@@ -88,12 +88,29 @@ exports.getAPIPair = (team_id) => {
             return null;
         });
 };
+
+//Whenever a user completes a cooldown/warmup increase weeklyPoints by 1
 exports.setPoints = function setPoints(workspaceID, userID) {
   let userDocRef = db.collection('workspaces').doc(workspaceID).collection('users').doc(userID);
-  //let userDocRef = db.collection('workspaces').doc(workspaceID);
   userDocRef.update({weeklyPoints:admin.firestore.FieldValue.increment(1)}).then(res => {
   });
 };
+//Always reset points at the beginning of running this app, and at the end of the month
+exports.resetPoints = function resetPoints(workspaceID, userID) {
+  let userDocRef = db.collection('workspaces').doc(workspaceID).collection('users').doc(userID);
+  userDocRef.set
+  ({
+      weeklyPoints: 0,
+      monthlyPoints: 0
+  }, {merge: true});
+};
+
+/*
+  1. Store weeklyPoints into array
+  2. Add weeklyPoints to monthlyPoints, then reset weeklyPoints to 0
+  3. Sort the array by points
+  4. Output in nice format (not done)
+*/
 exports.leaderboard = function leaderboard(workspaceID)
 {
  let rankings = [];
@@ -101,14 +118,25 @@ exports.leaderboard = function leaderboard(workspaceID)
  {
      querySnapshot.forEach(function(doc)
      {
-       rankings.push(doc.data());
+       var pair  =
+       {
+         "id" : "weeklyPoints"
+       };
+       pair['id'] = doc.id;
+       pair['weeklyPoints'] = doc.data().weeklyPoints;
+       rankings.push(pair);
+       console.log(pair);
+       let userDocRef = db.collection('workspaces').doc(workspaceID).collection('users').doc(pair['id']);
+       userDocRef.update
+       ({
+           weeklyPoints: 0,
+           monthlyPoints: doc.data().monthlyPoints + pair['weeklyPoints']
+       }, {merge: true});
      });
-    console.log(rankings);
-
   function compare(a, b)
   {
 
-    if (a.weeklyPoints <= b.weeklyPointsB)
+    if (a.weeklyPoints <= b.weeklyPoints)
     {
       comparison = 1;
     }
@@ -118,16 +146,12 @@ exports.leaderboard = function leaderboard(workspaceID)
     }
     return comparison;
   }
-rankings.sort(compare);
-console.log(rankings);
-
-
-
- });
-
-
-
-
+  rankings.sort(compare);
+  for (var i = 0; i < rankings.length; i++)
+  {
+    console.log(i+1 + ")" + rankings[i]['id'] + " " + "points: " + rankings[i]['weeklyPoints']);
+  }
+  });
 };
 
 
