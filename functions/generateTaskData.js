@@ -51,7 +51,7 @@ exports.generatePuzzle =function generatePuzzle(typeOfPuzzle) {
     // Hardcoded difficulty, can be changed but also need to
     // hardcode the upper limit for each game in that case
     const difficulty = "1";
-
+    //var difficulty = Math.floor(Math.random() * 3) + 1 
     // Hardcode the start of the url
     var url = `https://brainbashers.com/show${typeOfPuzzle}.asp?`;
 
