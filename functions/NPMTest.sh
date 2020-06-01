@@ -5,13 +5,13 @@ Range=2 #Change how many times to run npm test
 while [ $Count -lt $Range ]
 do
     npm test | tee TestOutput.txt
-    if grep -q passing "TestOutput.txt"; 
+    if grep -q failing "TestOutput.txt"; 
     then
-        Count=$((Count+1))
-        echo "Test $Count Passed!!"        
-    else
         echo "Test $Count Failed!!"
-        break;
+        break;  
+    else
+        Count=$((Count+1))
+        echo "Test $Count Passed!!"
     fi
 done
 
