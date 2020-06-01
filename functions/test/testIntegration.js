@@ -121,7 +121,7 @@ describe('Integration Testing', () => {
       it('Test Pairup with testing channel', async function() {
         this.timeout(180000) // 3 min
 
-        await pairUp.pairUp(undefined, token);
+        let test = await Promise.all(await pairUp.pairUp(undefined, token));
         var pairs = await firestoreFuncs.getPairedUsers(workspaceId);
         /* eslint-disable no-await-in-loop */
         for(var i = 0; i < pairs.length; i++)
@@ -143,8 +143,9 @@ describe('Integration Testing', () => {
       it('Test Pairup random users', async function() {
         this.timeout(180000);
 
-        await pairUp.pairUp(undefined, token);
+        let test = await Promise.all(await pairUp.pairUp(undefined, token));
         var pairs = await firestoreFuncs.getPairedUsers(workspaceId);
+        //console.log(pairs);
 
         var partner1 = pairs[0]["users"][0];
         var partner2 = pairs[0]["users"][1];
