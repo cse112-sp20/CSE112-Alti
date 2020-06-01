@@ -105,12 +105,12 @@ exports.storeNewPairing = async function storeNewPairing(workspace, dmThreadID, 
                            .collection('activeChannels').doc(channelID)
                            .collection('pairedUsers');
     
-    usersRef.doc(pairedUsers[0]).set({
+    await usersRef.doc(pairedUsers[0]).set({
         dmThreadID: dmThreadID,
         partnerID: pairedUsers[1],
     }, {merge: true});
 
-    usersRef.doc(pairedUsers[1]).set({
+    await usersRef.doc(pairedUsers[1]).set({
         dmThreadID: dmThreadID,
         partnerID: pairedUsers[0],
     }, {merge: true});
@@ -131,7 +131,7 @@ exports.storeDirectedPairing = async function storeDirectedPairing(workspace, dm
                            .collection('activeChannels').doc(channelID)
                            .collection('pairedUsers');
     
-    usersRef.doc(pairedUsers[0]).set({
+    await usersRef.doc(pairedUsers[0]).set({
         dmThreadID: dmThreadID,
         partnerID: pairedUsers[1],
     }, {merge: true});
