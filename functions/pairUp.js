@@ -115,7 +115,7 @@ exports.pairUp = async function pairUp(context=undefined, botToken=undefined){
         }
         // Going through the paired channels and post messages to them.
         // also store the pairing info on the firebase
-        await conversationInfos.map( conversationInfo => {
+        return conversationInfos.map( conversationInfo => {
             return conversationInfo
                 .then( response => {
                     return handlePairingResponse(response, app, token, workspaceInfo, pairingChannelIdVal);
@@ -124,7 +124,7 @@ exports.pairUp = async function pairUp(context=undefined, botToken=undefined){
                     return console.error(err.message+"\n Could not open conversation at workspace " + workspaceInfo.team.id + ".");
             });
         });  
-        return Promise.all(conversationInfos);
+        // return Promise.all(conversationInfos);
     }
     catch(error){
         console.error(error);
