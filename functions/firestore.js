@@ -363,7 +363,7 @@ exports.getPairedUsers = async function getPairedUsers(workspaceID) {
     let userRef = db.collection("workspaces").doc(workspaceID).collection("activeChannels")
                     .doc(channelID).collection('pairedUsers');
     
-    return await Promise.all(await userRef.get().then((querySnapshot) => {
+    return userRef.get().then((querySnapshot) => {
         let partnerIDs = [];
         let pairings = [];
         querySnapshot.forEach((doc) => {
@@ -375,7 +375,7 @@ exports.getPairedUsers = async function getPairedUsers(workspaceID) {
             }
         });
         return pairings;
-    }));
+    });
 };
  
 /*
