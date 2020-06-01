@@ -28,33 +28,32 @@ const app = index.getBolt();
  exports.scheduleMsg = async function scheduleMsg(hour, minute, text, id, token) {
 	// set up the time
 	// convert to utc then to pst to set correct hour and minutes, then back to utc for correct timestamp
+	/*
 	var reminder = new Date();
-	console.log("Current date");
-	console.log(reminder);
-	console.log(reminder.getTime());
-	console.log(reminder.getTime() - (3600000 * (-7)));
-	console.log("Current date's offset: " + reminder.getTimezoneOffset());
 	var localTime = reminder.getTime();
 	var localOffset = reminder.getTimezoneOffset()*60000;
 	var utc = localTime + localOffset;
 	var offset = -7;
 	var cali = (utc + (3600000 * offset));
 	var newDate = new Date(cali);
-	console.log("Date in pst before setting");
-	console.log(newDate);
-	console.log(newDate.getTime());
 	newDate.setHours(hour);
 	newDate.setMinutes(minute);
 	newDate.setSeconds(0);
-
-	console.log("Date in pst");
-	console.log(newDate);
-	console.log(newDate.getTime());
 	newDate = new Date(newDate.getTime() - (3600000 * offset));
-	console.log("Date in utc");
-	console.log(newDate);
-	console.log(newDate.getTime());
-	console.log("Schedule msg runs");
+*/
+	var now = new Date();
+	var year, month, day;
+	year = now.getFullYear();
+	month = String(now.getUTCMonth() + 1);
+	if (month.length === 1) {
+		month = "0" + month;
+	}
+	day = now.getDate();
+
+	var dateString = year + "-" + month + "-" + day + "T" + hour + ":" + minute + ":00.000-07:00";
+	console.log(dateString);
+	var newDate = new Date(dateString);
+
 	//call api
 	return await app.client.chat.scheduleMessage({
 										token: token,
@@ -69,6 +68,7 @@ const app = index.getBolt();
 
 	exports.scheduleCooldownChoice = async function(hour, minute, targChannelID,token){
 				// set up the time
+				/*
 		var reminder = new Date();
 		var localTime = reminder.getTime();
 		var localOffset = reminder.getTimezoneOffset()*60000;
@@ -80,7 +80,19 @@ const app = index.getBolt();
 		newDate.setMinutes(minute);
 		newDate.setSeconds(0);
 		newDate = new Date(newDate.getTime() - (3600000 * offset));
+*/
+		var now = new Date();
+		var year, month, day;
+		year = now.getFullYear();
+		month = String(now.getUTCMonth() + 1);
+		if (month.length === 1) {
+			month = "0" + month;
+		}
+		day = now.getDate();
 
+		var dateString = year + "-" + month + "-" + day + "T" + hour + ":" + minute + ":00.000-07:00";
+		console.log(dateString);
+		var newDate = new Date(dateString);
 		const notificationString = "Send a cool-down to your buddy!";
 		
 			var res = await app.client.chat.scheduleMessage({
@@ -96,6 +108,7 @@ const app = index.getBolt();
 	};
 
 	exports.scheduleWarmupChoice = async function(hour, minute,targChannelID,token){
+		/*
 		var reminder = new Date();
 		var localTime = reminder.getTime();
 		var localOffset = reminder.getTimezoneOffset()*60000;
@@ -107,7 +120,20 @@ const app = index.getBolt();
 		newDate.setMinutes(minute);
 		newDate.setSeconds(0);
 		newDate = new Date(newDate.getTime() - (3600000 * offset));
+*/
 
+		var now = new Date();
+		var year, month, day;
+		year = now.getFullYear();
+		month = String(now.getUTCMonth() + 1);
+		if (month.length === 1) {
+			month = "0" + month;
+		}
+		day = now.getDate();
+
+		var dateString = year + "-" + month + "-" + day + "T" + hour + ":" + minute + ":00.000-07:00";
+		console.log(dateString);
+		var newDate = new Date(dateString);
 		const notificationString = "Send a warmup to your buddy!";
 		
 		//try function logic
