@@ -369,7 +369,7 @@ exports.getPairedUsers = async function getPairedUsers(workspaceID) {
         querySnapshot.forEach((doc) => {
             let partner = doc.data().partnerID;
             if (!partnerIDs.includes(doc.id)) {
-                consolr.log('pushed');
+                console.log('pushed');
                 pairings.push({users: [doc.id, partner], dmThreadID: doc.data().dmThreadID});
                 partnerIDs.push(partner);
             }
