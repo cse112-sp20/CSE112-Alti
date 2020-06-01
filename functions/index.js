@@ -62,6 +62,9 @@ app.error(console.log);
 
 
 // TEST LEADERBOARD
+// To test: Go to app home, under the Messages tab, send any message to the app.
+// The leaderboard message will be posted in the designated pairing channel.
+
 app.message(async ({ context }) => {
     try {
         console.log("HELLO! It is Friday, and the time is 5 PM.");
