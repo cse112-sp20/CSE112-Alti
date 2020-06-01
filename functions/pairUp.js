@@ -165,7 +165,7 @@ async function handlePairingResponse(response, app, token, workspaceInfo, pairin
     // If not, pair a random group of 3 people in a circle where user0 -> user1 -> user2 -> user0.
     if(pairedUsers.length % 2 === 0){
         console.log("Even numbered channel");
-        return await firestoreFuncs.storeNewPairing(workspaceInfo.team.id, response.channel.id, pairedUsers);
+        return firestoreFuncs.storeNewPairing(workspaceInfo.team.id, response.channel.id, pairedUsers);
     }
     else{
         if(pairedUsers.length !== 3){
@@ -178,7 +178,7 @@ async function handlePairingResponse(response, app, token, workspaceInfo, pairin
         directedPairings.push(firestoreFuncs.storeDirectedPairing(workspaceInfo.team.id, response.channel.id, [pairedUsers[0],pairedUsers[1]]));
         directedPairings.push(firestoreFuncs.storeDirectedPairing(workspaceInfo.team.id, response.channel.id, [pairedUsers[1],pairedUsers[2]]));
         directedPairings.push(firestoreFuncs.storeDirectedPairing(workspaceInfo.team.id, response.channel.id, [pairedUsers[2],pairedUsers[0]]));
-        return await Promise.all(directedPairings);
+        return Promise.all(directedPairings);
     }
 }
 
