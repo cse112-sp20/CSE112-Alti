@@ -47,7 +47,7 @@ exports.generateRetro = function() {
 
 
 // TODO
-function generatePuzzle(typeOfPuzzle) {
+exports.generatePuzzle =function generatePuzzle(typeOfPuzzle) {
     // Hardcoded difficulty, can be changed but also need to
     // hardcode the upper limit for each game in that case
     const difficulty = "1";
