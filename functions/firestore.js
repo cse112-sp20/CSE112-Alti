@@ -97,14 +97,12 @@ exports.setPoints = function setPoints(channelId, userID) {
   userDocRef.update({
     weeklyPoints:admin.firestore.FieldValue.increment(1),
     monthlyPoints:admin.firestore.FieldValue.increment(1)
-  }).then(res => {
-  });
+  }).then(res => {});
 };
 //Always reset points at the beginning of running this app, and at the end of the month
 exports.resetPoints = function resetPoints(team_id, userID) {
   let userDocRef = db.collection('workspaces').doc(team_id).collection('users').doc(userID);
-  userDocRef.set
-  ({
+  userDocRef.set({
       weeklyPoints: 0,
       monthlyPoints: 0
   }, {merge: true});
@@ -114,39 +112,42 @@ exports.resetPoints = function resetPoints(team_id, userID) {
   2. Sort the array by points
   4. Output in nice format (not done)
 */
-exports.leaderboard = function leaderboard(workspaceID)
-{
- let rankings = [];
- db.collection('workspaces').doc(workspaceID).collection('users').get().then(function(querySnapshot)
- {
-     querySnapshot.forEach(function(doc)
-     {
-       var user = {id:doc.id, weeklyPoints:doc.data().weeklyPoints, monthlyPoints:doc.data().monthlyPoints};
-       rankings.push(user);
-     });
-  function compare(a, b)
-  {
+/*
+  1. Store id/points into array
+  2. Sort the array by points
+  3. Return sorted array
+*/
+exports.getRankings = function getRankings(workspaceID) {
+    try {
+        let rankings = [];
+        db.collection('workspaces').doc(workspaceID).collection('users').get().then(function(querySnapshot)
+        {
+            querySnapshot.forEach(function(doc)
+        {
+            var user = {id:doc.id, weeklyPoints:doc.data().weeklyPoints, monthlyPoints:doc.data().monthlyPoints};
+            rankings.push(user);
+        });
 
-    if (a.weeklyPoints <= b.weeklyPoints)
-    {
-      comparison = 1;
+        function compare(a, b) {
+            if (a.weeklyPoints <= b.weeklyPoints) {
+                comparison = 1;
+            } else {
+                comparison = -1;
+            }
+            return comparison;
+        }
+        rankings.sort(compare);
+       for (var i = 0; i < rankings.length; i++)
+       {
+        console.log(i+1 + ")" + rankings[i]['id'] + " " + "points: " + rankings[i]['weeklyPoints']);
+      }
+      //return rankings;
+      });
+
+    } catch (error) {
+        console.log(error);
     }
-    else
-    {
-      comparison = -1;
-    }
-    return comparison;
-  }
-  rankings.sort(compare);
-  for (var i = 0; i < rankings.length; i++)
-  {
-    console.log(i+1 + ")" + rankings[i]['id'] + " " + "points: " + rankings[i]['weeklyPoints']);
-  }
-  });
 };
-
-
-
 /*
     Stores the new pairings (DM thread ids + partnerIDs) in the corresponding place (with the corresponding
     workspace and channel) in cloud firestore.
@@ -307,6 +308,7 @@ exports.storeTypeOfExercise = async function storeTypeOfExercise(workspaceID, us
 
     console.log(workspaceID + "   " + userID);
     firestoreFuncs.setPoints(workspaceID,userID);
+    //firestoreFuncs.getRankings(workspaceID); //testing the rankings function
     return setResult;
 }
 
