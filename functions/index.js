@@ -105,7 +105,7 @@ app.command('/getwarmup', async ({ command, ack, say, context }) => {
     // Acknowledge command request
     ack();
 
-    warmupMessage.sendExercisePrompt(command.team_id, command.user_id, command.channel_id, true, context);
+    warmupMessage.sendGetWarmupButton(command.channel_id, app, context.botToken);
 });
 
 

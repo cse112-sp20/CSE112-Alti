@@ -1033,6 +1033,44 @@ app.action('warmup_quote_selected_ack', ({ ack, body, context }) => {
 	handleVideoSelect(view,ack,body,context);
  });
 
+//sends a get warmup button to a channel
+exports.sendGetWarmupButton = async function(targChannelID,app,token) {
+	//notification to be sent when button is posted into chat
+	const notificationString = "Your warmup is ready!";
+	//button blocks object.
+	const getterButton = [
+		{
+			"type": "actions",
+			"elements": [
+				{
+					"action_id": "getMyWarmupClick",
+					"type": "button",
+					"text": {
+						"type": "plain_text",
+						"text": "Get your warmup!",
+						"emoji": true
+					}
+				}
+			]
+		}
+	];
+	//try function logic
+	try {
+		//make a call to the web api to post button in targ channel
+		const result = await app.client.chat.postMessage({
+		  token: token,
+		  channel: targChannelID,
+		  text: notificationString,
+		  blocks: getterButton
+		});
+	}
+	//catch any errors
+	catch(error) {
+		console.log(error);
+	}
+	
+}
+
 exports.sendWarmupButton = async function(targChannelID,app,token){
 	const notificationString = "Alert to send a warmup to your buddy!";
 		const warmupButton = [
@@ -1068,6 +1106,8 @@ exports.sendWarmupButton = async function(targChannelID,app,token){
 	}
 }	
 
+
+//sends a cooldown button to a target channel 
 exports.sendCooldownButton = async function(targChannelID,app,token){
 	const notificationString = "Alert to send a cooldown to your buddy!";
 		const warmupButton = [
@@ -1103,25 +1143,60 @@ exports.sendCooldownButton = async function(targChannelID,app,token){
 	}
 }	
 
+//sends a warmup modal to the user with their prompt   
+sendMyWarmup = async function(body, context){
+	let prompt = await firestoreFuncs.getExercisePrompt(body.user.team_id, body.user.id, true);
+	try {
+		if (prompt == undefined) {
+			prompt = "no message sent";
+		}
+		const promptJSON = createConfirmationView("Warmup",prompt);
+		//make a call to the web api to post the promp as a modal
+		const result = await app.client.views.open({
+			token: context.botToken,
+			trigger_id: body.trigger_id,
+			view: JSON.stringify(promptJSON)
+		});
+	}
+	//catch any errors
+	catch(error) {
+		console.log(error);
+	}
+}
+
+//handles calling function to send warmup choice modal to context while acknoledges event calling function
 sendWarmupHandler = async function(ack,body,context) {
 	ack();
 	sendSelectWarmupChoice(ack,body, context);
 }
 
+//handles calling function to send cooldown choice modal to context while acknoledges event calling function
 sendCooldownHandler = async function(ack,body,context) {
 	ack();
 	sendSelectCooldownChoice(ack,body, context);
 }
 
+//listen for and acknowledge a sendCooldownButtonClick Action and handle by calling the sendCooldownHandler
 app.action('sendCooldownButtonClick', ({ ack, body, context }) => {
 	sendCooldownHandler(ack,body,context);
 });
  
+ 
+//listen for and acknowledge a sendWarmupButtonClick Action and handle by calling the sendWarmupHandler
 app.action('sendWarmupButtonClick', ({ ack, body, context }) => {
 	sendWarmupHandler(ack,body,context);
 });
+
+//listen for and acknowledge a getMyWarmupClick Action and handle by calling the sendMyWarmup function
+app.action('getMyWarmupClick', ({ack,body,context }) => {
+	ack(); //acknowledge the click 
+	sendMyWarmup(body,context);
+	
+});
+
 app.action('confirmation', ({view, ack, body, context }) => {
 	ack({
 		 "response_action": "clear"
 	});
 });
+
