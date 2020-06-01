@@ -28,7 +28,7 @@ const app = index.getBolt();
  exports.scheduleMsg = async function scheduleMsg(hour, minute, text, id, token) {
 	// set up the time
 	// convert to utc then to pst to set correct hour and minutes, then back to utc for correct timestamp
-	/*
+	/* 1
 	var reminder = new Date();
 	var localTime = reminder.getTime();
 	var localOffset = reminder.getTimezoneOffset()*60000;
@@ -41,14 +41,22 @@ const app = index.getBolt();
 	newDate.setSeconds(0);
 	newDate = new Date(newDate.getTime() - (3600000 * offset));
 */
+// 2: Construct date string to create date obj
 	var now = new Date();
+	// adjust current timestamp to be behind to get proper date of pst timezone
+	now = now - 420 * 60 * 1000;
+
+	now = new Date(now);
 	var year, month, day;
 	year = now.getFullYear();
 	month = String(now.getUTCMonth() + 1);
 	if (month.length === 1) {
 		month = "0" + month;
 	}
-	day = now.getDate();
+	day = now.getUTCDate();
+	if (day.length === 1) {
+		day = "0" + day;	
+	}
 
 	var dateString = year + "-" + month + "-" + day + "T" + hour + ":" + minute + ":00.000-07:00";
 	console.log(dateString);
@@ -82,13 +90,20 @@ const app = index.getBolt();
 		newDate = new Date(newDate.getTime() - (3600000 * offset));
 */
 		var now = new Date();
+		// adjust current timestamp to be behind to get proper date of pst timezone
+		now = now - 420 * 60 * 1000;
+
+		now = new Date(now);
 		var year, month, day;
 		year = now.getFullYear();
 		month = String(now.getUTCMonth() + 1);
 		if (month.length === 1) {
 			month = "0" + month;
 		}
-		day = now.getDate();
+		day = now.getUTCDate();
+		if (day.length === 1) {
+			day = "0" + day;	
+		}
 
 		var dateString = year + "-" + month + "-" + day + "T" + hour + ":" + minute + ":00.000-07:00";
 		console.log(dateString);
@@ -121,15 +136,21 @@ const app = index.getBolt();
 		newDate.setSeconds(0);
 		newDate = new Date(newDate.getTime() - (3600000 * offset));
 */
-
 		var now = new Date();
+		// adjust current timestamp to be behind to get proper date of pst timezone
+		now = now - 420 * 60 * 1000;
+
+		now = new Date(now);
 		var year, month, day;
 		year = now.getFullYear();
 		month = String(now.getUTCMonth() + 1);
 		if (month.length === 1) {
 			month = "0" + month;
 		}
-		day = now.getDate();
+		day = now.getUTCDate();
+		if (day.length === 1) {
+			day = "0" + day;	
+		}
 
 		var dateString = year + "-" + month + "-" + day + "T" + hour + ":" + minute + ":00.000-07:00";
 		console.log(dateString);

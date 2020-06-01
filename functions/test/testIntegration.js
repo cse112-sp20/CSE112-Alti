@@ -22,7 +22,7 @@ let token = config.slack.bot_token;
 describe('Integration Testing', () => {
   // If it passes, means the function finished and message was scheduled, baseline test
   // Need more rigorous testing using promises of async function and validation from Slack API channel reading
-  /*
+  
   describe('Scheduler', () => {
    
     let schedule;
@@ -32,12 +32,23 @@ describe('Integration Testing', () => {
 
     it('schedule for 2 min after', async function() {
       this.timeout(5000); // 5 sec
-      let now = new Date();
+
+      var now = new Date();
+      var year, month, day;
+      year = now.getFullYear();
+      month = String(now.getUTCMonth() + 1);
+      if (month.length === 1) {
+        month = "0" + month;
+      }
+      day = now.getUTCDate();
+      
+      var dateString = year + "-" + month + "-" + day + "T" + hour + ":" + minute + ":00.000-07:00";
+      now = new Date(dateString); 
       now.setTime(now.getTime() + 120000); 
       var response = await schedule.scheduleMsg(now.getHours(), now.getMinutes(), 
                                                       "A reminder", "#testing", token);
       
-      //console.log("RESPONSE: ", response);
+      console.log("RESPONSE: ", response);
       app.client.chat.deleteScheduledMessage({
         token: token,
         channel: "testing",
@@ -90,7 +101,7 @@ describe('Integration Testing', () => {
       assert.equal(response.ok, true);
     });
   });
-  */
+  
 
 
   describe('Pairup', () => {
