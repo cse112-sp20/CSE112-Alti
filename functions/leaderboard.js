@@ -8,17 +8,12 @@ exports.scheduledLeaderboard =
     functions.pubsub
     .schedule('every friday 17:00') // 5 PM // 'every friday 17:00'
 	.timeZone('America/Los_Angeles')
-	.onRun(async (context, botToken) =>  {
+	.onRun(async (context) =>  {
         try {
             console.log("HELLO! It is Friday, and the time is 5 PM.");
 
             // get bot token
-            if (context !== undefined) {
-                token = context.botToken;
-            }
-            else {
-                token = botToken;
-            }
+            token = context.botToken;
 
             // get workspace info
             const workspaceInfo = await app.client.team.info({
@@ -38,7 +33,8 @@ exports.scheduledLeaderboard =
 	return null;
 });
 
-async function sendLeaderboardMessage(app, token, workspaceID) {
+//async function sendLeaderboardMessage(app, token, workspaceID) {
+exports.sendLeaderboardMessage = async (app, token, workspaceID) => {
     try {
         // get pairing channel
         const pairingChannel = await firestoreFuncs.getPairingChannel(workspaceID);
@@ -50,7 +46,7 @@ async function sendLeaderboardMessage(app, token, workspaceID) {
         app.client.chat.postMessage({
             token: token,
             channel: pairingChannel,
-            text: "Happy Friday!! 🎉\nGreat job this week, everyone!\nHere are the stats from this past week and for this month:",
+            text: "", 
             blocks: leaderboardBlock
         });
 
@@ -64,6 +60,20 @@ async function sendLeaderboardMessage(app, token, workspaceID) {
 function getLeaderboardBlock(workspaceID) {
     // get sorted array of IDs and their points 
     const rankingsArr = firestoreFuncs.getRankings(workspaceID);
+    if (rankingsArr === undefined) {
+        return [
+            {
+                "type": "section",
+                "text": {
+                    "type": "mrkdwn",
+                    "text": "*Happy Friday!!* 🎉\nGreat job this week, everyone!\nHere are the stats from this past week and for this month:"
+                }
+            },    
+            {
+                "type": "divider"
+            }
+        ];
+    }
 
     // get leaderboard strings
     const weeklyLeaderboard = getWeeklyLeaderboardStr(rankingsArr);
@@ -71,6 +81,13 @@ function getLeaderboardBlock(workspaceID) {
 
     const leaderboardBlock = 
     [
+        {
+            "type": "section",
+            "text": {
+                "type": "mrkdwn",
+                "text": "*Happy Friday!!* 🎉\nGreat job this week, everyone!\nHere are the stats from this past week and for this month:"
+            }
+        },
         {
             "type": "divider"
         },
