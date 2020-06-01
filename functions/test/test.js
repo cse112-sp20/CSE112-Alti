@@ -102,13 +102,24 @@ describe('Unit Testing', () => {
 
     it('Testing calcudoku', () => {
       url = generateTaskData.generatePuzzle('calcudoku');
-      assert.equal(url.substring(0, 37),'https://brainbashers.com/showcalcudoku');
+      assert.equal(url.substring(0, 38),'https://brainbashers.com/showcalcudoku');
     });
 
     it('Testing hitori', () => {
       url = generateTaskData.generatePuzzle('hitori');
       assert.equal(url.substring(0, 35),'https://brainbashers.com/showhitori');
     });
+
+  });
+
+  describe('generateMessageToSend', () => {
+    var msg;
+    it('Testing puzzle messages', () => {
+        msg = generateMessageToSend('puzzle', 'sudoku')
+        var expectedSubstring = "Your partner sent you this sudoku puzzle to help you get those brain juices flowing!"
+        assert.equal(msg.substring(0, 85), expectedSubstring);
+    });
+
 
   });
 
