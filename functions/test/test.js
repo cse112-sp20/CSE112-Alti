@@ -86,6 +86,33 @@ describe('Unit Testing', () => {
       assert.equal(url.substring(0, 37),'http://www.speedcoder.net/lessons/cpp');
     });
   });
+  
+  describe('generatePuzzle', () => {
+    var url;
+    it('Testing sudoku', () => {
+      //generatePuzzle();
+      url = generateTaskData.generatePuzzle('sudoku');
+      assert.equal(url.substring(0,44),'https://brainbashers.com/show${sudoku}.asp?');
+    });
+
+    it('Testing 3 in a row', () => {
+      url = generateTaskData.generatePuzzle('3inarow');
+      assert.equal(url.substring(0,45),'https://brainbashers.com/show${3inarow}.asp?');
+    });
+
+    it('Testing calcudoku', () => {
+      url = generateTaskData.generatePuzzle('calcudoku');
+      assert.equal(url.substring(0, 46),'https://brainbashers.com/show${calcudoku}.asp?');
+    });
+
+    it('Testing hitori', () => {
+      url = generateTaskData.generatePuzzle('hitori');
+      assert.equal(url.substring(0, 44),'https://brainbashers.com/show${hitori}.asp?');
+    });
+
+  });
+
+  
 
   //tests random generation features
   describe('Testing Random Generation', () => {
