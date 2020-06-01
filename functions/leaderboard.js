@@ -57,21 +57,18 @@ exports.sendLeaderboardMessage = async (app, token, workspaceID) => {
 
 // given the workspace ID,
 // returns the leaderboard block to use in our message
-function getLeaderboardBlock(workspaceID) {
+async function getLeaderboardBlock(workspaceID) {
     // get sorted array of IDs and their points
-    const rankingsArr = firestoreFuncs.getRankings(workspaceID);
+    let rankingsArr = await firestoreFuncs.getRankings(workspaceID);
     if (rankingsArr === undefined) {
         return [
             {
                 "type": "section",
                 "text": {
                     "type": "mrkdwn",
-                    "text": "*Happy Friday!!* 🎉\nGreat job this week, everyone!\nHere are the stats from this past week and for this month:"
+                    "text": "No users in this workspace. :("
                 }
             },
-            {
-                "type": "divider"
-            }
         ];
     }
 
@@ -79,7 +76,7 @@ function getLeaderboardBlock(workspaceID) {
     const weeklyLeaderboard = getWeeklyLeaderboardStr(rankingsArr);
     const monthlyLeaderboard = getMonthlyLeaderboardStr(rankingsArr);
 
-    const leaderboardBlock =
+    var leaderboardBlock =
     [
         {
             "type": "section",
@@ -117,14 +114,17 @@ function getWeeklyLeaderboardStr(rankingsArr) {
     var weeklyLeaderboard = "*Weekly Leaderboard*\n" +
                         "Rank       Name                    Points\n";
 
-    for (var i = 0; i < rankingsArr.length; rank++) {
+    console.log("LEN: " + rankingsArr.length);
+    for (var i = 0; i < rankingsArr.length; i++) {
         rank = i + 1;
         name = rankingsArr[i]['id'];
         weeklyPoints = rankingsArr[i]['weeklyPoints'];
-        weeklyLeaderboard += rank + ".      " + name + "                    " + weeklyPoints + "\n";
+        // console.log("name: "+name);
+        // console.log("points: "+weeklyPoints);
+        weeklyLeaderboard += rank + ".      " + name + "               " + weeklyPoints + "\n";
     }
 
-    console.log(weeklyLeaderboard);
+    console.log("weeklyLeaderboard: "+weeklyLeaderboard);
     return weeklyLeaderboard;
 }
 
@@ -132,7 +132,7 @@ function getWeeklyLeaderboardStr(rankingsArr) {
 function getMonthlyLeaderboardStr(rankingsArr) {
     var rank, name, monthlyPoints;
     var currMonthStr = getMonthStr();
-    var monthlyLeaderboard = "*" + currMonthStr + "* Leaderboard\n" +
+    var monthlyLeaderboard = "*" + currMonthStr + " Leaderboard*\n" +
                         "Rank       Name                    Points\n";
 
     for (var i = 0; i < rankingsArr.length; rank++) {
@@ -142,7 +142,7 @@ function getMonthlyLeaderboardStr(rankingsArr) {
         monthlyLeaderboard += rank + ".      " + name + "                   " + monthlyPoints + "\n";
     }
 
-    console.log(monthlyLeaderboard);
+    console.log("monthlyLeaderboard: "+monthlyLeaderboard);
     return monthlyLeaderboard;
 }
 
