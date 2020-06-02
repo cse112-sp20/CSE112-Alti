@@ -2,7 +2,7 @@
   "name": "functions",
   "description": "Cloud Functions for Firebase",
   "scripts": {
-    "test": "nyc --reporter=lcov --reporter=text --reporter=text-summary mocha",
+    "test": "bash ./Startup.sh",
     "coverage": "codecov",
     "lint": "eslint .",
     "serve": "firebase emulators:start --only functions",
