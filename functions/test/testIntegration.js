@@ -64,7 +64,7 @@ describe('Integration Testing', () => {
 
       console.log("Post at time: " + postAtTime);
       console.log("scheduleTime: " + scheduleTime);
-      assert(postAtTime-scheduleTime < 5, "The schedule time does not match with input"); // allow 5 sec delay
+      assert(postAtTime-scheduleTime < 5000, "The schedule time does not match with input"); // allow 5 sec delay
     });
 
     it('schedule for 1 min before', async () => {
