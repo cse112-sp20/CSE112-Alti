@@ -271,7 +271,7 @@ async function scheduleDailyUser(workspaceId, userId, token, day, threads) {
     cooldownTask = pairingData.cooldownTask;
   }
 
-  if (test === 1) {
+  //if (test === 1) {
     // TESTING PURPOSES
     //if no such warmup or cooldown make one for testing
     if (!warmupTask) {
@@ -282,7 +282,7 @@ async function scheduleDailyUser(workspaceId, userId, token, day, threads) {
     if (!cooldownTask) {
       cooldownTask = `Your partner didn't send a cooldown for today :frowning:`;
     }
-  }
+  //}
 
   var hour, min, mid;
 
