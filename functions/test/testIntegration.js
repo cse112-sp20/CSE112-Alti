@@ -22,7 +22,7 @@ let token = config.slack.bot_token;
 describe('Integration Testing', () => {
   // If it passes, means the function finished and message was scheduled, baseline test
   // Need more rigorous testing using promises of async function and validation from Slack API channel reading
-  /*
+  
   describe('Scheduler', () => {
    
     let schedule;
@@ -30,21 +30,19 @@ describe('Integration Testing', () => {
       schedule = require('../schedule');
     });
 
-    it('schedule for 2 min after', async function() {
+    it('schedule for 5 min after', async function() {
       this.timeout(5000); // 5 sec
 
       var now = new Date();
-      var year, month, day;
-      year = now.getFullYear();
-      month = String(now.getUTCMonth() + 1);
-      if (month.length === 1) {
-        month = "0" + month;
-      }
-      day = now.getUTCDate();
-      
-      var dateString = year + "-" + month + "-" + day + "T" + hour + ":" + minute + ":00.000-07:00";
-      now = new Date(dateString); 
-      now.setTime(now.getTime() + 120000); 
+      var localTime = now.getTime();
+      let localOffset = now.getTimezoneOffset()*60000;
+      let utc = localTime + localOffset;
+      let offset = -7;
+      let cali = (utc + (3600000 * offset));
+      let newDate = new Date(cali);
+      now = newDate;
+      now.setTime(now.getTime() + 300000); 
+
       var response = await schedule.scheduleMsg(now.getHours(), now.getMinutes(), 
                                                       "A reminder", "#testing", token);
       
@@ -73,8 +71,8 @@ describe('Integration Testing', () => {
     it('schedule for 4 min after', async function() {
       this.timeout(5000); // 5 sec
       // Submit hours and minutes that are in pst to schedule msg
-      let now = new Date();
-      let localTime = now.getTime();
+      var now = new Date();
+      var localTime = now.getTime();
       let localOffset = now.getTimezoneOffset()*60000;
       let utc = localTime + localOffset;
       let offset = -7;
@@ -101,7 +99,7 @@ describe('Integration Testing', () => {
       assert.equal(response.ok, true);
     });
   });
-  */
+  
 
 
   describe('Pairup', () => {
