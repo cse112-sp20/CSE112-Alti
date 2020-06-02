@@ -277,10 +277,10 @@ async function scheduleDailyUser(workspaceId, userId, token, day, threads) {
     if (!warmupTask) {
       quote = generateTaskData.generateQuote();
       quote = quote.split("-")[1] + "-" + quote.split("-")[2];
-      warmupTask = `Your partner sent you a motivational quote to help you start your day right!\n${quote}`;
+      warmupTask = `Your partner didn't send you a warmup for today :frowning:`;
     }
     if (!cooldownTask) {
-      cooldownTask = `Retrospective question for <@${  userId  }>`;
+      cooldownTask = `Your partner didn't send a cooldown for today :frowning:`;
     }
   }
 
