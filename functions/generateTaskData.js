@@ -235,7 +235,7 @@ exports.generateMessageToSend = function generateMessageToSend(exerciseType, arg
   var msg = "";  	//temporary msg to store
   switch(exerciseType) {
     case "puzzle":
-      url = generatePuzzle(arg);
+      url = exports.generatePuzzle(arg);
       message = "Your partner sent you this " + arg +
                 " puzzle to help you get those brain juices flowing!\nComplete it here: " + url;
       break;
@@ -269,10 +269,10 @@ exports.generateMessageToSend = function generateMessageToSend(exerciseType, arg
       }
       break;
 	  
-	case "article":
-		url = arg;
-		message = "Your partner sent you a tech article to read! Here is the link: " + arg;
-	break; 
+	  case "article":
+		  url = arg;
+		  message = "Your partner sent you a tech article to read! Here is the link: " + arg;
+	  break; 
 	
     default:
       throw new Exception('Exercise Type did not match any of the provided types.');

@@ -115,13 +115,84 @@ describe('Unit Testing', () => {
   describe('generateMessageToSend', () => {
     var msg;
     it('Testing puzzle messages', () => {
-        msg = generateMessageToSend('puzzle', 'sudoku')
+        msg = generateTaskData.generateMessageToSend('puzzle', 'sudoku');
         var expectedSubstring = "Your partner sent you this sudoku puzzle to help you get those brain juices flowing!"
         assert.equal(msg.substring(0, 85), expectedSubstring);
+
+        msg = generateTaskData.generateMessageToSend('puzzle', '3inarow');
+        expectedSubstring = "Your partner sent you this 3inarow puzzle to help you get those brain juices flowing!"
+        assert.equal(msg.substring(0, 86), expectedSubstring);
+
+        msg = generateTaskData.generateMessageToSend('puzzle', 'calcudoku');
+        expectedSubstring = "Your partner sent you this calcudoku puzzle to help you get those brain juices flowing!"
+        assert.equal(msg.substring(0, 88), expectedSubstring);
+
+        msg = generateTaskData.generateMessageToSend('puzzle', 'hitori');
+        expectedSubstring = "Your partner sent you this calcudoku puzzle to help you get those brain juices flowing!"
+        assert.equal(msg.substring(0, 85), expectedSubstring);
+    
+    });
+
+    it('Testing retro message', () => {
+      msg = generateTaskData.generateMessageToSend('retro', 0)
+      var expectedSubstring = "Your partner sent you this retro"
+      assert.equal(msg.substring(0, 33), expectedSubstring);
+    });
+
+    it('Testing video message', () => {
+      msg = generateTaskData.generateMessageToSend('video', "youtube.com")
+      var expected = "Your partner sent you this video to watch! : youtube.com"
+      assert.equal(msg, expected);
+    });
+
+    it('Testing cooldownArticle message', () => {
+      msg = generateTaskData.generateMessageToSend('cooldownArticle', "fivethirtyeight.com")
+      var expected = "Your partner sent you a non-tech article to read! Here is the link: fivethirtyeight.com"
+      assert.equal(msg, expected);
+    });
+
+    it('Testing typing message', () => {
+      msg = generateTaskData.generateMessageToSend('typing', "english");
+      var expectedSubstring = "Your partner sent you this cool speed coding challenge in english to get your mind and fingers ready for the day!"
+      assert.equal(msg.substring(0, 114), expectedSubstring);
+      
+      msg = generateTaskData.generateMessageToSend('typing', "python");
+      expectedSubstring = "Your partner sent you this cool speed coding challenge in python to get your mind and fingers ready for the day!"
+      assert.equal(msg.substring(0, 113), expectedSubstring);
+
+      msg = generateTaskData.generateMessageToSend('typing', "javascript");
+      var expectedSubstring = "Your partner sent you this cool speed coding challenge in javascript to get your mind and fingers ready for the day!"
+      assert.equal(msg.substring(0, 117), expectedSubstring);
+
+      msg = generateTaskData.generateMessageToSend('typing', "java");
+      var expectedSubstring = "Your partner sent you this cool speed coding challenge in java to get your mind and fingers ready for the day!"
+      assert.equal(msg.substring(0, 111), expectedSubstring);
+
+      msg = generateTaskData.generateMessageToSend('typing', "c");
+      var expectedSubstring = "Your partner sent you this cool speed coding challenge in c to get your mind and fingers ready for the day!"
+      assert.equal(msg.substring(0, 108), expectedSubstring);
+
+      msg = generateTaskData.generateMessageToSend('typing', "c++");
+      var expectedSubstring = "Your partner sent you this cool speed coding challenge in c++ to get your mind and fingers ready for the day!"
+      assert.equal(msg.substring(0, 110), expectedSubstring);
+    });
+
+    it('Testing quote message', () => {
+      var quoteInfo = ["MLK", "A riot is the language of the unheard."]
+      msg = generateTaskData.generateMessageToSend('quote', quoteInfo);
+      var expected = "Your partner sent you a motivational quote to help you start your day right! MLK says: A riot is the language of the unheard."
+      assert.equal(msg, expected);
+    });
+
+    it('Testing article message', () => {
+      msg = generateTaskData.generateMessageToSend('article', "theverge.com");
+      var expected = "Your partner sent you a tech article to read! Here is the link: theverge.com"
+      assert.equal(msg, expected);
     });
 
 
   });
+
 
   
 
