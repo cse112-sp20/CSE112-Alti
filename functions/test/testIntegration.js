@@ -60,6 +60,9 @@ describe('Integration Testing', () => {
       assert.equal(response.ok, true);
       let postAtTime = parseInt(response.post_at, 10);
       let scheduleTime = initial.getTime()/1000;
+
+      console.log("Post at time: " + postAtTime);
+      console.log("scheduleTime: " + scheduleTime);
       assert(postAtTime-scheduleTime < 5, "The schedule time does not match with input"); // allow 5 sec delay
     });
 
