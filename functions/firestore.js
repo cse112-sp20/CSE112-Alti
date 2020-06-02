@@ -326,6 +326,9 @@ exports.getExercisePrompt = async function getExercisePrompt(workspaceID, userID
         partner's userID, or undefined if error or cannot find the user passed in
 */
 exports.getPartner = function getPartner(workspaceID, channelID, userID) {
+    console.log(workspaceID);
+    console.log(channelID);
+    console.log(userID);
     let userRef = db.collection("workspaces").doc(workspaceID).collection("activeChannels")
                     .doc(channelID).collection('pairedUsers').doc(userID);
     

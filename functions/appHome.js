@@ -125,7 +125,6 @@ async function loadHomeTabUI(app, workspaceID, userId, context) {
 	}).catch((error) => {
         console.log(error);
   	});
-  	console.log("Pairing channel: " + channelId);
   /*
 	var timeZone = await firestoreFuncs.getTimeZone(workspaceID).then((obj)=>{
 		return obj;
@@ -153,6 +152,10 @@ async function loadHomeTabUI(app, workspaceID, userId, context) {
   var ownerText;
   var channelText;
   var timeZoneText;
+  var partnerText;
+  var partnerId;
+  var dmThreadText;
+  var dmThreadID;
   if (ownerId === undefined) {
 	  ownerText = `Current Owner of Alti is...there is no current owner of Alti! :scream: You can easily set an owner in the *Pick a folk* section.`;
   }
@@ -161,10 +164,36 @@ async function loadHomeTabUI(app, workspaceID, userId, context) {
   }
   if (channelId === undefined) {
 	  channelText = `Current Pairing Channel: None`;
+	  partnerText = `Current partner: None`;
+	  dmThreadText = `Current pairing thread: None`
   }
   else {
 	  channelText = `Current Pairing Channel: #${  channelName  }`;
+	  let pairingData = await firestoreFuncs.getUserPairingData(workspaceID, userId);
+	  dmThreadID = pairingData.dmThreadID;
+	  partnerId = await firestoreFuncs.getPartner(workspaceID, channelId, userId).then((obj)=>{
+		return obj;
+	  }).catch((error) => {
+		  console.log(error);
+	  });
+	  console.log(partnerId);
   }
+
+  if (partnerId === undefined) {
+	partnerText = `Current partner: None`;
+  }else {
+	  partnerText = `Current partner:  <@${  partnerId  }>`;
+  }
+
+  if (dmThreadID === undefined) {
+	dmThreadText = `Current pairing thread: None`;
+  }else {
+	  dmThreadText = `Current pairing thread:  ${  dmThreadID  }`;
+  }
+
+  //if (partnerId === undefined)
+
+
   /*
   if (timeZone === undefined) {
 	  timeZoneText = `Working Time Zone: None`;
@@ -198,6 +227,20 @@ async function loadHomeTabUI(app, workspaceID, userId, context) {
 					"text": {
 						"type": "mrkdwn",
 						"text": channelText,
+					}
+				},
+				{
+					"type": "section",
+					"text": {
+						"type": "mrkdwn",
+						"text": partnerText,
+					}
+				},
+				{
+					"type": "section",
+					"text": {
+						"type": "mrkdwn",
+						"text": dmThreadText,
 					}
 				},/*
 				{
@@ -511,6 +554,20 @@ async function loadHomeTabUI(app, workspaceID, userId, context) {
 						"type": "plain_text",
 						"text": channelText,
 						"emoji": true
+					}
+				},
+				{
+					"type": "section",
+					"text": {
+						"type": "mrkdwn",
+						"text": partnerText,
+					}
+				},
+				{
+					"type": "section",
+					"text": {
+						"type": "mrkdwn",
+						"text": dmThreadText,
 					}
 				},/*
 				{

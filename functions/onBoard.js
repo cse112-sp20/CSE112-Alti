@@ -227,12 +227,16 @@ app.event('member_joined_channel', async ({ body, context }) => {
             console.log(error);
         });
 
-
+        var promises = [];
 
         for (var day of days) {
-            promises.push(firestoreFuncs.setWarmupTime(team_id, userId, "9:00 AM", day));
-            promises.push(firestoreFuncs.setCooldownTime(team_id, userId, "5:00 PM", day));
+            promises.push(firestoreFuncs.setWarmupTime(body.team_id, body.event.user, "9:00 AM", day));
+            promises.push(firestoreFuncs.setCooldownTime(body.team_id, body.event.user, "5:00 PM", day));
         }
+
+        Promise.all(promises).catch((error) => {
+            console.log(error);
+        });
     }
 });
 
