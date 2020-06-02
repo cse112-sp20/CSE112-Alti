@@ -129,7 +129,7 @@ describe('Unit Testing', () => {
         assert.equal(msg.substring(0, 88), expectedString);
 
         msg = generateTaskData.generateMessageToSend('puzzle', 'hitori');
-        expectedString = "Your partner sent you this calcudoku puzzle to help you get those brain juices flowing!\n"
+        expectedString = "Your partner sent you this hitori puzzle to help you get those brain juices flowing!\n"
         assert.equal(msg.substring(0, 85), expectedString);
     
     });
