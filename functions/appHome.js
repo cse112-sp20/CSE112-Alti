@@ -125,14 +125,7 @@ async function loadHomeTabUI(app, workspaceID, userId, context) {
 	}).catch((error) => {
         console.log(error);
   	});
-  /*
-	var timeZone = await firestoreFuncs.getTimeZone(workspaceID).then((obj)=>{
-		return obj;
-	}).catch((error) => {
-        console.log(error);
-	});
-	// TODO store default LA timezone, probably on installation so in oauth.js
-*/
+
   var channelName;
   if (typeof(channelId) !== "undefined") {
     channelName = await app.client.conversations.info({
@@ -160,7 +153,7 @@ async function loadHomeTabUI(app, workspaceID, userId, context) {
 	  ownerText = `Current Owner of Alti is...there is no current owner of Alti! :scream: You can easily set an owner in the *Pick a folk* section.`;
   }
   else {
-	  ownerText = `Current Owner of Alti is <@${  ownerId  }>, you can ask the owner for modifying the time zone and change paring channel of the team.`;
+	  ownerText = `Current Owner of Alti is <@${  ownerId  }>, you can ask the owner for changing paring channel of the team.`;
   }
   if (channelId === undefined) {
 	  channelText = `Current Pairing Channel: None`;
@@ -256,7 +249,7 @@ async function loadHomeTabUI(app, workspaceID, userId, context) {
 					"block_id": "section678",
 					"text": {
 						"type": "mrkdwn",
-						"text": "🤝 *Pick a folk* to be the leader of Alti. The leader can pick pairing channel or change the time zone of the workspace"
+						"text": "🤝 *Pick a folk* to be the leader of Alti. The leader can pick pairing channel of the workspace"
 					},
 					"accessory": {
 						"action_id": "selectOwner",
