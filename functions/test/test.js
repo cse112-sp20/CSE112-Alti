@@ -117,7 +117,7 @@ describe('Unit Testing', () => {
     var expectedString;
     it('Testing puzzle messages', () => {
         msg = generateTaskData.generateMessageToSend('puzzle', 'sudoku');
-        var expectedString = "Your partner sent you this sudoku puzzle to help you get those brain juices flowing!"
+        expectedString = "Your partner sent you this sudoku puzzle to help you get those brain juices flowing!"
         assert.equal(msg.substring(0, 85), expectedString);
 
         msg = generateTaskData.generateMessageToSend('puzzle', '3inarow');
@@ -136,25 +136,25 @@ describe('Unit Testing', () => {
 
     it('Testing retro message', () => {
       msg = generateTaskData.generateMessageToSend('retro', 0)
-      var expectedString = "Your partner sent you this retro"
+      expectedString = "Your partner sent you this retro"
       assert.equal(msg.substring(0, 33), expectedString);
     });
 
     it('Testing video message', () => {
       msg = generateTaskData.generateMessageToSend('video', "youtube.com")
-      var expectedString= "Your partner sent you this video to watch! : youtube.com"
+      expectedString= "Your partner sent you this video to watch! : youtube.com"
       assert.equal(msg, expectedString);
     });
 
     it('Testing cooldownArticle message', () => {
       msg = generateTaskData.generateMessageToSend('cooldownArticle', "fivethirtyeight.com")
-      var expectedString= "Your partner sent you a non-tech article to read! Here is the link: fivethirtyeight.com"
+      expectedString= "Your partner sent you a non-tech article to read! Here is the link: fivethirtyeight.com"
       assert.equal(msg, expectedString);
     });
 
     it('Testing typing message', () => {
       msg = generateTaskData.generateMessageToSend('typing', "english");
-      var expectedString = "Your partner sent you this cool speed coding challenge in english to get your mind and fingers ready for the day!"
+      expectedString = "Your partner sent you this cool speed coding challenge in english to get your mind and fingers ready for the day!"
       assert.equal(msg.substring(0, 114), expectedString);
       
       msg = generateTaskData.generateMessageToSend('typing', "python");
@@ -162,32 +162,32 @@ describe('Unit Testing', () => {
       assert.equal(msg.substring(0, 113), expectedString);
 
       msg = generateTaskData.generateMessageToSend('typing', "javascript");
-      var expectedString = "Your partner sent you this cool speed coding challenge in javascript to get your mind and fingers ready for the day!"
+      expectedString = "Your partner sent you this cool speed coding challenge in javascript to get your mind and fingers ready for the day!"
       assert.equal(msg.substring(0, 117), expectedString);
 
       msg = generateTaskData.generateMessageToSend('typing', "java");
-      var expectedString = "Your partner sent you this cool speed coding challenge in java to get your mind and fingers ready for the day!"
+      expectedString = "Your partner sent you this cool speed coding challenge in java to get your mind and fingers ready for the day!"
       assert.equal(msg.substring(0, 111), expectedString);
 
       msg = generateTaskData.generateMessageToSend('typing', "c");
-      var expectedString = "Your partner sent you this cool speed coding challenge in c to get your mind and fingers ready for the day!"
+      expectedString = "Your partner sent you this cool speed coding challenge in c to get your mind and fingers ready for the day!"
       assert.equal(msg.substring(0, 108), expectedString);
 
       msg = generateTaskData.generateMessageToSend('typing', "c++");
-      var expectedString = "Your partner sent you this cool speed coding challenge in c++ to get your mind and fingers ready for the day!"
+      expectedString = "Your partner sent you this cool speed coding challenge in c++ to get your mind and fingers ready for the day!"
       assert.equal(msg.substring(0, 110), expectedString);
     });
 
     it('Testing quote message', () => {
       var quoteInfo = ["MLK", "A riot is the language of the unheard."]
       msg = generateTaskData.generateMessageToSend('quote', quoteInfo);
-      var expectedString= "Your partner sent you a motivational quote to help you start your day right! MLK says: A riot is the language of the unheard."
+      expectedString= "Your partner sent you a motivational quote to help you start your day right! MLK says: A riot is the language of the unheard."
       assert.equal(msg, expectedString);
     });
 
     it('Testing article message', () => {
       msg = generateTaskData.generateMessageToSend('article', "theverge.com");
-      var expectedString= "Your partner sent you a tech article to read! Here is the link: theverge.com"
+      expectedString= "Your partner sent you a tech article to read! Here is the link: theverge.com"
       assert.equal(msg, expectedString);
     });
 
