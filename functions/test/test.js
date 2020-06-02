@@ -85,6 +85,10 @@ describe('Unit Testing', () => {
       url = generateTaskData.generateCodingChallenge('c++',5);
       assert.equal(url.substring(0, 37),'http://www.speedcoder.net/lessons/cpp');
     });
+
+    it('Testing Exception', () =>{
+      assert.throws( function() {  generateTaskData.generateCodingChallenge('rust',5); }, Exception );
+    });
   });
   
   describe('generatePuzzle', () => {
@@ -109,7 +113,9 @@ describe('Unit Testing', () => {
       url = generateTaskData.generatePuzzle('hitori');
       assert.equal(url.substring(0, 35),'https://brainbashers.com/showhitori');
     });
-
+    it('Testing Exception', () =>{
+      assert.throws( function() {  generateTaskData.generatePuzzle('neighbors'); }, Error );
+    });
   });
 
   describe('generateMessageToSend', () => {
@@ -183,6 +189,11 @@ describe('Unit Testing', () => {
       msg = generateTaskData.generateMessageToSend('quote', quoteInfo);
       expectedString= "Your partner sent you a motivational quote to help you start your day right! MLK says: A riot is the language of the unheard."
       assert.equal(msg, expectedString);
+
+      quoteInfo = ["Unknown", "Water and words, easy to pour, impossible to recover."]
+      msg = generateTaskData.generateMessageToSend('quote', quoteInfo);
+      expectedString= "Your partner sent you a motivational quote to help you start your day right! Water and words, easy to pour, impossible to recover."
+      assert.equal(msg, expectedString);
     });
 
     it('Testing article message', () => {
@@ -191,7 +202,9 @@ describe('Unit Testing', () => {
       assert.equal(msg, expectedString);
     });
 
-
+    it('Testing Exception', () =>{
+      assert.throws( function() {  generateTaskData.generateMessageToSend('exercise', 'push-ups'); }, Exception );
+    });
   });
 
 
