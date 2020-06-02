@@ -53,7 +53,7 @@ const app = index.getBolt();
 	if (month.length === 1) {
 		month = "0" + month;
 	}
-	day = now.getUTCDate();
+	day = String(now.getUTCDate());
 	if (day.length === 1) {
 		day = "0" + day;	
 	}
@@ -100,7 +100,7 @@ const app = index.getBolt();
 		if (month.length === 1) {
 			month = "0" + month;
 		}
-		day = now.getUTCDate();
+		day = String(now.getUTCDate());
 		if (day.length === 1) {
 			day = "0" + day;	
 		}
@@ -147,7 +147,7 @@ const app = index.getBolt();
 		if (month.length === 1) {
 			month = "0" + month;
 		}
-		day = now.getUTCDate();
+		day = String(now.getUTCDate());
 		if (day.length === 1) {
 			day = "0" + day;	
 		}

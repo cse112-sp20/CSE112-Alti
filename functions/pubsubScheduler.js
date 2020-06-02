@@ -307,7 +307,7 @@ async function scheduleDailyUser(workspaceId, userId, token, day, threads) {
     }
     else {
     // TESTING PURPOSES
-      schedule.scheduleMsg(22, 55, warmupTask, dmThreadID, token);
+      //schedule.scheduleMsg(22, 55, warmupTask, dmThreadID, token);
     }
   }
   else {
@@ -334,7 +334,7 @@ async function scheduleDailyUser(workspaceId, userId, token, day, threads) {
     }
     else {
     // TESTING PURPOSES
-      await schedule.scheduleMsg(1, 58, cooldownTask, dmThreadID, token);
+      await schedule.scheduleMsg(18, 17, cooldownTask, dmThreadID, token);
     }
   }
   else {
@@ -366,8 +366,8 @@ async function scheduleDailyUser(workspaceId, userId, token, day, threads) {
     }
     else {
       // TESTING PURPOSES
-      await schedule.scheduleWarmupChoice(16, 59, dmThreadID, token);
-      await schedule.scheduleCooldownChoice(16, 59, dmThreadID, token);
+      await schedule.scheduleWarmupChoice(18, 17, dmThreadID, token);
+      await schedule.scheduleCooldownChoice(18, 17, dmThreadID, token);
     }
   }
   else {
