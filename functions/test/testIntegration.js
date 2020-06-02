@@ -42,11 +42,13 @@ describe('Integration Testing', () => {
       let cali = (utc + (3600000 * offset));
       let newDate = new Date(cali);
       now = newDate;
+      console.log("Now time after converting: " + now.getTime());
       now.setTime(now.getTime() + 120000); 
 
       var response = await schedule.scheduleMsg(now.getHours(), now.getMinutes(), 
                                                       "A reminder", "#testing", token);
-      
+      console.log("Initial:  " + initial.getTime());
+      console.log("Initial offset: " + initial.getTimezoneOffset());
       console.log("RESPONSE: ", response);
       app.client.chat.deleteScheduledMessage({
         token: token,
@@ -68,7 +70,7 @@ describe('Integration Testing', () => {
                                                       "A failed reminder", "#testing", token);
       assert.equal(response.ok, false);
     });
-
+/*
     it('schedule for 4 min after', async function() {
       this.timeout(5000); // 5 sec
       // Submit hours and minutes that are in pst to schedule msg
@@ -100,6 +102,7 @@ describe('Integration Testing', () => {
       //console.log(response);
       assert.equal(response.ok, true);
     });
+    */
   });
   
 
