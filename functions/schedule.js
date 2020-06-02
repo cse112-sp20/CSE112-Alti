@@ -57,6 +57,14 @@ const app = index.getBolt();
 	if (day.length === 1) {
 		day = "0" + day;	
 	}
+	hour = String(hour);
+	minute = String(minute);
+	if (hour.length === 1) {
+		hour = "0" + hour;
+	}
+	if (minute.length === 1) {
+		minute = "0" + minute;
+	}
 
 	var dateString = year + "-" + month + "-" + day + "T" + hour + ":" + minute + ":00.000-07:00";
 	console.log(dateString);
@@ -104,6 +112,14 @@ const app = index.getBolt();
 		if (day.length === 1) {
 			day = "0" + day;	
 		}
+		hour = String(hour);
+		minute = String(minute);
+		if (hour.length === 1) {
+			hour = "0" + hour;
+		}
+		if (minute.length === 1) {
+			minute = "0" + minute;
+		}
 
 		var dateString = year + "-" + month + "-" + day + "T" + hour + ":" + minute + ":00.000-07:00";
 		console.log(dateString);
@@ -150,6 +166,14 @@ const app = index.getBolt();
 		day = String(now.getUTCDate());
 		if (day.length === 1) {
 			day = "0" + day;	
+		}
+		hour = String(hour);
+		minute = String(minute);
+		if (hour.length === 1) {
+			hour = "0" + hour;
+		}
+		if (minute.length === 1) {
+			minute = "0" + minute;
 		}
 
 		var dateString = year + "-" + month + "-" + day + "T" + hour + ":" + minute + ":00.000-07:00";

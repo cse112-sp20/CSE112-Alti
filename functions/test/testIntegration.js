@@ -47,6 +47,7 @@ describe('Integration Testing', () => {
 
       var response = await schedule.scheduleMsg(now.getHours(), now.getMinutes(), 
                                                       "A reminder", "#testing", token);
+      assert.equal(response.ok, true);
 
       console.log("RESPONSE: ", response);
       console.log("Initial:  " + initial.getTime());
@@ -58,7 +59,6 @@ describe('Integration Testing', () => {
       });
                                                       
       //console.log(response);
-      assert.equal(response.ok, true);
       let postAtTime = parseInt(response.post_at, 10);
       let scheduleTime = initial.getTime()/1000;
 
