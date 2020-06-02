@@ -17,7 +17,6 @@ let firestoreFuncs = require('../firestore');
 const functions = require('firebase-functions');
 const config = functions.config();
 let token = config.slack.bot_token;
-
 // Unit Tests  go Here
 describe('Unit Testing', () => {
   describe('util', () => {
@@ -173,64 +172,31 @@ describe('Setup Warmup Callbacks', () => {
     });
   });
 
-  beforeEach((done) => {
-    ackCalled = false;
-    setTimeout(()=>{
-      firestoreFuncs.storeTypeOfExercise(workspaceId, userId1, true, "");
-      done();
-    }, 1000);
-  });
-
   after(async() => {
     await testUtil.deleteWorkspace(workspaceId);
   })
 
-  it('handleTypingSelect', () => {  
+  it('handleTypingSelect', async function() {  
     fakeBody.actions[0].value = 'java';
-    let selectPromise = new Promise((resolve, reject) => {
-      setTimeout(() => {
-        return resolve(handleTypingSelect(fakeAck, fakeBody, fakeContext));
-      }, 1000);
-    });
-    
-    let typingPrompt = selectPromise.then((res) => {
-      let ret = new Promise((resolve, reject) => {
-        setTimeout(() => {
-          return resolve(firestoreFuncs.getExercisePrompt(workspaceId, userId2, true));
-        }, 1000);
-      });
-      return ret;
-    });
 
-    return typingPrompt.then( prompt => {
-      let expectedString = "Your partner sent you this cool speed coding challenge in java to get your mind and fingers ready for the day!\nComplete it here: ";
-      assert.equal(ackCalled, true);
-      assert.equal(prompt.substring(0,expectedString.length), expectedString);
-      return Promise.resolve();
-    });
-  }).timeout(7000);
+    let check1 = await handleTypingSelect(fakeAck, fakeBody, fakeContext);
+    //console.log(check1);
+    let check2 = await firestoreFuncs.getExercisePrompt(workspaceId, userId2, true);
+    //console.log(check2);
+
+    let expectedString = "Your partner sent you this cool speed coding challenge in java to get your mind and fingers ready for the day!\nComplete it here: ";
+    assert.equal(check2.substring(0,expectedString.length), expectedString);
+  });
     
-  it('handlePuzzleSelect', () => {
+  it('handlePuzzleSelect', async function() {
     fakeBody.actions[0].value = 'sudoku';
-    let selectPromise = new Promise((resolve, reject) => {
-      setTimeout(() => {
-        return resolve(handlePuzzleSelect(fakeAck, fakeBody, fakeContext));
-      }, 1000);
-    });
 
-    let puzzlePrompt = selectPromise.then((res) => {
-      let ret = new Promise((resolve, reject) => {
-        setTimeout(() => {
-          return resolve(firestoreFuncs.getExercisePrompt(workspaceId, userId2, true));
-        }, 1000);
-      });
-      return ret;
-    });
-    return puzzlePrompt.then( prompt => {
-      let expectedString = "Your partner sent you this sudoku puzzle to help you get those brain juices flowing!\nComplete it here: ";
-      assert.equal(ackCalled, true);
-      assert.equal(prompt.substring(0,expectedString.length), expectedString);
-      return Promise.resolve();
-    });
-  }).timeout(7000);
+    let check1 = await handlePuzzleSelect(fakeAck, fakeBody, fakeContext);
+    //console.log(check1);
+    let check2 = await firestoreFuncs.getExercisePrompt(workspaceId, userId2, true);
+    //console.log(check2);
+
+    let expectedString = "Your partner sent you this sudoku puzzle to help you get those brain juices flowing!\nComplete it here: ";
+    assert.equal(check2.substring(0,expectedString.length), expectedString);
+  });
 });

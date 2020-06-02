@@ -115,13 +115,38 @@ exports.storeNewPairing = async function storeNewPairing(workspace, dmThreadID, 
         partnerID: pairedUsers[0],
     }, {merge: true});
 };
-
+/* 
+    Stores a new pairing (DM thread ids + partnerIDs) in the corresponding place (with the corresponding
+    workspace and channel) in cloud firestore. Unlike storeNewPairing, this function only sets one way 
+    pairing. This means pairedUsers[0] is paired with pairedUsers[1] but not the other way around.
+    ASSUMPTION: pairedUsers length is always 2
+    Inputs:
+        workspace - workspace id where the new pairings were made
+        dmThreadID - a singular DM thread id of a new pairing
+        pairedUsers - the user IDs of the newly paired teammates: format [u1, u2]
+*/
+exports.storeDirectedPairing = async function storeDirectedPairing(workspace, dmThreadID, pairedUsers) {
+    let channelID = await this.getPairingChannel(workspace);
+    let usersRef = db.collection('workspaces').doc(workspace)
+                           .collection('activeChannels').doc(channelID)
+                           .collection('pairedUsers');
+    
+    usersRef.doc(pairedUsers[0]).set({
+        dmThreadID: dmThreadID,
+        partnerID: pairedUsers[1],
+    }, {merge: true});
+};
 exports.writeMsgToDB = function writeMsgToDB(teamId, userID, channelID,msgToSend,isWarmup) {
 	db.collection("workspaces").doc(teamId+"/activeChannels/"+channelID+"/teammatePairings/"+userID).set({
 		warmupMessage: msgToSend
 	});
 };
 
+// Deletes all pairing information under a specific pairing channel of a workspace
+exports.deletePairings = async function deletePairings(workspaceId, channelId){
+    const path = 'workspaces/'+ workspaceId + '/activeChannels/' + channelId + '/pairedUsers';
+    return await deleteCollection(path, 100);
+}
 /*
     Description:
         This function will store a newly designated pairing channel under the 'activeChannels' collection.
