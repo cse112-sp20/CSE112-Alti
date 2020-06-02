@@ -117,7 +117,7 @@ describe('Unit Testing', () => {
     var expectedString;
     it('Testing puzzle messages', () => {
         msg = generateTaskData.generateMessageToSend('puzzle', 'sudoku');
-        expectedString = "Your partner sent you this sudoku puzzle to help you get those brain juices flowing!"
+        expectedString = "Your partner sent you this sudoku puzzle to help you get those brain juices flowing!\n"
         assert.equal(msg.substring(0, 85), expectedString);
 
         msg = generateTaskData.generateMessageToSend('puzzle', '3inarow');
@@ -136,7 +136,7 @@ describe('Unit Testing', () => {
 
     it('Testing retro message', () => {
       msg = generateTaskData.generateMessageToSend('retro', 0)
-      expectedString = "Your partner sent you this retro"
+      expectedString = "Your partner sent you this retro:"
       assert.equal(msg.substring(0, 33), expectedString);
     });
 
@@ -154,7 +154,7 @@ describe('Unit Testing', () => {
 
     it('Testing typing message', () => {
       msg = generateTaskData.generateMessageToSend('typing', "english");
-      expectedString = "Your partner sent you this cool speed coding challenge in english to get your mind and fingers ready for the day!"
+      expectedString = "Your partner sent you this cool speed coding challenge in english to get your mind and fingers ready for the day!\n"
       assert.equal(msg.substring(0, 114), expectedString);
       
       msg = generateTaskData.generateMessageToSend('typing', "python");
