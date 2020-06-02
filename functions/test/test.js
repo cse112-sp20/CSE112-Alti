@@ -121,15 +121,15 @@ describe('Unit Testing', () => {
         assert.equal(msg.substring(0, 85), expectedString);
 
         msg = generateTaskData.generateMessageToSend('puzzle', '3inarow');
-        expectedString = "Your partner sent you this 3inarow puzzle to help you get those brain juices flowing!"
+        expectedString = "Your partner sent you this 3inarow puzzle to help you get those brain juices flowing!\n"
         assert.equal(msg.substring(0, 86), expectedString);
 
         msg = generateTaskData.generateMessageToSend('puzzle', 'calcudoku');
-        expectedString = "Your partner sent you this calcudoku puzzle to help you get those brain juices flowing!"
+        expectedString = "Your partner sent you this calcudoku puzzle to help you get those brain juices flowing!\n"
         assert.equal(msg.substring(0, 88), expectedString);
 
         msg = generateTaskData.generateMessageToSend('puzzle', 'hitori');
-        expectedString = "Your partner sent you this calcudoku puzzle to help you get those brain juices flowing!"
+        expectedString = "Your partner sent you this calcudoku puzzle to help you get those brain juices flowing!\n"
         assert.equal(msg.substring(0, 85), expectedString);
     
     });
@@ -158,23 +158,23 @@ describe('Unit Testing', () => {
       assert.equal(msg.substring(0, 114), expectedString);
       
       msg = generateTaskData.generateMessageToSend('typing', "python");
-      expectedString = "Your partner sent you this cool speed coding challenge in python to get your mind and fingers ready for the day!"
+      expectedString = "Your partner sent you this cool speed coding challenge in python to get your mind and fingers ready for the day!\n"
       assert.equal(msg.substring(0, 113), expectedString);
 
       msg = generateTaskData.generateMessageToSend('typing', "javascript");
-      expectedString = "Your partner sent you this cool speed coding challenge in javascript to get your mind and fingers ready for the day!"
+      expectedString = "Your partner sent you this cool speed coding challenge in javascript to get your mind and fingers ready for the day!\n"
       assert.equal(msg.substring(0, 117), expectedString);
 
       msg = generateTaskData.generateMessageToSend('typing', "java");
-      expectedString = "Your partner sent you this cool speed coding challenge in java to get your mind and fingers ready for the day!"
+      expectedString = "Your partner sent you this cool speed coding challenge in java to get your mind and fingers ready for the day!\n"
       assert.equal(msg.substring(0, 111), expectedString);
 
       msg = generateTaskData.generateMessageToSend('typing', "c");
-      expectedString = "Your partner sent you this cool speed coding challenge in c to get your mind and fingers ready for the day!"
+      expectedString = "Your partner sent you this cool speed coding challenge in c to get your mind and fingers ready for the day!\n"
       assert.equal(msg.substring(0, 108), expectedString);
 
       msg = generateTaskData.generateMessageToSend('typing', "c++");
-      expectedString = "Your partner sent you this cool speed coding challenge in c++ to get your mind and fingers ready for the day!"
+      expectedString = "Your partner sent you this cool speed coding challenge in c++ to get your mind and fingers ready for the day!\n"
       assert.equal(msg.substring(0, 110), expectedString);
     });
 
