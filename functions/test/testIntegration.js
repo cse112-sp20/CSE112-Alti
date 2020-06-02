@@ -49,7 +49,7 @@ describe('Integration Testing', () => {
                                                       "A reminder", "#testing", token);
       console.log("Initial:  " + initial.getTime());
       console.log("Initial offset: " + initial.getTimezoneOffset());
-      console.log("RESPONSE: ", response);
+      //console.log("RESPONSE: ", response);
       app.client.chat.deleteScheduledMessage({
         token: token,
         channel: "testing",
