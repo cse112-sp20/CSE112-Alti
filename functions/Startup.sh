@@ -14,19 +14,8 @@ else
     firebase functions:config:get service_account_key > serviceAccountKey.json
 fi
 
-
-if [ $OSTYPE == "msys" ]; then
-    CurrPath=`cmd.exe /c cd`
-    ServiceAccountKeyPath="$CurrPath\\$ServiceAccountKey"
-    export GOOGLE_APPLICATION_CREDENTIALS="$ServiceAccountKeyPath"
-fi
-
-if [ $OSTYPE == "darwin"* ]; then
-    CurrPath=`pwd`
-    ServiceAccountKeyPath="$CurrPath/$ServiceAccountKey"
-    export GOOGLE_APPLICATION_CREDENTIALS="$ServiceAccountKeyPath"
-fi
-
-
+CurrPath=`pwd`
+ServiceAccountKeyPath="$CurrPath\\$ServiceAccountKey"
+export GOOGLE_APPLICATION_CREDENTIALS="$ServiceAccountKeyPath"
 
 nyc --reporter=lcov --reporter=text --reporter=text-summary mocha
