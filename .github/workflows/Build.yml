@@ -41,11 +41,12 @@ jobs:
       run: npm test
       env:
         GOOGLE_APPLICATION_CREDENTIALS: ./serviceAccountKey.json
-        CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
-    - name: Run Coverage
-      working-directory: ./functions
-      run: npm run coverage
+    - name: Test & publish code coverage
+      uses: paambaati/codeclimate-action@v2.6.0
       env:
-        GOOGLE_APPLICATION_CREDENTIALS: ./serviceAccountKey.json
-        CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
+        CC_TEST_REPORTER_ID: 0738f461208013810c9bfaf97401f9c8ecb6d4a61ac4aa58c580fbd0ac3ebe28
+      with:
+        coverageCommand: bash ./DoNothing.sh
+        coverageLocations: ${{github.workspace}}/functions/coverage/lcov.info:lcov
+        debug: true
     
