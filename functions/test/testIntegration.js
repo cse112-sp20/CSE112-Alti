@@ -57,7 +57,6 @@ describe('Integration Testing', () => {
         scheduled_message_id: response.scheduled_message_id
       });
                                                       
-      //console.log(response);
       let postAtTime = parseInt(response.post_at, 10);
       let scheduleTime = initial.getTime()/1000;
 
