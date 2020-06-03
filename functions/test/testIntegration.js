@@ -124,6 +124,7 @@ describe('Integration Testing', () => {
         let test = await Promise.all(await pairUp.pairUp(undefined, token));
         var pairs = await firestoreFuncs.getPairedUsers(workspaceId);
         /* eslint-disable no-await-in-loop */
+        assert(pairs.length != 0);
         for(var i = 0; i < pairs.length; i++)
         {
           var pair = pairs[i];
@@ -249,6 +250,27 @@ describe('Integration Testing', () => {
       for (var i = 0; i < 10; i++) {
         assert.equal(res[i], i+1);
       }
+    });
+  });
+
+  describe('onBoard Test', () => {
+    
+    let onBoard;
+    let team_id;
+    before(async () => {
+      onBoard = require('../onBoard');
+      // block action payload type
+      var team_info = await app.client.team.info({
+        token: context.botToken
+        }).catch((error) => {
+            console.log(error);
+        });
+        team_id = body.team.id;
+    });
+
+    it('Test CreateOnBoardChannel', async() => {
+      console.log(team_id);
+      await onBoard.createOnBoardingChannel(app, token, team_id, "TestOnBoard");
     });
   });
 });
