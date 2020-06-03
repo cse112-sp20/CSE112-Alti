@@ -14,6 +14,7 @@ else
     firebase functions:config:get service_account_key > serviceAccountKey.json
 fi
 
+echo $OSTYPE
 
 if [ $OSTYPE == "msys" ]; then
     CurrPath=`pwd`
