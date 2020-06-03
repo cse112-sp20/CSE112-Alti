@@ -1,9 +1,12 @@
 {
   "name": "functions",
   "description": "Cloud Functions for Firebase",
+  "main": "index.js",
   "scripts": {
-    "test": "nyc --reporter=lcov --reporter=text --reporter=text-summary mocha",
-    "coverage": "codecov",
+    "test": "bash ./Startup.sh",
+    "Local_Action_Build": "bash ./GitHubAction.sh build",
+    "Local_Action_Deploy": "bash ./GitHubAction.sh deploy",
+    "coverage": "bash ./Coverage.sh",
     "lint": "eslint .",
     "serve": "firebase emulators:start --only functions",
     "shell": "firebase functions:shell",
