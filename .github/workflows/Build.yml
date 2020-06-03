@@ -48,6 +48,5 @@ jobs:
         GOOGLE_APPLICATION_CREDENTIALS: ./serviceAccountKey.json
       with:
         coverageCommand: bash ./DoNothing.sh
-        coverageLocations: ${{github.workspace}}/functions/coverage/lcov.info:lcov
         debug: true
     
