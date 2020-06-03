@@ -36,7 +36,7 @@ exports.pairUp = async function pairUp(context=undefined, botToken=undefined){
         });
 
         const channelId = firestoreFuncs.getPairingChannel(workspaceInfo.team.id);
-        var pairingChannelIdVal;
+        let pairingChannelIdVal = await channelId;
         // const workspaceInfo = await workspaceInfoPromise.then(result => result.data);
 
         const members = channelId.then( id => {
@@ -44,12 +44,11 @@ exports.pairUp = async function pairUp(context=undefined, botToken=undefined){
                 return Promise.reject(new Error("Could not pair channel " + workspaceInfo.team.id + 
                                                 ". Pairing channel could not be retrieved."));
             }
-            pairingChannelIdVal = id;
             return app.client.conversations.members({
                     token:token,
                     channel:id
             });
-        });
+        }).catch(err => Promise.reject(new Error(err+ ' (Workspace: '+workspaceInfo.team.id+' activeChannel: '+pairingChannelIdVal+')')));
         // Clean the previous pairings in case someone has left the channel after last pairup
         const deletePairingResponse = channelId.then( id => {
             return firestoreFuncs.deletePairings(workspaceInfo.team.id, id);
@@ -89,6 +88,11 @@ exports.pairUp = async function pairUp(context=undefined, botToken=undefined){
             shuffle(ids);
             return ids
         }); 
+
+        // There was less than 2 peaople in the workspace
+        if(ids === undefined){
+            return console.error("Stopped pairing up. This is probably because there were not enough people in the workspace");
+        }
         //Pairing people up randomly and saving the response containing the paired channel information
         conversationInfos = []
 
@@ -111,13 +115,17 @@ exports.pairUp = async function pairUp(context=undefined, botToken=undefined){
         }
         // Going through the paired channels and post messages to them.
         // also store the pairing info on the firebase
-        return conversationInfos.map( conversationInfo => {
+        conversationInfos = conversationInfos.map( conversationInfo => {
             return conversationInfo
-                .then( response => handlePairingResponse(response, app, token, workspaceInfo, pairingChannelIdVal))
+                .then( response => {
+                    return handlePairingResponse(response, app, token, workspaceInfo, pairingChannelIdVal);
+                })
                 .catch(err => {
                     return console.error(err.message+"\n Could not open conversation at workspace " + workspaceInfo.team.id + ".");
             });
-        });    
+        });  
+        await Promise.all(conversationInfos);
+        return conversationInfos;
     }
     catch(error){
         console.error(error);
@@ -157,7 +165,7 @@ async function handlePairingResponse(response, app, token, workspaceInfo, pairin
     // If the number of people in the channel is even, pair them normally.
     // If not, pair a random group of 3 people in a circle where user0 -> user1 -> user2 -> user0.
     if(pairedUsers.length % 2 === 0){
-        return firestoreFuncs.storeNewPairing(workspaceInfo.team.id, response.channel.id, pairedUsers);
+        return await firestoreFuncs.storeNewPairing(workspaceInfo.team.id, response.channel.id, pairedUsers);
     }
     else{
         if(pairedUsers.length !== 3){
@@ -165,9 +173,11 @@ async function handlePairingResponse(response, app, token, workspaceInfo, pairin
         }
         // Shuffle so that when the same 3 people get matched, the direction of the matchings alternate
         shuffle(pairedUsers);
-        firestoreFuncs.storeDirectedPairing(workspaceInfo.team.id, response.channel.id, [pairedUsers[0],pairedUsers[1]]);
-        firestoreFuncs.storeDirectedPairing(workspaceInfo.team.id, response.channel.id, [pairedUsers[1],pairedUsers[2]]);
-        return firestoreFuncs.storeDirectedPairing(workspaceInfo.team.id, response.channel.id, [pairedUsers[2],pairedUsers[0]]);
+        directedPairings = []
+        directedPairings.push(firestoreFuncs.storeDirectedPairing(workspaceInfo.team.id, response.channel.id, [pairedUsers[0],pairedUsers[1]]));
+        directedPairings.push(firestoreFuncs.storeDirectedPairing(workspaceInfo.team.id, response.channel.id, [pairedUsers[1],pairedUsers[2]]));
+        directedPairings.push(firestoreFuncs.storeDirectedPairing(workspaceInfo.team.id, response.channel.id, [pairedUsers[2],pairedUsers[0]]));
+        return await Promise.all(directedPairings);
     }
 }
 
