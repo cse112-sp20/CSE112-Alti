@@ -526,6 +526,7 @@ exports.setOwner = function updateOwner(workspaceID, userID) {
 
 /*
     Description:
+<<<<<<< HEAD
         Gets timezone associated with the given workspace and the schedules of
         everyone paired up within the designated pairing-channel in that workspace.
         Returns a promise that you have to 'await'
@@ -570,6 +571,8 @@ exports.setTimeZone = function updateTimeZone(workspaceID, timeZone) {
 
 /*
     Description:
+=======
+>>>>>>> 5b4e6bd460ef8aadcc1827ba603844ab2c0b2be3
         Retrieves all workspace ids
     Returns:
         list of workspace ids, for ex: ['T123452324', 'T62345234', 'T6762342342']
