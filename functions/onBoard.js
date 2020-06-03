@@ -200,14 +200,7 @@ app.event('member_joined_channel', async ({ body, context }) => {
         var userId = body.event.user;
         var teamId = body.team_id;
         console.log("Member joined pairing channel");
-<<<<<<< HEAD
-        // TODO
-        // 1. DM user with information about being in pairing channel
-        // 2. Store user's info in db
-        //firestoreFuncs.setWarmupTime(team_id, userId, "9:00 AM", day);
-        //firestoreFuncs.setCooldownTime(team_id, userId, "5:00 PM", day);
-=======
-
+        
         var conversation = await app.client.conversations.open({
             token: context.botToken,
             users: userId
@@ -243,7 +236,6 @@ app.event('member_joined_channel', async ({ body, context }) => {
                 promises.push(firestoreFuncs.setCooldownTime(teamId, userId, "5:00 PM", day));
             }
         }
->>>>>>> 5b4e6bd460ef8aadcc1827ba603844ab2c0b2be3
     }
 });
 
