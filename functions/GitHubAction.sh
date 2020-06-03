@@ -9,7 +9,7 @@ echo "Local" > Local.env
 
 cd ..
 
-./act -b -s RUNTIME_CONFIG -s SERVICE_ACCOUNT_KEY -s FIREBASE_TOKEN -s CODECOV_TOKEN -j build
+./act -b -s RUNTIME_CONFIG -s SERVICE_ACCOUNT_KEY -s FIREBASE_TOKEN -s CODECOV_TOKEN -j $1
 
 cd ./functions
 

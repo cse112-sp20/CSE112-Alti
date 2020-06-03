@@ -4,7 +4,8 @@
   "main": "index.js",
   "scripts": {
     "test": "bash ./Startup.sh",
-    "Local_Action": "bash ./GitHubAction.sh",
+    "Local_Action_Build": "bash ./GitHubAction.sh build",
+    "Local_Action_Deploy": "bash ./GitHubAction.sh deploy",
     "coverage": "bash ./Coverage.sh",
     "lint": "eslint .",
     "serve": "firebase emulators:start --only functions",
