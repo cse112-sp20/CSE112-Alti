@@ -23,7 +23,7 @@ const app = new App({
     authorize: authorizeFunction,
 });
 
-//arrow function for simplicity
+//arrow function for simplicity 
 exports.getBolt = () => app;
 
 
@@ -43,7 +43,8 @@ exports.scheduleDaily = pubsubScheduler.scheduleDaily;
 exports.scheduleResetWeeklyPoints = leaderboard.scheduleResetWeeklyPoints;
 exports.scheduleResetMonthlyPoints = leaderboard.scheduleResetMonthlyPoints;
 
-//Test Ruixian
+
+//Test Ruixian 
 exports.test1 = pubsubScheduler.test1;
 //
 
@@ -57,7 +58,7 @@ app.error(console.log);
 //     say(`Trying to schedule a warmup`);
 //     //let hour = parseInt(command.text.split(" ")[0])
 //     //let minute = parseInt(command.text.split(" ")[1])
-//     //schedule.warmup(app, bot_token, hour , minute);
+//     //schedule.warmup(app, bot_token, hour , minute); 
 // });
 
 
@@ -82,15 +83,15 @@ app.message(async ({ message, context }) => {
 exports.slack = functions.https.onRequest(expressReceiver.app);
 
 
-//export this to separate file
-exports.oauth = oauthEndpoint.oAuthFunction;
+//export this to separate file 
+exports.oauth = oauthEndpoint.oAuthFunction; 
 
-app.command('/firestore', async ({ command, ack, say}) => {
-    // Acknowledge command request
-    ack();
+app.command('/firestore', async ({ command, ack, say}) => {	
+    // Acknowledge command request	 
+    ack();	
     firestoreFuncs.firestoreTest();
-    say(`Trying to firebase`);
-});
+    say(`Trying to firebase`);	
+}); 
 
 
 
@@ -123,9 +124,9 @@ app.action('generic_button', async ({ action, ack, context }) => {
 });
 /*
 request_custom_send Action Listener
-Descr: Listens for a slack provided action id matching
+Descr: Listens for a slack provided action id matching 
 'request_custom_send' and opens a model for sending a custom message
-in the user's from where the action originated from window with a
+in the user's from where the action originated from window with a 
 model for sending a custom message
 return:
 na
@@ -133,12 +134,12 @@ na
 app.action('request_custom_send', async ({ ack, body, context }) => {
    warmupMessage.requestCustomSend(ack,body,context);
  });
-
+ 
 /*
 custom_msg_view view Listener
-Descr: Listens for a slack provided view id matching
+Descr: Listens for a slack provided view id matching 
 'custom_msg_view' and stores a custom message submitted in this view
-within firebase.
+within firebase. 
 return:
 na
 */
@@ -158,7 +159,7 @@ app.command('/setupcooldown', async ({ command, ack, say, context }) => {
 app.action('cooldown_video_select', async ({ ack, body, context }) => {
    warmupMessage.cooldownVideoSelect(ack,body,context);
  });
-
+ 
 app.action('cooldown_article_select', async ({ ack, body, context }) => {
    warmupMessage.cooldownArticleSelect(ack,body,context);
  });
@@ -166,19 +167,19 @@ app.action('cooldown_article_select', async ({ ack, body, context }) => {
 app.action('cooldown_retro_select', async ({ ack, body, context }) => {
    warmupMessage.cooldownRetroSelect(ack,body,context);
  });
-
+ 
 app.action('cooldown_custom_select', async ({ ack, body, context }) => {
    warmupMessage.requestCustomSendCooldown(ack,body,context);
  });
-
+ 
 app.view('custom_msg_view_cooldown', async ({ ack, body, view, context }) => {
 	warmupMessage.customMsgView(ack, body, view, context,false);
 });
-
+ 
 app.action('warmup_coding_select', async ({ ack, body, context }) => {
    warmupMessage.warmupCodingSelect(ack,body,context);
  });
-
+ 
  app.action('warmup_article_select', async ({ ack, body, context }) => {
    warmupMessage.warmupArticleSelect(ack,body,context);
  });
@@ -190,25 +191,25 @@ app.action('warmup_puzzle_select', async ({ ack, body, context }) => {
 app.action('warmup_quote_select', async ({ ack, body, context }) => {
    warmupMessage.warmupQuoteSelect(ack,body,context);
  });
-
+ 
  app.action('warmup_quote_select', async ({ ack, body, context }) => {
    warmupMessage.warmupQuoteSelect(ack,body,context);
  });
 
 
 
-
+ 
  app.view('generic_close', async ({ ack, body, context }) => {
     ack({
 	  //clear the modal off the users screen
 	 "response_action": "clear"
   });
  });
-
+  
  app.action('generic_ack', async ({ ack, body, context }) => {
     ack();
  });
-
+ 
 exports.testFirestore = functions.https.onRequest(async (req, res) => {
     console.log(await  firestoreFuncs.getExercisePrompt('T011H6FAPV4', 'U011C8CCYDV', true));
 });
