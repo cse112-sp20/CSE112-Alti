@@ -113,15 +113,15 @@ exports.getLeaderboards = async (app, token, workspaceID) => {
     const rankingsArr = await firestoreFuncs.getRankings(workspaceID);
 
     // get user real names (not IDs)
-    for (i = 0; i < rankingsArr.length; i++) {
-        var m = await app.client.users.info({
+    await Promise.all(rankingsArr.map(async (ranking) => {
+        const m = await app.client.users.info({
             token: token,
-            user: rankingsArr[i]['id']
+            user: ranking['id']
         });
-        if (rankingsArr[i]['id'] !== undefined) {
-            rankingsArr[i]['id'] = m.user.real_name;
+        if (ranking['id'] !== undefined) {
+            ranking['id'] = m.user.real_name;
         }
-    }
+    }));
 
     // get leaderboard strings
     const weeklyLeaderboard = getWeeklyLeaderboardStr(rankingsArr);
