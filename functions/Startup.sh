@@ -6,7 +6,7 @@ ServiceAccountKey="serviceAccountKey.json"
 if test -f "$RunTimeConfig"; then
     echo "$RunTimeConfig exist"
 else
-    firebase functions:config:get slack_setup_token > .runtimeconfig.jsonnp
+    firebase functions:config:get slack_setup_token > .runtimeconfig.json
 fi
 if test -f "$ServiceAccountKey"; then
     echo "$ServiceAccountKey exist"

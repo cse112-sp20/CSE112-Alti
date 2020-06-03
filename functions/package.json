@@ -3,6 +3,7 @@
   "description": "Cloud Functions for Firebase",
   "scripts": {
     "test": "bash ./Startup.sh",
+    "Local_Action": "bash ./GitHubAction.sh",
     "coverage": "codecov",
     "lint": "eslint .",
     "serve": "firebase emulators:start --only functions",
