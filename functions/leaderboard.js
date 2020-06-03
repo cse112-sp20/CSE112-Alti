@@ -6,79 +6,139 @@ const functions = require('firebase-functions');
 /*
     scheduleResetWeeklyPoints
 
-    Resets all users' weeklyPoints to 0 
+    Resets all users' weeklyPoints in all workspaces to 0 
     every Monday at 12 AM Pacific Time.
 */
 exports.scheduleResetWeeklyPoints = functions.pubsub
                                 .schedule('every monday 00:00')
 	                            .timeZone('America/Los_Angeles')
 	                            .onRun(async (context) =>  {
-    
-    // get bot token
-    token = context.botToken;
+    // get all workspaces
+    const workspaces = await firestoreFuncs.getAllWorkspaces();
 
-    // get workspace info
-    const workspaceInfo = await app.client.team.info({
-        token: token
+    let promise = Promise.resolve();
+
+    // go through each workspace and reset everyone's weekly points
+	for (i = 0; i < workspaces.length; i++) {
+        let workspace = workspaces[i];
+        promise = promise.then(res => {
+            return firestoreFuncs.getAPIPair(workspace);
+        }, rej => {
+            return firestoreFuncs.getAPIPair(workspace);
+        });
+        promise = promise.then(res => {
+            return resetWeeklyHelper(workspace, res)
     });
+}
 
-    // get workspace id
-    const workspaceID = workspaceInfo.team.id;
+/*
+    resetWeeklyHelper(workspaceID, apiPair)
 
-    // get list of user IDs in workspace
-    var userList = await getUsersInWorkSpace(app, token);
+    Resets all users' weeklyPoints to 0 in a workspace.
+        PARAMS:
+        workspaceID - the workspace ID
+        apiPair - API pair for the workspace
+*/
+async function resetWeeklyHelper(workspaceID, apiPair) {
+    if (apiPair !== null) {
+        const token = apiPair.botToken;
+        try {
+            // get list of user IDs in workspace
+            var userList = await getUsersInWorkSpace(app, token);
 
-    // reset everyone's weekly points
-    for (var userID of userList) {
-        firestoreFuncs.resetWeeklyPoints(workspaceID, userID);
+            // reset everyone's weekly points
+            for (var userID of userList) {
+                firestoreFuncs.resetWeeklyPoints(workspaceID, userID);
+            }
+            return Promise.resolve();
+        } catch (error) {
+            console.error(error);
+        }
     }
-
-	return null;
+    else {
+        console.error("weeklyPoints in workspace " + workspaceID + 
+                        " were not reset because the api pair is not stored in firestore");
+    }
+    return Promise.reject(new Error("Workspace " + workspaceID + 
+                                    " weeklyPoints could not be reset"));
+  }
+  promise.catch(err => console.error(err));
+  await promise;
 });
 
 /*
     scheduleResetMonthlyPoints
 
-    Resets all users' monthlyPoints to 0 at the 
-    beginning of every month at 12 AM Pacific Time.
+    Resets all users' monthlyPoints in all workspaces to 0
+    at the beginning of every month at 12 AM Pacific Time.
 */
 exports.scheduleResetMonthlyPoints = functions.pubsub
-                                .schedule('first of month 00:00')
+                                .schedule('1 of month 00:00')
 	                            .timeZone('America/Los_Angeles')
 	                            .onRun(async (context) =>  {
     
-    // get bot token
-    token = context.botToken;
+    // get all workspaces
+    const workspaces = await firestoreFuncs.getAllWorkspaces();
 
-    // get workspace info
-    const workspaceInfo = await app.client.team.info({
-        token: token
+    let promise = Promise.resolve();
+
+    // go through each workspace and reset everyone's monthly points
+	for (i = 0; i < workspaces.length; i++) {
+        let workspace = workspaces[i];
+        promise = promise.then(res => {
+            return firestoreFuncs.getAPIPair(workspace);
+        }, rej => {
+            return firestoreFuncs.getAPIPair(workspace);
+        });
+        promise = promise.then(res => {
+            return resetMonthlyHelper(workspace, res)
     });
+}
 
-    // get workspace id
-    const workspaceID = workspaceInfo.team.id;
+/*
+    resetMonthlyHelper(workspaceID, apiPair)
 
-    // get list of user IDs in workspace
-    var userList = await getUsersInWorkSpace(app, token);
+    Resets all users' monthlyPoints to 0 in a workspace.
+        PARAMS:
+        workspaceID - the workspace ID
+        apiPair - API pair for the workspace
+*/
+async function resetMonthlyHelper(workspaceID, apiPair) {
+    if (apiPair !== null) {
+        const token = apiPair.botToken;
+        try {
+            // get list of user IDs in workspace
+            var userList = await getUsersInWorkSpace(app, token);
 
-    // reset everyone's monthly points
-    for (var userID of userList) {
-        firestoreFuncs.resetMonthlyPoints(workspaceID, userID);
+            // reset everyone's monthly points
+            for (var userID of userList) {
+                firestoreFuncs.resetMonthlyPoints(workspaceID, userID);
+            }
+            return Promise.resolve();
+        } catch (error) {
+            console.error(error);
+        }
     }
-
-	return null;
+    else {
+        console.error("monthlyPoints in workspace " + workspaceID + 
+                        " were not reset because the api pair is not stored in firestore");
+    }
+    return Promise.reject(new Error("Workspace " + workspaceID + 
+                                    " monthlyPoints could not be reset"));
+  }
+  promise.catch(err => console.error(err));
+  await promise;
 });
 
 /*
     getUsersInWorkSpace(app, token)
 
-    Returns a list of all user IDs (no bots) in a workspace.
+    Returns a list of all user IDs (including bots) in a workspace.
     Used in scheduleResetWeeklyPoints() and scheduleResetMonthlyPoints().
         PARAMS:
         app         - index.getBolt()
         token       - bot token
 */
-// Returns all user IDs in a workspace
 async function getUsersInWorkSpace(app, token) {
     var userMembers = await app.client.users.list({
         token: token
@@ -88,12 +148,10 @@ async function getUsersInWorkSpace(app, token) {
         console.log(error);
     });
 
-    // get list of user IDs (ignoring bots)
+    // get list of user IDs
     var userList = [];
     userMembers.forEach((user) => {
-        if (user.is_bot === false) {
-            userList.push(user.id);
-        }
+        userList.push(user.id);
     });
 
     return userList;
@@ -142,17 +200,23 @@ exports.getLeaderboards = async (app, token, workspaceID) => {
 function getWeeklyLeaderboardStr(rankingsArr) {
     var rank, name, weeklyPoints;
     var rankings = rankingsArr.sort(compareWeekly);
-    // if everyone has 0 points, just return this message
-    if (rankings[0]['weeklyPoints'] === 0) {
+    // if first person in rankings has 0 points, everyone has 0 points
+    if (rankings[0]['weeklyPoints'] === 0 || rankings[0]['weeklyPoints'] === undefined) {
         return "*Weekly Leaderboard*\n```No one is on the leaderboard!```";
     }
     var weeklyLeaderboard = "*Weekly Leaderboard*\n" + 
                             "```Rank     Name                      Points\n";
 
-    for (var i = 0; i < rankings.length; i++) {
+    var i = 0;
+    for (var ranking of rankings) {
         // do not show people who have 0 points
-        if (rankings[i]['weeklyPoints'] === 0) {
+        if (ranking['weeklyPoints'] === 0) {
             break;
+        }
+        // do not show people whose points or names are undefined
+        if (ranking['weeklyPoints'] === undefined || 
+            ranking['id'] === undefined) {
+            continue;
         }
         num = i + 1;
         if (num === 1) {
@@ -164,14 +228,13 @@ function getWeeklyLeaderboardStr(rankingsArr) {
         } else {
             rank = num + ".";
         }
-        name = rankings[i]['id'];
-        weeklyPoints = String(rankings[i]['weeklyPoints']);
+        name = ranking['id'];
+        weeklyPoints = String(ranking['weeklyPoints']);
         weeklyLeaderboard += rank + "       " + rightJustify(name, 25) + 
-                                " " + leftJustify(weeklyPoints, 4) + "\n";
+                            " " + leftJustify(weeklyPoints, 4) + "\n";
+        i++;
     }
     weeklyLeaderboard += "```";
-
-    console.log("weeklyLeaderboard: " + weeklyLeaderboard);
     return weeklyLeaderboard;
 }
 
@@ -205,17 +268,23 @@ function getMonthlyLeaderboardStr(rankingsArr) {
     var rank, name, monthlyPoints;
     var rankings = rankingsArr.sort(compareMonthly);
     var currMonthStr = getMonthStr();
-    // if everyone has 0 points, just return this message
-    if (rankings[0]['monthlyPoints'] === 0) {
+    // if first person in rankings has 0 points, everyone has 0 points
+    if (rankings[0]['monthlyPoints'] === 0 || rankings[0]['monthlyPoints'] === undefined) {
         return "*" + currMonthStr + " Leaderboard*\n```No one is on the leaderboard!```";
     }
     var monthlyLeaderboard = "*" + currMonthStr + " Leaderboard*\n" +
                              "```Rank     Name                      Points\n";
-
-    for (var i = 0; i < rankings.length; i++) {
+ 
+    var i = 0;
+    for (var ranking of rankings) {
         // do not show people who have 0 points
-        if (rankings[i]['monthlyPoints'] === 0) {
+        if (ranking['monthlyPoints'] === 0) {
             break;
+        }
+        // do not show people whose points or names are undefined
+        if (ranking['weeklyPoints'] === undefined || 
+            ranking['id'] === undefined) {
+            continue;
         }
         num = i + 1;
         if (num === 1) {
@@ -227,13 +296,15 @@ function getMonthlyLeaderboardStr(rankingsArr) {
         } else {
             rank = num + ".";
         }
-        name = rankings[i]['id'];
-        monthlyPoints = String(rankings[i]['monthlyPoints']);
-        monthlyLeaderboard += rank + "       " + rightJustify(name, 25) + 
-                                " " + leftJustify(monthlyPoints, 4) + "\n";
+        name = ranking['id'];
+        monthlyPoints = String(ranking['monthlyPoints']);
+        if (name !== undefined) {
+            monthlyLeaderboard += rank + "       " + rightJustify(name, 25) + 
+                                    " " + leftJustify(monthlyPoints, 4) + "\n";
+        }
+        i++;
     }
     monthlyLeaderboard += "```";
-    console.log("monthlyLeaderboard: " + monthlyLeaderboard);
     return monthlyLeaderboard;
 }
 

@@ -628,7 +628,6 @@ exports.getUserPairingData = async function getUserData(workspaceID, userID) {
         userID      - ID of user whose points will be incremented
 */
 exports.setPoints = async function setPoints(workspaceID, userID) {
-    //console.log("SETTING POINTS");
     let userDocRef = db.collection('workspaces')
                     .doc(workspaceID)
                     .collection('users')
@@ -650,7 +649,6 @@ exports.setPoints = async function setPoints(workspaceID, userID) {
         userID      - ID of user whose points will be reset
 */
 exports.resetWeeklyPoints = async function resetWeeklyPoints(workspaceID, userID) {
-    //console.log("RESET POINTS");
     let data = {
         weeklyPoints: 0
     };
@@ -658,7 +656,7 @@ exports.resetWeeklyPoints = async function resetWeeklyPoints(workspaceID, userID
                 .doc(workspaceID)
                 .collection('users')
                 .doc(userID)
-                .set(data);
+                .set(data, {merge: true});
 };
 
 /*
@@ -672,7 +670,6 @@ exports.resetWeeklyPoints = async function resetWeeklyPoints(workspaceID, userID
         userID      - ID of user whose points will be reset
 */
 exports.resetMonthlyPoints = async function resetMonthlyPoints(workspaceID, userID) {
-    //console.log("RESET POINTS");
     let data = {
         monthlyPoints: 0
     };
@@ -680,7 +677,7 @@ exports.resetMonthlyPoints = async function resetMonthlyPoints(workspaceID, user
                 .doc(workspaceID)
                 .collection('users')
                 .doc(userID)
-                .set(data);
+                .set(data, {merge: true});
 };
 
 /*
