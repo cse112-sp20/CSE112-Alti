@@ -71,6 +71,7 @@ describe('Integration Testing', () => {
       now.setTime(now.getTime() - 120000); 
       let response = await schedule.scheduleMsg(now.getHours(), now.getMinutes(), 
                                                       "A failed reminder", "#testing", token);
+      console.log(response)
       assert.equal(response.ok, false);
     });
 
