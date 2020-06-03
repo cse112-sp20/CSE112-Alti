@@ -67,7 +67,15 @@ describe('Integration Testing', () => {
     });
 
     it('schedule for 1 min before', async () => {
+      let initial = new Date();
       let now = new Date();
+      var localTime = now.getTime();
+      let localOffset = now.getTimezoneOffset()*60000;
+      let utc = localTime + localOffset;
+      let offset = -7;
+      let cali = (utc + (3600000 * offset));
+      let newDate = new Date(cali);
+      now = newDate;
       now.setTime(now.getTime() - 60000); 
       let response = await schedule.scheduleMsg(now.getHours(), now.getMinutes(), 
                                                       "A failed reminder", "#testing", token);
