@@ -45,6 +45,7 @@ jobs:
       uses: paambaati/codeclimate-action@v2.6.0
       env:
         CC_TEST_REPORTER_ID: 0738f461208013810c9bfaf97401f9c8ecb6d4a61ac4aa58c580fbd0ac3ebe28
+        GOOGLE_APPLICATION_CREDENTIALS: ./serviceAccountKey.json
       with:
         coverageCommand: bash ./DoNothing.sh
         coverageLocations: ${{github.workspace}}/functions/coverage/lcov.info:lcov
