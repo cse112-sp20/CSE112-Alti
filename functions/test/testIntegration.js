@@ -22,7 +22,7 @@ let token = config.slack.bot_token;
 describe('Integration Testing', () => {
   // If it passes, means the function finished and message was scheduled, baseline test
   // Need more rigorous testing using promises of async function and validation from Slack API channel reading
-  /*
+  
   describe('Scheduler', () => {
    
     let schedule;
@@ -32,12 +32,25 @@ describe('Integration Testing', () => {
 
     it('schedule for 2 min after', async function() {
       this.timeout(5000); // 5 sec
+      let initial = new Date();
       let now = new Date();
+      var localTime = now.getTime();
+      let localOffset = now.getTimezoneOffset()*60000;
+      let utc = localTime + localOffset;
+      let offset = -7;
+      let cali = (utc + (3600000 * offset));
+      let newDate = new Date(cali);
+      now = newDate;
+      //console.log("Now time after converting: " + now.getTime());
       now.setTime(now.getTime() + 120000); 
+
       var response = await schedule.scheduleMsg(now.getHours(), now.getMinutes(), 
                                                       "A reminder", "#testing", token);
-      
+      assert.equal(response.ok, true);
+
       //console.log("RESPONSE: ", response);
+      //console.log("Initial:  " + initial.getTime());
+      //console.log("Initial offset: " + initial.getTimezoneOffset());
       app.client.chat.deleteScheduledMessage({
         token: token,
         channel: "testing",
@@ -45,10 +58,12 @@ describe('Integration Testing', () => {
       });
                                                       
       //console.log(response);
-      assert.equal(response.ok, true);
       let postAtTime = parseInt(response.post_at, 10);
-      let scheduleTime = now.getTime()/1000;
-      assert(postAtTime-scheduleTime < 5, "The schedule time does not match with input"); // allow 5 sec delay
+      let scheduleTime = initial.getTime()/1000;
+
+      //console.log("Post at time: " + postAtTime);
+      //console.log("scheduleTime: " + scheduleTime);
+      assert(postAtTime-scheduleTime < 5000, "The schedule time does not match with input"); // allow 5 sec delay
     });
 
     it('schedule for 1 min before', async () => {
@@ -62,35 +77,41 @@ describe('Integration Testing', () => {
     it('schedule for 4 min after', async function() {
       this.timeout(5000); // 5 sec
       // Submit hours and minutes that are in pst to schedule msg
+      let initial = new Date();
       let now = new Date();
-      let localTime = now.getTime();
+      var localTime = now.getTime();
       let localOffset = now.getTimezoneOffset()*60000;
       let utc = localTime + localOffset;
       let offset = -7;
       let cali = (utc + (3600000 * offset));
       let newDate = new Date(cali);
       now = newDate;
+      //console.log("Now time after converting: " + now.getTime());
       now.setTime(now.getTime() + 240000); 
+
       var response = await schedule.scheduleMsg(now.getHours(), now.getMinutes(), 
                                                       "A reminder", "#testing", token);
-      assert.equal(response.error, undefined);                                                
       assert.equal(response.ok, true);
-      let postAtTime = parseInt(response.post_at, 10);
-      let scheduleTime = now.getTime()/1000;
-      assert(postAtTime-scheduleTime < 5, "The schedule time does not match with input"); // allow 5 sec delay
-      
+
       //console.log("RESPONSE: ", response);
+      //console.log("Initial:  " + initial.getTime());
+      //console.log("Initial offset: " + initial.getTimezoneOffset());
       app.client.chat.deleteScheduledMessage({
         token: token,
-        channel: "#testing",
+        channel: "testing",
         scheduled_message_id: response.scheduled_message_id
       });
                                                       
       //console.log(response);
-      assert.equal(response.ok, true);
+      let postAtTime = parseInt(response.post_at, 10);
+      let scheduleTime = initial.getTime()/1000;
+
+      //console.log("Post at time: " + postAtTime);
+      //console.log("scheduleTime: " + scheduleTime);
+      assert(postAtTime-scheduleTime < 5000, "The schedule time does not match with input"); // allow 5 sec delay
     });
   });
-  */
+  
 
 
   describe('Pairup', () => {
@@ -198,7 +219,6 @@ describe('Integration Testing', () => {
       onBoard = require('../onBoard');
       workspaceId = "TestWorkspace";
       userId = "user1";
-      await firestoreFuncs.setTimeZone(workspaceId, 'LA');
       await firestoreFuncs.setOwner(workspaceId, userId);
       await firestoreFuncs.storeNewPairingChannel(workspaceId, "Channel1");
 
@@ -219,15 +239,6 @@ describe('Integration Testing', () => {
     after(async() => {
       await testUtil.deleteWorkspace(workspaceId);
     })
-
-    it('Get time zone', async () => {
-      var timeZone = await firestoreFuncs.getTimeZone(workspaceId).then((obj)=>{
-        return obj;
-      }).catch((error) => {
-            console.log(error);
-      });
-      assert.equal(timeZone, "LA");
-    });
 
 
     it('Check Owner', async () => {
