@@ -3,6 +3,7 @@ const app = index.getBolt();
 
 const appHomeObjects = require('./appHomeObjects');
 const firestoreFuncs = require('./firestore');
+const leaderboard = require('./leaderboard');
 
 var days = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"];
 
@@ -162,6 +163,11 @@ async function loadHomeTabUI(app, workspaceID, userId, context) {
 	  channelText = `Current Pairing Channel: #${  channelName  }`;
   }
 
+	// get leaderboard strings
+	const leaderboards = await leaderboard.getLeaderboards(app, context.botToken, workspaceID);
+	const weeklyLeaderboard = leaderboards[0];
+	const monthlyLeaderboard = leaderboards[1];
+	
 	if(await checkOwner(workspaceID, userId)){
 		view = {
 			"type": "home",
@@ -423,6 +429,28 @@ async function loadHomeTabUI(app, workspaceID, userId, context) {
 					}
 				  },
 				{
+                    "type": "divider"
+                },
+                {
+                    "type": "section",
+                    "text":
+                    {
+                        "type": "mrkdwn",
+                        "text": weeklyLeaderboard
+                    }
+                },
+                {
+                    "type": "section",
+                    "text":
+                    {
+                        "type": "mrkdwn",
+                        "text": monthlyLeaderboard
+                    }
+				},
+				{
+                    "type": "divider"
+                },
+				{
 					"type": "context",
 					"elements": [
 						{
@@ -597,6 +625,25 @@ async function loadHomeTabUI(app, workspaceID, userId, context) {
 				{
 					"type": "divider"
 				},
+                {
+                    "type": "section",
+                    "text":
+                    {
+                        "type": "mrkdwn",
+                        "text": weeklyLeaderboard
+                    }
+                },
+                {
+                    "type": "section",
+                    "text":
+                    {
+                        "type": "mrkdwn",
+                        "text": monthlyLeaderboard
+                    }
+				},
+				{
+                    "type": "divider"
+                },
 				{
 					"type": "context",
 					"elements": [
