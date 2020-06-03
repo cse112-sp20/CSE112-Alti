@@ -47,4 +47,5 @@ jobs:
       env:
         GOOGLE_APPLICATION_CREDENTIALS: ./serviceAccountKey.json
         CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
+        LOCAL_ENV: "GitHub"
     
