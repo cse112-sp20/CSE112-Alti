@@ -5,7 +5,7 @@
   "scripts": {
     "test": "bash ./Startup.sh",
     "Local_Action": "bash ./GitHubAction.sh",
-    "coverage": "codecov",
+    "coverage": "bash ./Coverage.sh",
     "lint": "eslint .",
     "serve": "firebase emulators:start --only functions",
     "shell": "firebase functions:shell",
