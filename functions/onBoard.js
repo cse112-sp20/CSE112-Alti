@@ -104,8 +104,8 @@ async function createOnBoardingChannel(app, token, team_id, channelName) {
             }
             
             // reset user's weekly and monthly points
-            firestoreFuncs.resetWeeklyPoints(team_id,userId);
-            firestoreFuncs.resetMonthlyPoints(team_id,userId);
+            promises.push(firestoreFuncs.resetWeeklyPoints(team_id,userId));
+            promises.push(firestoreFuncs.resetMonthlyPoints(team_id,userId));
             
             Promise.all(promises).catch((error) => {
                 console.log(error);
@@ -146,8 +146,8 @@ async function boardExistingChannel(app, token, team_id, channelId) {
             }
             
             // reset everyone's weekly and monthly points
-            firestoreFuncs.resetWeeklyPoints(team_id,userId);
-            firestoreFuncs.resetMonthlyPoints(team_id,userId);
+            promises.push(firestoreFuncs.resetWeeklyPoints(team_id,userId));
+            promises.push(firestoreFuncs.resetMonthlyPoints(team_id,userId));
         }
         Promise.all(promises).catch((error) => {
             console.log(error);
@@ -242,9 +242,6 @@ app.event('member_joined_channel', async ({ body, context }) => {
             }
         }
     }
-    // reset user's weekly and monthly points upon joining
-        firestoreFuncs.resetWeeklyPoints(teamId,userId);
-        firestoreFuncs.resetMonthlyPoints(team_id,userId);
 });
 
 app.event('member_left_channel', async ({ body, context }) => {
@@ -273,9 +270,6 @@ app.event('member_left_channel', async ({ body, context }) => {
         }).catch((error) => {
             console.log(error);
         });
-    // reset user's weekly and monthly points upon leave
-        firestoreFuncs.resetWeeklyPoints(teamId,userId);
-        firestoreFuncs.resetMonthlyPoints(team_id,userId);
 });
 
 
