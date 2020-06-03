@@ -7,10 +7,10 @@ const functions = require('firebase-functions');
     scheduleResetWeeklyPoints
 
     Resets all users' weeklyPoints to 0 
-    every Sunday at 11:59 PM Pacific Time.
+    every Monday at 12 AM Pacific Time.
 */
 exports.scheduleResetWeeklyPoints = functions.pubsub
-                                .schedule('every sunday 23:59')
+                                .schedule('every monday 00:00')
 	                            .timeZone('America/Los_Angeles')
 	                            .onRun(async (context) =>  {
     
@@ -39,11 +39,11 @@ exports.scheduleResetWeeklyPoints = functions.pubsub
 /*
     scheduleResetMonthlyPoints
 
-    Resets all users' monthlyPoints to 0 
-    at the end of every month at 11:59 PM Pacific Time.
+    Resets all users' monthlyPoints to 0 at the 
+    beginning of every month at 12 AM Pacific Time.
 */
 exports.scheduleResetMonthlyPoints = functions.pubsub
-                                .schedule('every sunday 23:59') // CHANGE THIS
+                                .schedule('first of month 00:00')
 	                            .timeZone('America/Los_Angeles')
 	                            .onRun(async (context) =>  {
     
