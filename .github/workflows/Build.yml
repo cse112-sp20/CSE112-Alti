@@ -49,6 +49,5 @@ jobs:
       with:
         coverageCommand: bash ./DoNothing.sh
         coverageLocations: ${{github.workspace}}/functions/coverage/lcov.info:lcov
-        prefix: ${{github.workspace}}/functions
         debug: true
     
