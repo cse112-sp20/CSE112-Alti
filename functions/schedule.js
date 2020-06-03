@@ -58,10 +58,10 @@ const app = index.getBolt();
 		day = "0" + day;	
 	}
 	hour = String(hour);
-	minute = String(minute);
 	if (hour.length === 1) {
 		hour = "0" + hour;
 	}
+	minute = String(minute);
 	if (minute.length === 1) {
 		minute = "0" + minute;
 	}
@@ -113,10 +113,10 @@ const app = index.getBolt();
 			day = "0" + day;	
 		}
 		hour = String(hour);
-		minute = String(minute);
 		if (hour.length === 1) {
 			hour = "0" + hour;
 		}
+		minute = String(minute);
 		if (minute.length === 1) {
 			minute = "0" + minute;
 		}
@@ -168,10 +168,10 @@ const app = index.getBolt();
 			day = "0" + day;	
 		}
 		hour = String(hour);
-		minute = String(minute);
 		if (hour.length === 1) {
 			hour = "0" + hour;
 		}
+		minute = String(minute);
 		if (minute.length === 1) {
 			minute = "0" + minute;
 		}
