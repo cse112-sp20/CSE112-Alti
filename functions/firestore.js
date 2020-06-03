@@ -1,6 +1,7 @@
 const functions = require('firebase-functions');
 const admin = require('firebase-admin');
 const request = require('request');
+const firestoreFuncs = require('./firestore');
 // const dotenv = require('dotenv');
 // dotenv.config();
 
@@ -275,8 +276,7 @@ exports.storeTypeOfExercise = async function storeTypeOfExercise(workspaceID, us
 
     // console.log(workspaceID + "   " + userID);
     // update user's points
-    updatePoints(workspaceID, userID);
-	
+    firestoreFuncs.updatePoints(workspaceID, userID);	
     return setResult;
 }
 
