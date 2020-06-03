@@ -1,6 +1,7 @@
 const functions = require('firebase-functions');
 const admin = require('firebase-admin');
 const request = require('request');
+const firestoreFuncs = require('./firestore');
 // const dotenv = require('dotenv');
 // dotenv.config();
 
@@ -272,7 +273,11 @@ exports.storeTypeOfExercise = async function storeTypeOfExercise(workspaceID, us
     else {
         setResult = await partnerRef.set({'cooldownTask': exercisePrompt}, {merge: true});
     }
+    //console.log(workspaceID + "   " + userID);
+    // update user's points
+    firestoreFuncs.updatePoints(workspaceID, userID);
     return setResult;
+	
 }
 
 /*
@@ -569,3 +574,89 @@ exports.getUserPairingData = async function getUserData(workspaceID, userID) {
             return undefined;
         });
 }
+
+/*
+    updatePoints(workspaceID, userID)
+
+    Increments a user's weeklyPoints and monthlyPoints by 1.
+    Called when a user sends either a warmup or cooldown to their partner.
+    PARAMS:
+        workspaceID - current workspace ID
+        userID      - ID of user whose points will be incremented
+*/
+exports.updatePoints = async function updatePoints(workspaceID, userID) {
+    let userDocRef = db.collection('workspaces')
+                    .doc(workspaceID)
+                    .collection('users')
+                    .doc(userID);
+    userDocRef.update({
+        weeklyPoints: admin.firestore.FieldValue.increment(1),
+        monthlyPoints: admin.firestore.FieldValue.increment(1)
+    });
+};
+
+/*
+    resetWeeklyPoints(workspaceID, userID)
+
+    Resets a user's weeklyPoints to 0.
+    Called when a new user joins the pairing channel AND
+    at the end of the week.
+    PARAMS:
+        workspaceID - current workspace ID
+        userID      - ID of user whose points will be reset
+*/
+exports.resetWeeklyPoints = async function resetWeeklyPoints(workspaceID, userID) {
+    let data = {
+        weeklyPoints: 0
+    };
+    let setDoc = db.collection('workspaces')
+                .doc(workspaceID)
+                .collection('users')
+                .doc(userID)
+                .set(data, {merge: true});
+};
+
+/*
+    resetMonthlyPoints(workspaceID, userID)
+
+    Resets a user's monthlyPoints to 0.
+    Called when a new user joins the pairing channel AND
+    at the end of the month.
+    PARAMS:
+        workspaceID - current workspace ID
+        userID      - ID of user whose points will be reset
+*/
+exports.resetMonthlyPoints = async function resetMonthlyPoints(workspaceID, userID) {
+    let data = {
+        monthlyPoints: 0
+    };
+    let setDoc = db.collection('workspaces')
+                .doc(workspaceID)
+                .collection('users')
+                .doc(userID)
+                .set(data, {merge: true});
+};
+
+/*
+    getRankings(workspaceID)
+
+    Returns an array of all users in the pairing channel,
+    along with their weekly points and monthly points.
+    PARAMS:
+        workspaceID - current workspace ID
+*/
+exports.getRankings = async function getRankings(workspaceID) {
+    let rankings = [];
+    let users = db.collection('workspaces')
+                .doc(workspaceID)
+                .collection('users');
+    return users.get().then((querySnapshot) => {
+        querySnapshot.forEach((doc) => {
+            let ranking = {id:doc.id, weeklyPoints:doc.data().weeklyPoints, monthlyPoints:doc.data().monthlyPoints};
+            if (ranking['weeklyPoints'] !== undefined) {
+                rankings.push(ranking);
+            }
+        });
+        return rankings;
+    });
+};

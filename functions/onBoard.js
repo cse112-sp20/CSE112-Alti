@@ -101,7 +101,11 @@ async function createOnBoardingChannel(app, token, team_id, channelName) {
                     promises.push(firestoreFuncs.setWarmupTime(team_id, userId, "9:00 AM", day));
                     promises.push(firestoreFuncs.setCooldownTime(team_id, userId, "5:00 PM", day));
                 }
+                // reset everyone's weekly and monthly points
+                firestoreFuncs.resetWeeklyPoints(team_id,userId);
+                firestoreFuncs.resetMonthlyPoints(team_id,userId);
             }
+            
             Promise.all(promises).catch((error) => {
                 console.log(error);
             });
@@ -138,6 +142,10 @@ async function boardExistingChannel(app, token, team_id, channelId) {
                 promises.push(firestoreFuncs.setWarmupTime(team_id, userId, "9:00 AM", day));
                 promises.push(firestoreFuncs.setCooldownTime(team_id, userId, "5:00 PM", day));
             }
+            
+            // reset everyone's weekly and monthly points
+            promises.push(firestoreFuncs.resetWeeklyPoints(team_id,userId));
+            promises.push(firestoreFuncs.resetMonthlyPoints(team_id,userId));
         }
         Promise.all(promises).catch((error) => {
             console.log(error);
