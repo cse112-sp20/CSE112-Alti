@@ -3,6 +3,7 @@ const app = index.getBolt();
 
 const appHomeObjects = require('./appHomeObjects');
 const firestoreFuncs = require('./firestore');
+const leaderboard = require('./leaderboard');
 
 var days = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"];
 
@@ -12,10 +13,6 @@ app.event("app_home_opened", async ({ body, context }) => {
   appHome(app, body, context);
 });
 
-app.action("selectTimeZone", async({body, ack, context}) => {
-  ack();
-  setTimeZone(app, body, context);
-});
 app.action("selectOwner", async({body, ack, context}) => {
   ack();
   setOwner(app, body, context);
@@ -196,6 +193,11 @@ async function loadHomeTabUI(app, workspaceID, userId, context) {
   }
   */
 
+	// get leaderboard strings
+	const leaderboards = await leaderboard.getLeaderboards(app, context.botToken, workspaceID);
+	const weeklyLeaderboard = leaderboards[0];
+	const monthlyLeaderboard = leaderboards[1];
+	
 	if(await checkOwner(workspaceID, userId)){
 		view = {
 			"type": "home",
@@ -329,42 +331,7 @@ async function loadHomeTabUI(app, workspaceID, userId, context) {
 							"emoji": true
 						}
 					}
-				},/*
-				{
-					"type": "section",
-					"text": {
-						"type": "mrkdwn",
-						"text": "🌏 *Pick a time zone* for your workspace"
-					},
-					"accessory": {
-						"action_id": "selectTimeZone",
-						"type": "static_select",
-						"placeholder": {
-							"type": "plain_text",
-							"text": "Select a time zone...atn",
-							"emoji": true
-						},
-						"options": appHomeObjects.time_zones,
-						"confirm": {
-							"title": {
-								"type": "plain_text",
-								"text": "Are you sure?"
-							},
-							"text": {
-								"type": "plain_text",
-								"text": "Designate this as working time zone?"
-							},
-							"confirm": {
-								"type": "plain_text",
-								"text": "Do it"
-							},
-							"deny": {
-								"type": "plain_text",
-								"text": "Stop, I've changed my mind!"
-							}
-						}
-					}
-				},*/
+				},
 				{
 					"type": "divider"
 				},
@@ -506,6 +473,28 @@ async function loadHomeTabUI(app, workspaceID, userId, context) {
 					}
 				  },
 				{
+                    "type": "divider"
+                },
+                {
+                    "type": "section",
+                    "text":
+                    {
+                        "type": "mrkdwn",
+                        "text": weeklyLeaderboard
+                    }
+                },
+                {
+                    "type": "section",
+                    "text":
+                    {
+                        "type": "mrkdwn",
+                        "text": monthlyLeaderboard
+                    }
+				},
+				{
+                    "type": "divider"
+                },
+				{
 					"type": "context",
 					"elements": [
 						{
@@ -549,28 +538,6 @@ async function loadHomeTabUI(app, workspaceID, userId, context) {
 						"emoji": true
 					}
 				},
-				{
-					"type": "section",
-					"text": {
-						"type": "mrkdwn",
-						"text": partnerText,
-					}
-				},
-				{
-					"type": "section",
-					"text": {
-						"type": "mrkdwn",
-						"text": dmThreadText,
-					}
-				},/*
-				{
-					"type": "section",
-					"text": {
-						"type": "plain_text",
-						"text": timeZoneText,
-						"emoji": true
-					}
-				},*/
 				{
 					"type": "divider"
 				  },
@@ -702,6 +669,25 @@ async function loadHomeTabUI(app, workspaceID, userId, context) {
 				{
 					"type": "divider"
 				},
+                {
+                    "type": "section",
+                    "text":
+                    {
+                        "type": "mrkdwn",
+                        "text": weeklyLeaderboard
+                    }
+                },
+                {
+                    "type": "section",
+                    "text":
+                    {
+                        "type": "mrkdwn",
+                        "text": monthlyLeaderboard
+                    }
+				},
+				{
+                    "type": "divider"
+                },
 				{
 					"type": "context",
 					"elements": [
@@ -718,15 +704,10 @@ async function loadHomeTabUI(app, workspaceID, userId, context) {
 	return view;
 }
 
-async function setTimeZone(app, body, context){
-  firestoreFuncs.setTimeZone(body.team.id, body.actions[0].selected_option.value);
-  updateAppHome(body.user.id, body.team.id, context);
-}
 async function setOwner(app, body, context){
   firestoreFuncs.setOwner(body.team.id, body.actions[0].selected_user);
   updateAppHome(body.user.id, body.team.id, context);
 }
-exports.setTimeZone = setTimeZone;
 exports.setOwner = setOwner;
 exports.updateAppHome = updateAppHome;
 exports.getAllTimes = getAllTimes;
