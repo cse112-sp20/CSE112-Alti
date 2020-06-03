@@ -522,50 +522,6 @@ exports.setOwner = function updateOwner(workspaceID, userID) {
 
 /*
     Description:
-        Gets timezone associated with the given workspace and the schedules of
-        everyone paired up within the designated pairing-channel in that workspace.
-        Returns a promise that you have to 'await'
-    
-    Input:
-        workspaceID - workspace id that you want the associated timezone of
-*/
-exports.getTimeZone = function getTimezone(workspaceID) {
-    let workspaceDocRef = db.collection('workspaces').doc(workspaceID);
-
-    return workspaceDocRef.get()
-        .then(doc => {
-            if (!doc.exists) {
-                console.log('No such document!');
-                return undefined;
-            }
-            else {
-                return doc.data().timezone;
-            }
-        })
-        .catch(err => {
-            console.log('Error getting workspace document: ', err);
-            return undefined;
-        });
-};
-
-/*
-    Description:
-        Sets the timezone associated with a given workspace
-    
-    Inputs:
-        workspaceID - workspace id of the workspace you want to set timezone for
-        timeZone - new timezone you want to set, in abbreviated format, ex: "PST"
-*/
-exports.setTimeZone = function updateTimeZone(workspaceID, timeZone) {
-    let workspaceDocRef = db.collection('workspaces').doc(workspaceID);
-
-    workspaceDocRef.set({
-        timezone: timeZone
-    }, {merge: true});
-};
-
-/*
-    Description:
         Retrieves all workspace ids
     Returns: 
         list of workspace ids, for ex: ['T123452324', 'T62345234', 'T6762342342']

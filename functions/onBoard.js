@@ -191,14 +191,15 @@ async function findUsersChannel(app, token, channelId) {
 
 app.event('member_joined_channel', async ({ body, context }) => {
     console.log("Member joined channel");
-    console.log(body);
     var activeChannel = await firestoreFuncs.getPairingChannel(body.team_id);
     if (activeChannel === body.event.channel) {
+        var userId = body.event.user;
+        var teamId = body.team_id;
         console.log("Member joined pairing channel");
 
         var conversation = await app.client.conversations.open({
             token: context.botToken,
-            users: body.event.user
+            users: userId
         }).catch((error) => {
             console.log(error);
         });
@@ -208,19 +209,28 @@ app.event('member_joined_channel', async ({ body, context }) => {
             console.log("Open DM failed!");
             return;
         }
-
+        var text;
+        var time = await firestoreFuncs.getWarmupTime(teamId, userId, "Monday");
+        if (time) {
+            text = "You have rejoined the alti pairing channel!";
+        }
+        else {
+            text = "You have joined the alti pairing channel! Your default warmup time is 9:00 AM and cooldown time is 5:00 PM.";
+        }
         var result = await app.client.chat.postMessage({
             token: context.botToken,
             channel: conversation.channel.id,
-            text: "You have joined the alti pairing channel! Your default warmup time is 9:00 AM and cooldown time is 5:00 PM."
+            text: text
         }).catch((error) => {
             console.log(error);
         });
 
-        var promises = [];
-        for (var day of days) {
-            promises.push(firestoreFuncs.setWarmupTime(body.team_id, userId, "9:00 AM", day));
-            promises.push(firestoreFuncs.setCooldownTime(body.team_id, userId, "5:00 PM", day));
+        if (!time) { 
+            var promises = [];
+            for (var day of days) {
+                promises.push(firestoreFuncs.setWarmupTime(teamId, userId, "9:00 AM", day));
+                promises.push(firestoreFuncs.setCooldownTime(teamId, userId, "5:00 PM", day));
+            }
         }
     }
 });

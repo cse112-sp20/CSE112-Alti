@@ -88,7 +88,8 @@ async function scheduleDailyHelper() {
   }
   else {
   // TESTING PURPOSES
-    scheduleDailyWorkspace("T012US11G4X");
+    //scheduleDailyWorkspace("T012US11G4X");
+    scheduleDailyWorkspace("T011H6FAPV4");
   }
   return null;
 }
@@ -242,6 +243,8 @@ async function scheduleDailyWorkspace(workspaceId) {
 // Helper function for scheduleDailyWorkspace- Iterate through single user
 async function scheduleDailyUser(workspaceId, userId, token, day, threads) {
   // TESTING PURPOSES
+  // U011HDLFMCN is Eric in Alti workspace
+  // Your dm thread G015C4G5PCG
   console.log("user: " + userId);
   let pairingData = await firestoreFuncs.getUserPairingData(workspaceId, userId);
   let warmupTime = await firestoreFuncs.getWarmupTime(workspaceId, userId, day);
@@ -271,18 +274,15 @@ async function scheduleDailyUser(workspaceId, userId, token, day, threads) {
     cooldownTask = pairingData.cooldownTask;
   }
 
-  //if (test === 1) {
-    // TESTING PURPOSES
-    //if no such warmup or cooldown make one for testing
-    if (!warmupTask) {
-      quote = generateTaskData.generateQuote();
-      quote = quote.split("-")[1] + "-" + quote.split("-")[2];
-      warmupTask = `Your partner didn't send you a warmup for today :frowning:`;
-    }
-    if (!cooldownTask) {
-      cooldownTask = `Your partner didn't send a cooldown for today :frowning:`;
-    }
-  //}
+
+  if (!warmupTask) {
+    quote = generateTaskData.generateQuote();
+    quote = quote.split("-")[1] + "-" + quote.split("-")[2];
+    warmupTask = `Your partner didn't send you a warmup for today :frowning:`;
+  }
+  if (!cooldownTask) {
+    cooldownTask = `Your partner didn't send a cooldown for today :frowning:`;
+  }
 
   var hour, min, mid;
 
@@ -307,7 +307,7 @@ async function scheduleDailyUser(workspaceId, userId, token, day, threads) {
     }
     else {
     // TESTING PURPOSES
-      //schedule.scheduleMsg(22, 55, warmupTask, dmThreadID, token);
+      schedule.scheduleMsg(15, 57, warmupTask, dmThreadID, token);
     }
   }
   else {
@@ -334,7 +334,7 @@ async function scheduleDailyUser(workspaceId, userId, token, day, threads) {
     }
     else {
     // TESTING PURPOSES
-      await schedule.scheduleMsg(18, 17, cooldownTask, dmThreadID, token);
+      await schedule.scheduleMsg(15, 21, cooldownTask, dmThreadID, token);
     }
   }
   else {
@@ -366,8 +366,8 @@ async function scheduleDailyUser(workspaceId, userId, token, day, threads) {
     }
     else {
       // TESTING PURPOSES
-      await schedule.scheduleWarmupChoice(18, 17, dmThreadID, token);
-      await schedule.scheduleCooldownChoice(18, 17, dmThreadID, token);
+      await schedule.scheduleWarmupChoice(15, 21, dmThreadID, token);
+      await schedule.scheduleCooldownChoice(15, 21, dmThreadID, token);
     }
   }
   else {

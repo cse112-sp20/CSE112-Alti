@@ -216,7 +216,6 @@ describe('Integration Testing', () => {
       onBoard = require('../onBoard');
       workspaceId = "TestWorkspace";
       userId = "user1";
-      await firestoreFuncs.setTimeZone(workspaceId, 'LA');
       await firestoreFuncs.setOwner(workspaceId, userId);
       await firestoreFuncs.storeNewPairingChannel(workspaceId, "Channel1");
 
@@ -237,15 +236,6 @@ describe('Integration Testing', () => {
     after(async() => {
       await testUtil.deleteWorkspace(workspaceId);
     })
-
-    it('Get time zone', async () => {
-      var timeZone = await firestoreFuncs.getTimeZone(workspaceId).then((obj)=>{
-        return obj;
-      }).catch((error) => {
-            console.log(error);
-      });
-      assert.equal(timeZone, "LA");
-    });
 
 
     it('Check Owner', async () => {
