@@ -18,7 +18,7 @@ if test -f "$ServiceAccountKey"; then
 else
     firebase functions:config:get service_account_key > serviceAccountKey.json
     if [[ $OSTYPE == "darwin"* ]]; then
-        sed -i '' -E "1 s/[^{]*//" .runtimeconfig.json
+        sed -i '' -E "1 s/[^{]*//" serviceAccountKey.json
     fi
     echo "$ServiceAccountKey created"
 fi
