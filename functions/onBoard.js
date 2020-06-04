@@ -136,7 +136,6 @@ async function boardExistingChannel(app, token, team_id, channelId) {
                     `
             
         });
-        // TODO (To opt out, just leave the channel.)
         await firestoreFuncs.storeNewPairingChannel(team_id, channelId);
         for (var userId of userList) {
             for (var day of days) {

@@ -5,6 +5,8 @@
 
 ![Website](https://img.shields.io/website?down_color=red&down_message=offline&label=Alti&logo=firebase&up_color=green&up_message=online&url=https%3A%2F%2Fus-central1-altitest-5f53d.cloudfunctions.net)
 
+[![Maintainability](https://api.codeclimate.com/v1/badges/e27516f1060f29ef7ccb/maintainability)](https://codeclimate.com/github/cse112-sp20/CSE112-Alti/maintainability)
+
 ![Codecov](https://img.shields.io/codecov/c/github/cse112-sp20/CSE112-Alti?label=master%20codecov&logo=codecov&token=NT94ZROVG7)
 
 [![codecov](https://codecov.io/gh/cse112-sp20/CSE112-Alti/branch/master/graph/sunburst.svg?token=NT94ZROVG7)](https://codecov.io/gh/cse112-sp20/CSE112-Alti)

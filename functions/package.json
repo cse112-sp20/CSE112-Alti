@@ -1,9 +1,13 @@
 {
   "name": "functions",
   "description": "Cloud Functions for Firebase",
+  "main": "index.js",
   "scripts": {
-    "test": "nyc --reporter=lcov --reporter=text --reporter=text-summary mocha",
-    "coverage": "codecov",
+    "test": "bash ./RunTest.sh",
+    "setup": "bash ./Setup.sh",
+    "Local_Action_Build": "bash ./GitHubAction.sh build",
+    "Local_Action_Deploy": "bash ./GitHubAction.sh deploy",
+    "coverage": "bash ./Coverage.sh",
     "lint": "eslint .",
     "serve": "firebase emulators:start --only functions",
     "shell": "firebase functions:shell",
@@ -16,9 +20,7 @@
   },
   "dependencies": {
     "@google-cloud/firestore": "3.7.5",
-    "@google-cloud/profiler": "^4.0.0",
     "@google-cloud/pubsub": "^1.7.3",
-    "@google-cloud/trace-agent": "^4.2.5",
     "@slack/bolt": "^2.0.1",
     "dotenv": "^8.2.0",
     "firebase-admin": "^8.12.1",

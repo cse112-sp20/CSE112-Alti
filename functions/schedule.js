@@ -67,7 +67,7 @@ const app = index.getBolt();
 	}
 
 	var dateString = year + "-" + month + "-" + day + "T" + hour + ":" + minute + ":00.000-07:00";
-	console.log(dateString);
+	//console.log(dateString);
 	var newDate = new Date(dateString);
 
 	//call api
@@ -122,7 +122,7 @@ const app = index.getBolt();
 		}
 
 		var dateString = year + "-" + month + "-" + day + "T" + hour + ":" + minute + ":00.000-07:00";
-		console.log(dateString);
+		//console.log(dateString);
 		var newDate = new Date(dateString);
 		const notificationString = "Send a cool-down to your buddy!";
 		
@@ -177,7 +177,7 @@ const app = index.getBolt();
 		}
 
 		var dateString = year + "-" + month + "-" + day + "T" + hour + ":" + minute + ":00.000-07:00";
-		console.log(dateString);
+		//console.log(dateString);
 		var newDate = new Date(dateString);
 		const notificationString = "Send a warmup to your buddy!";
 		
