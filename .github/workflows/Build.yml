@@ -23,7 +23,7 @@ jobs:
     - name: Install Dependencys 
       working-directory: ./functions
       run: npm install
-    - name: add .runtimeconfig.json
+    - name: Add .runtimeconfig.json
       working-directory: ./functions
       env:
         RUNTIME_CONFIG: ${{ secrets.RUNTIME_CONFIG }}
