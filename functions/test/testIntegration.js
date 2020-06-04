@@ -65,7 +65,8 @@ describe('Integration Testing', () => {
       assert(postAtTime-scheduleTime < 5000, "The schedule time does not match with input"); // allow 5 sec delay
     });
 
-    it('schedule for 1 min before', async () => {
+    it('schedule for 2 min before', async function() {
+      this.timeout(5000);
       let initial = new Date();
       let now = new Date();
       var localTime = now.getTime();
@@ -75,9 +76,10 @@ describe('Integration Testing', () => {
       let cali = (utc + (3600000 * offset));
       let newDate = new Date(cali);
       now = newDate;
-      now.setTime(now.getTime() - 60000); 
+      now.setTime(now.getTime() - 120000); 
       let response = await schedule.scheduleMsg(now.getHours(), now.getMinutes(), 
                                                       "A failed reminder", "#testing", token);
+      //console.log(response)
       assert.equal(response.ok, false);
     });
 
