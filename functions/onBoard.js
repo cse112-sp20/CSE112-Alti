@@ -77,7 +77,7 @@ async function createOnBoardingChannel(app, token, team_id, channelName) {
             });
 
             // invite people
-            app.client.conversations.invite({
+            await app.client.conversations.invite({
                 token: token, 
                 channel: conversationObj.channel.id,
                 users: userString
