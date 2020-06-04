@@ -37,6 +37,11 @@ fi
 export FIREBASE_TOKEN=`cat firebase_token.txt`
 
 echo "Local" > Local.env
+
+if [[ $OSTYPE == "msys" ]]; then
+    dos2unix RunTest.sh
+fi
+
 cd ..
 if [[ $OSTYPE == "darwin"* ]]; then
     act -b -s RUNTIME_CONFIG -s SERVICE_ACCOUNT_KEY -s CODECOV_TOKEN -s FIREBASE_TOKEN -j $1
