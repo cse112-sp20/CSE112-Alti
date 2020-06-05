@@ -160,7 +160,7 @@ async function loadHomeTabUI(app, workspaceID, userId, context) {
   else {
 	  channelText = `Current Pairing Channel: #${  channelName  }`;
 	  let pairingData = await firestoreFuncs.getUserPairingData(workspaceID, userId);
-	  dmThreadID = pairingData.dmThreadID;
+	  dmThreadID = pairingData === undefined ? undefined : pairingData.dmThreadID;
 	  partnerId = await firestoreFuncs.getPartner(workspaceID, channelId, userId).then((obj)=>{
 		return obj;
 	  }).catch((error) => {
