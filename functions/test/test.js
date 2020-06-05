@@ -199,4 +199,99 @@ describe('Setup Warmup Callbacks', () => {
     let expectedString = "Your partner sent you this sudoku puzzle to help you get those brain juices flowing!\nComplete it here: ";
     assert.equal(check2.substring(0,expectedString.length), expectedString);
   });
+
+  it('handleQuoteSelect', async function() {
+    let quotePoolSize =  Object.keys(motivationalQuotes).length;
+
+    let randomQuoteIndex1 = Math.floor(Math.random() * quotePoolSize);
+    fakeBody.actions[0].value = randomQuoteIndex1;
+    await handleQuoteSelect(fakeAck, fakeBody, fakeContext);
+    let prompt1 = await firestoreFuncs.getExercisePrompt(workspaceId, userId2, true);
+    //console.log(prompt1);
+
+    let randomQuoteIndex2 = Math.floor(Math.random() * quotePoolSize);
+    fakeBody.actions[0].value = randomQuoteIndex2;
+    await handleQuoteSelect(fakeAck, fakeBody, fakeContext);
+    let prompt2 = await firestoreFuncs.getExercisePrompt(workspaceId, userId2, true);
+    //console.log(prompt2);
+
+    let author1 = motivationalQuotes[randomQuoteIndex1].author;
+    let text1 = motivationalQuotes[randomQuoteIndex1].text;
+    let actualPrompt1 = ""
+
+    if( author1 == null || author1 == 'Unknown' )
+      actualPrompt1 = `Your partner sent you a motivational quote to help you start your day right! ${text1}`;
+    else
+      actualPrompt1 = `Your partner sent you a motivational quote to help you start your day right! ${author1} says: ${text1}`;
+
+    let author2 = motivationalQuotes[randomQuoteIndex2].author;
+    let text2 = motivationalQuotes[randomQuoteIndex2].text;
+    let actualPrompt2 = ""
+
+    if( author2 == null || author2 == 'Unknown' )
+      actualPrompt2 = `Your partner sent you a motivational quote to help you start your day right! ${text2}`;
+    else
+      actualPrompt2 = `Your partner sent you a motivational quote to help you start your day right! ${author2} says: ${text2}`;
+    
+    assert.equal(prompt1, actualPrompt1);
+    assert.equal(prompt2, actualPrompt2);
+  });
+
+  it('handleRetroSelect', async function() {
+    let retroPoolSize =  Object.keys(retroQuestions).length;
+
+    let randomRetroIndex1 = Math.floor(Math.random() * retroPoolSize);
+    fakeBody.actions[0].value = randomRetroIndex1;
+    await handleRetroSelect(fakeAck, fakeBody, fakeContext);
+    let prompt1 = await firestoreFuncs.getExercisePrompt(workspaceId, userId2, false);
+    //console.log(prompt1);
+
+    let randomRetroIndex2 = Math.floor(Math.random() * retroPoolSize);
+    fakeBody.actions[0].value = randomRetroIndex2;
+    await handleRetroSelect(fakeAck, fakeBody, fakeContext);
+    let prompt2 = await firestoreFuncs.getExercisePrompt(workspaceId, userId2, false);
+    //console.log(prompt2);
+
+    let actualPrompt1 = "Your partner sent you this retro: '" + retroQuestions[randomRetroIndex1].retro + "' to complete";
+    let actualPrompt2 = "Your partner sent you this retro: '" + retroQuestions[randomRetroIndex2].retro + "' to complete";
+
+    assert.equal(prompt1, actualPrompt1);
+    assert.equal(prompt2, actualPrompt2);
+  });
+
+  it('handleArticleSelect', async function() {
+    //fakeBody.actions[0].value = 'sudoku';
+
+    //let check1 = await handleArticleSelect(fakeAck, fakeBody, fakeContext);
+    // console.log(check1);
+    // let check2 = await firestoreFuncs.getExercisePrompt(workspaceId, userId2, true);
+    // console.log(check2);
+
+    let actualPrompt1 = "Your partner sent you a tech article to read! Here is the link: ";
+    let actualPrompt2 = "Your partner sent you a tech article to read! Here is the link: ";
+  });
+
+  it('handleCooldownArticleSelect', async function() {
+    //fakeBody.actions[0].value = 'sudoku';
+
+    //let check1 = await handleCooldownArticleSelect(fakeAck, fakeBody, fakeContext);
+    // console.log(check1);
+    // let check2 = await firestoreFuncs.getExercisePrompt(workspaceId, userId2, false);
+    // console.log(check2);
+
+    let actualPrompt1 = "Your partner sent you a non-tech article to read! Here is the link: ";
+    let actualPrompt2 = "Your partner sent you a non-tech article to read! Here is the link: ";
+  });
+
+  it('handleVideoSelectle', async function() {
+    //fakeBody.actions[0].value = 'sudoku';
+
+    //let check1 = await handleVideoSelect(fakeAck, fakeBody, fakeContext);
+    // console.log(check1);
+    // let check2 = await firestoreFuncs.getExercisePrompt(workspaceId, userId2, false);
+    // console.log(check2);
+
+    let actualPrompt1 = "Your partner sent you this video to watch! : ";
+    let actualPrompt2 = "Your partner sent you this video to watch! : ";
+  });
 });
