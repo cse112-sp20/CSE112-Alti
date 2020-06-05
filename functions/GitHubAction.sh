@@ -35,7 +35,7 @@ else
         sed -i '' -E "1 s/[^{]*//" .runtimeconfig.json
     fi
     if [[ "$OSTYPE" == "linux-gnu"* ]]; then
-        ed -i "1s/.*/{/" .runtimeconfig.json
+        sed -i "1s/.*/{/" .runtimeconfig.json
     fi
     echo "$RunTimeConfig created"
 fi
@@ -50,7 +50,7 @@ else
         sed -i '' -E "1 s/[^{]*//" serviceAccountKey.json
     fi
     if [[ "$OSTYPE" == "linux-gnu"* ]]; then
-        ed -i "1s/.*/{/" serviceAccountKey.json
+        sed -i "1s/.*/{/" serviceAccountKey.json
     fi
     echo "$ServiceAccountKey created"
 fi
@@ -61,7 +61,7 @@ if [[ $OSTYPE == "darwin"* ]]; then
     sed -i '' -E "1 s/[^\"]*//" codecov.txt
 fi
 if [[ "$OSTYPE" == "linux-gnu"* ]]; then
-    ed -i "1s/.*/{/" codecov.txt
+    sed -i "1s/.*/{/" codecov.txt
 fi
 export CODECOV_TOKEN=`cat codecov.txt`
 
@@ -70,7 +70,7 @@ if [[ $OSTYPE == "darwin"* ]]; then
     sed -i '' -E "1 s/[^\"]*//" firebase_token.txt
 fi
 if [[ "$OSTYPE" == "linux-gnu"* ]]; then
-    ed -i "1s/.*/{/" firebase_token.txt
+    sed -i "1s/.*/{/" firebase_token.txt
 fi
 export FIREBASE_TOKEN=`cat firebase_token.txt`
 
