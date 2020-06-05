@@ -1110,7 +1110,7 @@ exports.sendWarmupButton = async function(targChannelID,app,token){
 //sends a cooldown button to a target channel 
 exports.sendCooldownButton = async function(targChannelID,app,token){
 	const notificationString = "Alert to send a cooldown to your buddy!";
-		const warmupButton = [
+		const cooldownButton = [
 		{
 			"type": "actions",
 			"elements": [
@@ -1134,7 +1134,7 @@ exports.sendCooldownButton = async function(targChannelID,app,token){
 		  token: token,
 		  channel: targChannelID,
 		  text: notificationString,
-		  blocks: warmupButton
+		  blocks: cooldownButton
 		});
 	}
 	//catch any errors
@@ -1200,3 +1200,78 @@ app.action('confirmation', ({view, ack, body, context }) => {
 	});
 });
 
+exports.getExerciseSelectView = function getExerciseSelectView(){
+	const view =  [
+		{
+			"type": "section",
+			"text": {
+				"type": "plain_text",
+				"emoji": true,
+				"text": "Hey there! You can pick exercises for your buddy to complete tomorrow!"
+			}
+		},
+		{
+			"type": "divider"
+		},
+		{
+			"type": "section",
+			"text": {
+				"type": "mrkdwn",
+				"text": "Select your partner's warmup: "
+			}
+		},
+		{
+			"type": "actions",
+			"elements": [
+				{
+					"action_id": "sendWarmupButtonClick",
+					"type": "button",
+					"text": {
+						"type": "plain_text",
+						"text": "Send A Warmup",
+						"emoji": true
+					}
+				}
+			]
+		},{
+			"type": "section",
+			"text": {
+				"type": "mrkdwn",
+				"text": "Select your partner's cooldown: "
+			}
+		},
+		{
+			"type": "actions",
+			"elements": [
+				{
+					"action_id": "sendCooldownButtonClick",
+					"type": "button",
+					"text": {
+						"type": "plain_text",
+						"text": "Send A Cooldown",
+						"emoji": true
+					}
+				}
+			]
+		}
+	];
+	return view;
+} 
+
+exports.getWarmupGetView = function getWarmupGetView(){
+	const button =  {
+		"type": "actions",
+		"elements": [
+			{
+				"action_id": "getMyWarmupClick",
+				"type": "button",
+				"text": {
+					"type": "plain_text",
+					"text": "Get your warmup!",
+					"emoji": true
+				}
+			}
+		]
+	};
+	return [button];
+} 

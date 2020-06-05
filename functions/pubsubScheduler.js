@@ -317,7 +317,7 @@ async function scheduleDailyUser(workspaceId, userId, token, day, threads) {
     }
     else {
     // TESTING PURPOSES
-      schedule.scheduleMsg(21, 1, warmupTask, dmThreadID, token);
+      // schedule.scheduleMsg(21, 53, warmupTask, dmThreadID, token);
     }
   }
   else {
@@ -344,7 +344,7 @@ async function scheduleDailyUser(workspaceId, userId, token, day, threads) {
     }
     else {
     // TESTING PURPOSES
-      await schedule.scheduleMsg(22, 36, cooldownTask, dmThreadID, token);
+      // await schedule.scheduleMsg(22, 36, cooldownTask, dmThreadID, token);
     }
   }
   else {
@@ -364,20 +364,19 @@ async function scheduleDailyUser(workspaceId, userId, token, day, threads) {
     else if (mid === "AM" && hour === "12") {
       hour = "0";
     }
-  
+    const exerciseSelectNotificationText = "You can send your buddy the exercises for tomorrow. I will remind this to you at the end of your workday!";
     if (test === 0) {
-      console.log("Schedule prompts for "+ hour + ":" + min);
-      await schedule.scheduleWarmupChoice(hour, min, dmThreadID, token).catch((error) => {
-        console.log(error);
-      });
-      await schedule.scheduleCooldownChoice(hour, min, dmThreadID, token).catch((error) => {
-        console.log(error);
-      });
+      await schedule.scheduleMsg(hour, min, exerciseSelectNotificationText, dmThreadID, token, warmupMessage.getExerciseSelectView())
+              .catch((err) => {
+                console.error(err);
+              });
     }
     else {
       // TESTING PURPOSES
-      await schedule.scheduleWarmupChoice(22, 36, dmThreadID, token);
-      await schedule.scheduleCooldownChoice(22, 36, dmThreadID, token);
+      await schedule.scheduleMsg(4, 13, exerciseSelectNotificationText, dmThreadID, token, warmupMessage.getExerciseSelectView())
+              .catch((err) => {
+                console.error(err);
+              });
     }
   }
   else {
