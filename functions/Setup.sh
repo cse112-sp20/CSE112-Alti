@@ -13,7 +13,7 @@ else
         sed -i '' -E "1 s/[^{]*//" .runtimeconfig.json
     fi
     if [[ "$OSTYPE" == "linux-gnu"* ]]; then
-        sed -i '' -E "1 s/[^{]*//" .runtimeconfig.json
+        ed -i "1s/.*/{/" .runtimeconfig.json
     fi
     echo "$RunTimeConfig created"
 fi
@@ -25,7 +25,7 @@ else
         sed -i '' -E "1 s/[^{]*//" serviceAccountKey.json
     fi
     if [[ "$OSTYPE" == "linux-gnu"* ]]; then
-    sed -i '' -E "1 s/[^{]*//" .runtimeconfig.json
+        ed -i "1s/.*/{/" serviceAccountKey.json
     fi
     echo "$ServiceAccountKey created"
 fi
