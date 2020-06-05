@@ -116,6 +116,76 @@ describe('Unit Testing', () => {
       }
     });
   });
+
+  describe('onBoard Test', () => {
+    let onBoard;
+    let util;
+    let team_id = 'T0137P851BJ';
+    
+    before(async function() {
+      this.timeout(5000); // 5sec
+      onBoard = require('../onBoard');
+      util = require('../util')
+    });
+
+    it('Test getUsersWorkspace', async function() {
+      this.timeout(5000);
+      let users = { 
+        'U01236C905V': 'alermi',
+        'U012HPHS2FR': 'dfritsch',
+        'U012P9C053Q': 'jnjohnso',
+        'U012RQ0TQG6': 'ajz007',
+        'U012X3JJS78': 'sssaiya',
+        'U012YEB5HR8': 'j2leigh',
+        'U012YGB2M50': 'rrshenoy',
+        'U012YNT21C3': 'hili',
+        'U0132DWLTT7': 'lumamoto',
+        'U0133SAJ0E7': 'yid118',
+        'U01341THLV9': 'bvanzant',
+        'U01341VGSE7': 'tlimperi',
+        'U0134PZ89UL': 'e4wei',
+        'U013G97PNFK': 'rusong' 
+      };
+      let onBoardUsers = await onBoard.onBoardFindUsersWorkspace(app, token);
+      assert.deepEqual(users, onBoardUsers);
+    });
+
+    it('Test getUsersChannel on testing', async function() {
+      this.timeout(5000);
+      let channelId = "C012B6BTVDL"; // testing channel
+      let users = [
+        'U01236C905V',
+        'U012HPHS2FR',
+        'U012P9C053Q',
+        'U012RQ0TQG6',
+        'U012X3JJS78',
+        'U012YEB5HR8',
+        'U012YGB2M50',
+        'U012YNT21C3',
+        'U0132DWLTT7',
+        'U0133SAJ0E7',
+        'U01341THLV9',
+        'U01341VGSE7',
+        'U0134PZ89UL',
+        'U013G97PNFK',
+        'U0138LYQM4Z'
+      ];
+      let onBoardUsers = await onBoard.onBoardFindUsersChannel(app, token, channelId);
+      assert.deepEqual(new Set(users), new Set(onBoardUsers));
+      
+    });
+
+    it('Test getUsersChannel on testingother', async function() {
+      this.timeout(5000);
+      let channelId = "C013REGN18F"; // testingother channel
+      let users = [
+        'U012YGB2M50',
+        'U0133SAJ0E7'
+      ];
+      let onBoardUsers = await onBoard.onBoardFindUsersChannel(app, token, channelId);
+      assert.deepEqual(new Set(users), new Set(onBoardUsers));
+    });
+  });
 });
 
 // This functions assumes that the HandleQuoteSelect function

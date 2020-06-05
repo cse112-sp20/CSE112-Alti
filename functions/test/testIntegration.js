@@ -286,7 +286,7 @@ describe('Integration Testing', () => {
     });
 
     it('Test CreateOnBoardChannel', async function() {
-      this.timeout(30000);
+      this.timeout(30000); //30 sec
       let channelName = "testonboard"
       await onBoard.onBoard(app, token, team_id, channelName);
       let channelId = await util.getChannelIdByName(app, token, channelName);
@@ -310,7 +310,7 @@ describe('Integration Testing', () => {
     });
 
     it('Test boardExistingChannel', async function() {
-      this.timeout(5000);
+      this.timeout(30000);
       let workspaceId = "T0137P851BJ";
       let channelId = "C012B6BTVDL";
       await onBoard.onBoardExisting(app, token, team_id, channelId);
@@ -319,9 +319,22 @@ describe('Integration Testing', () => {
     });
 
     after(async function(){
-      this.timeout(5000);
-
-      //let channelId = await util.getChannelIdByName(app, token, "test-on-board");
+     
     })
   });
 });
+
+// 'U01236C905V': 'Ani',
+// 'U012HPHS2FR': 'Daniel',
+// 'U012P9C053Q': 'Jeremiah',
+// 'U012RQ0TQG6': 'Alvin',
+// 'U012X3JJS78': 'Shardul Bot',
+// 'U012YEB5HR8': 'Jonathan Leigh',
+// 'U012YGB2M50': 'Rahul',
+// 'U012YNT21C3': 'Him Li',
+// 'U0132DWLTT7': 'Lacey Umamoto',
+// 'U0133SAJ0E7': 'Jason Ding',
+// 'U01341THLV9': 'Brent Vanzant',
+// 'U01341VGSE7': 'Thomas Limperis',
+// 'U0134PZ89UL': 'Eric Wei',
+// 'U0138LYQM4Z': 'slackbot'

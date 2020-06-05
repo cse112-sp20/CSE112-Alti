@@ -190,9 +190,7 @@ async function findUsersChannel(app, token, channelId) {
     }).catch((error) => {
         console.log(error);
     });
-
     return users;
-
 }
 
 
@@ -273,3 +271,5 @@ app.event('member_left_channel', async ({ body, context }) => {
 
 exports.onBoard = createOnBoardingChannel;
 exports.onBoardExisting = boardExistingChannel;
+exports.onBoardFindUsersWorkspace = findUsersWorkSpace;
+exports.onBoardFindUsersChannel = findUsersChannel;
