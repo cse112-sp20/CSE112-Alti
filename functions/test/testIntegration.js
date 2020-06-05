@@ -154,7 +154,7 @@ describe('Integration Testing', () => {
         let test = await Promise.all(await pairUp.pairUp(undefined, token));
         var pairs = await firestoreFuncs.getPairedUsers(workspaceId);
         /* eslint-disable no-await-in-loop */
-        assert(pairs.length != 0);
+        assert(pairs.length !== 0);
         for(var i = 0; i < pairs.length; i++)
         {
           var pair = pairs[i];
@@ -323,18 +323,3 @@ describe('Integration Testing', () => {
     })
   });
 });
-
-// 'U01236C905V': 'Ani',
-// 'U012HPHS2FR': 'Daniel',
-// 'U012P9C053Q': 'Jeremiah',
-// 'U012RQ0TQG6': 'Alvin',
-// 'U012X3JJS78': 'Shardul Bot',
-// 'U012YEB5HR8': 'Jonathan Leigh',
-// 'U012YGB2M50': 'Rahul',
-// 'U012YNT21C3': 'Him Li',
-// 'U0132DWLTT7': 'Lacey Umamoto',
-// 'U0133SAJ0E7': 'Jason Ding',
-// 'U01341THLV9': 'Brent Vanzant',
-// 'U01341VGSE7': 'Thomas Limperis',
-// 'U0134PZ89UL': 'Eric Wei',
-// 'U0138LYQM4Z': 'slackbot'
