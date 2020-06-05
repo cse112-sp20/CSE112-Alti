@@ -1,6 +1,7 @@
 const functions = require('firebase-functions');
 const admin = require('firebase-admin');
 const request = require('request');
+const firestoreFuncs = require('./firestore');
 // const dotenv = require('dotenv');
 // dotenv.config();
 
@@ -115,13 +116,38 @@ exports.storeNewPairing = async function storeNewPairing(workspace, dmThreadID, 
         partnerID: pairedUsers[0],
     }, {merge: true});
 };
-
+/* 
+    Stores a new pairing (DM thread ids + partnerIDs) in the corresponding place (with the corresponding
+    workspace and channel) in cloud firestore. Unlike storeNewPairing, this function only sets one way 
+    pairing. This means pairedUsers[0] is paired with pairedUsers[1] but not the other way around.
+    ASSUMPTION: pairedUsers length is always 2
+    Inputs:
+        workspace - workspace id where the new pairings were made
+        dmThreadID - a singular DM thread id of a new pairing
+        pairedUsers - the user IDs of the newly paired teammates: format [u1, u2]
+*/
+exports.storeDirectedPairing = async function storeDirectedPairing(workspace, dmThreadID, pairedUsers) {
+    let channelID = await this.getPairingChannel(workspace);
+    let usersRef = db.collection('workspaces').doc(workspace)
+                           .collection('activeChannels').doc(channelID)
+                           .collection('pairedUsers');
+    
+    usersRef.doc(pairedUsers[0]).set({
+        dmThreadID: dmThreadID,
+        partnerID: pairedUsers[1],
+    }, {merge: true});
+};
 exports.writeMsgToDB = function writeMsgToDB(teamId, userID, channelID,msgToSend,isWarmup) {
 	db.collection("workspaces").doc(teamId+"/activeChannels/"+channelID+"/teammatePairings/"+userID).set({
 		warmupMessage: msgToSend
 	});
 };
 
+// Deletes all pairing information under a specific pairing channel of a workspace
+exports.deletePairings = async function deletePairings(workspaceId, channelId){
+    const path = 'workspaces/'+ workspaceId + '/activeChannels/' + channelId + '/pairedUsers';
+    return await deleteCollection(path, 100);
+}
 /*
     Description:
         This function will store a newly designated pairing channel under the 'activeChannels' collection.
@@ -247,7 +273,11 @@ exports.storeTypeOfExercise = async function storeTypeOfExercise(workspaceID, us
     else {
         setResult = await partnerRef.set({'cooldownTask': exercisePrompt}, {merge: true});
     }
+    //console.log(workspaceID + "   " + userID);
+    // update user's points
+    firestoreFuncs.updatePoints(workspaceID, userID);
     return setResult;
+	
 }
 
 /*
@@ -301,6 +331,9 @@ exports.getExercisePrompt = async function getExercisePrompt(workspaceID, userID
         partner's userID, or undefined if error or cannot find the user passed in
 */
 exports.getPartner = function getPartner(workspaceID, channelID, userID) {
+    console.log(workspaceID);
+    console.log(channelID);
+    console.log(userID);
     let userRef = db.collection("workspaces").doc(workspaceID).collection("activeChannels")
                     .doc(channelID).collection('pairedUsers').doc(userID);
     
@@ -497,50 +530,6 @@ exports.setOwner = function updateOwner(workspaceID, userID) {
 
 /*
     Description:
-        Gets timezone associated with the given workspace and the schedules of
-        everyone paired up within the designated pairing-channel in that workspace.
-        Returns a promise that you have to 'await'
-    
-    Input:
-        workspaceID - workspace id that you want the associated timezone of
-*/
-exports.getTimeZone = function getTimezone(workspaceID) {
-    let workspaceDocRef = db.collection('workspaces').doc(workspaceID);
-
-    return workspaceDocRef.get()
-        .then(doc => {
-            if (!doc.exists) {
-                console.log('No such document!');
-                return undefined;
-            }
-            else {
-                return doc.data().timezone;
-            }
-        })
-        .catch(err => {
-            console.log('Error getting workspace document: ', err);
-            return undefined;
-        });
-};
-
-/*
-    Description:
-        Sets the timezone associated with a given workspace
-    
-    Inputs:
-        workspaceID - workspace id of the workspace you want to set timezone for
-        timeZone - new timezone you want to set, in abbreviated format, ex: "PST"
-*/
-exports.setTimeZone = function updateTimeZone(workspaceID, timeZone) {
-    let workspaceDocRef = db.collection('workspaces').doc(workspaceID);
-
-    workspaceDocRef.set({
-        timezone: timeZone
-    }, {merge: true});
-};
-
-/*
-    Description:
         Retrieves all workspace ids
     Returns: 
         list of workspace ids, for ex: ['T123452324', 'T62345234', 'T6762342342']
@@ -588,3 +577,89 @@ exports.getUserPairingData = async function getUserData(workspaceID, userID) {
             return undefined;
         });
 }
+
+/*
+    updatePoints(workspaceID, userID)
+
+    Increments a user's weeklyPoints and monthlyPoints by 1.
+    Called when a user sends either a warmup or cooldown to their partner.
+    PARAMS:
+        workspaceID - current workspace ID
+        userID      - ID of user whose points will be incremented
+*/
+exports.updatePoints = async function updatePoints(workspaceID, userID) {
+    let userDocRef = db.collection('workspaces')
+                    .doc(workspaceID)
+                    .collection('users')
+                    .doc(userID);
+    userDocRef.update({
+        weeklyPoints: admin.firestore.FieldValue.increment(1),
+        monthlyPoints: admin.firestore.FieldValue.increment(1)
+    });
+};
+
+/*
+    resetWeeklyPoints(workspaceID, userID)
+
+    Resets a user's weeklyPoints to 0.
+    Called when a new user joins the pairing channel AND
+    at the end of the week.
+    PARAMS:
+        workspaceID - current workspace ID
+        userID      - ID of user whose points will be reset
+*/
+exports.resetWeeklyPoints = async function resetWeeklyPoints(workspaceID, userID) {
+    let data = {
+        weeklyPoints: 0
+    };
+    let setDoc = db.collection('workspaces')
+                .doc(workspaceID)
+                .collection('users')
+                .doc(userID)
+                .set(data, {merge: true});
+};
+
+/*
+    resetMonthlyPoints(workspaceID, userID)
+
+    Resets a user's monthlyPoints to 0.
+    Called when a new user joins the pairing channel AND
+    at the end of the month.
+    PARAMS:
+        workspaceID - current workspace ID
+        userID      - ID of user whose points will be reset
+*/
+exports.resetMonthlyPoints = async function resetMonthlyPoints(workspaceID, userID) {
+    let data = {
+        monthlyPoints: 0
+    };
+    let setDoc = db.collection('workspaces')
+                .doc(workspaceID)
+                .collection('users')
+                .doc(userID)
+                .set(data, {merge: true});
+};
+
+/*
+    getRankings(workspaceID)
+
+    Returns an array of all users in the pairing channel,
+    along with their weekly points and monthly points.
+    PARAMS:
+        workspaceID - current workspace ID
+*/
+exports.getRankings = async function getRankings(workspaceID) {
+    let rankings = [];
+    let users = db.collection('workspaces')
+                .doc(workspaceID)
+                .collection('users');
+    return users.get().then((querySnapshot) => {
+        querySnapshot.forEach((doc) => {
+            let ranking = {id:doc.id, weeklyPoints:doc.data().weeklyPoints, monthlyPoints:doc.data().monthlyPoints};
+            if (ranking['weeklyPoints'] !== undefined) {
+                rankings.push(ranking);
+            }
+        });
+        return rankings;
+    });
+};

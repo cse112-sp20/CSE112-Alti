@@ -798,7 +798,7 @@ handleQuoteSelect = async function(ack,body,context) {
 	// console.log(body);
 	var workspaceId = body.team.id;
 	var userId = body.user.id;
-	firestoreFuncs.storeTypeOfExercise(workspaceId, userId, true, text);
+	await firestoreFuncs.storeTypeOfExercise(workspaceId, userId, true, text);
 
 	
 	let confirmationJSON = createConfirmationView("Alti-Confirmation","*Your buddy will receive the motiviational quote for warmup tomorrow!*");
@@ -826,7 +826,7 @@ handlePuzzleSelect = async function(ack,body,context) {
 	// console.log(text);
 	var workspaceId = body.team.id;
 	var userId = body.user.id;
-	var storeReturn = firestoreFuncs.storeTypeOfExercise(workspaceId, userId, true, text);
+	var storeReturn = await firestoreFuncs.storeTypeOfExercise(workspaceId, userId, true, text);
 		let confirmationJSON = createConfirmationView("Alti-Confirmation","*Your buddy will receive the puzzle for warmup tomorrow!*");
     try {
 		if(body.view.id !== undefined){
@@ -852,7 +852,7 @@ handleTypingSelect = async function(ack,body,context) {
 
 	var workspaceId = body.team.id;
 	var userId = body.user.id;
-	var storeReturn = firestoreFuncs.storeTypeOfExercise(workspaceId, userId, true, text);
+	var storeReturn = await firestoreFuncs.storeTypeOfExercise(workspaceId, userId, true, text);
 	let confirmationJSON = createConfirmationView("Alti-Confirmation","*Your buddy will receive the typing challenge for warmup tomorrow!*");
     try {
 		//push new view above old
@@ -879,7 +879,7 @@ handleRetroSelect = async function(ack,body,context) {
 
 	var workspaceId = body.team.id;
 	var userId = body.user.id;
-	var storeReturn = firestoreFuncs.storeTypeOfExercise(workspaceId, userId, false, text);
+	var storeReturn = await firestoreFuncs.storeTypeOfExercise(workspaceId, userId, false, text);
 	let confirmationJSON = createConfirmationView("Alti-Confirmation","*Your buddy will receive the retro for their cooldown tomorrow!*");
     try {
 		//push new view above old
@@ -921,7 +921,7 @@ handleArticleSelect = async function(view,ack,body,context) {
 	//gets the userID from the action
 	const userId = body['user']['id'];
 	var text = generateData.generateMessageToSend('article', quoteToSend);
-	var storeReturn = firestoreFuncs.storeTypeOfExercise(workspaceId, userId, true, text);
+	var storeReturn = await firestoreFuncs.storeTypeOfExercise(workspaceId, userId, true, text);
 	let confirmationJSON = createConfirmationView("Alti-Confirmation","*Your buddy will receive the article for warmup tomorrow!*");
     try {
 			const result = await app.client.views.open({
@@ -957,7 +957,7 @@ handleCooldownArticleSelect = async function(view,ack,body,context) {
 	//gets the userID from the action
 	const userId = body['user']['id'];
 	var text = generateData.generateMessageToSend('cooldownArticle', quoteToSend); //TODO UPDATE
-	var storeReturn = firestoreFuncs.storeTypeOfExercise(workspaceId, userId, false, text);
+	var storeReturn = await firestoreFuncs.storeTypeOfExercise(workspaceId, userId, false, text);
 	let confirmationJSON = createConfirmationView("Alti-Confirmation","*Your buddy will receive the article for cooldown tomorrow!*");
     try {
 			const result = await app.client.views.open({
@@ -993,7 +993,7 @@ handleVideoSelect = async function(view,ack,body,context) {
 	//gets the userID from the action
 	const userId = body['user']['id'];
 	var text = generateData.generateMessageToSend('video', quoteToSend);
-	var storeReturn = firestoreFuncs.storeTypeOfExercise(workspaceId, userId, false, text);
+	var storeReturn = await firestoreFuncs.storeTypeOfExercise(workspaceId, userId, false, text);
 	let confirmationJSON = createConfirmationView("Alti-Confirmation","*Your buddy will receive the video for cooldown tomorrow!*");
     try {
 			const result = await app.client.views.open({
