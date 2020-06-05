@@ -154,6 +154,7 @@ describe('Integration Testing', () => {
         let test = await Promise.all(await pairUp.pairUp(undefined, token));
         var pairs = await firestoreFuncs.getPairedUsers(workspaceId);
         /* eslint-disable no-await-in-loop */
+        assert(pairs.length !== 0);
         for(var i = 0; i < pairs.length; i++)
         {
           var pair = pairs[i];
@@ -270,5 +271,55 @@ describe('Integration Testing', () => {
         assert.equal(res[i], i+1);
       }
     });
+  });
+
+  describe('onBoard Test', () => {
+    let onBoard;
+    let util;
+    let team_id = 'T0137P851BJ';
+    
+    before(async function() {
+      this.timeout(5000); // 5sec
+      onBoard = require('../onBoard');
+      util = require('../util')
+      
+    });
+
+    it('Test CreateOnBoardChannel', async function() {
+      this.timeout(30000); //30 sec
+      let channelName = "testonboard"
+      await onBoard.onBoard(app, token, team_id, channelName);
+      let channelId = await util.getChannelIdByName(app, token, channelName);
+
+      let channel_info = await app.client.conversations.info({
+        token:token,
+        channel: channelId
+      }).catch((error) => {
+              console.log(error);
+      });
+      
+      assert(channel_info.ok);
+      assert.equal(channel_info.channel.name, channelName);
+
+      let member_info = await app.client.conversations.members({
+        token:token,
+        channel:channelId
+      });
+      assert(member_info.ok);
+      assert.equal(member_info.members.length, 15); //include bot
+    });
+
+    it('Test boardExistingChannel', async function() {
+      this.timeout(30000);
+      let workspaceId = "T0137P851BJ";
+      let channelId = "C012B6BTVDL";
+      await onBoard.onBoardExisting(app, token, team_id, channelId);
+      let activeChannel = await firestoreFuncs.getPairingChannel(workspaceId);
+      assert.equal(activeChannel, channelId);
+    });
+
+    after(async function(){
+     
+    })
   });
 });
