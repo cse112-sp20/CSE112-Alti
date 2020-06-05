@@ -91,8 +91,10 @@ async function scheduleDailyHelper() {
   }
   else {
   // TESTING PURPOSES
-    scheduleDailyWorkspace("T012US11G4X");
+    // scheduleDailyWorkspace("T012US11G4X");
     //scheduleDailyWorkspace("T011H6FAPV4");
+    scheduleDailyWorkspace("T0132EDC3M4");
+
   }
   return null;
 }
@@ -200,8 +202,13 @@ async function scheduleDailyWorkspace(workspaceId) {
 
   let memberList = [];
   let pairedUsers = await firestoreFuncs.getPairedUsers(workspaceId);
+  console.log(pairedUsers);
   pairedUsers.forEach( (obj) => {
-    memberList = memberList.concat(obj.users); 
+    obj.users.forEach(member =>{
+      if(!memberList.includes(member)){
+        memberList.push(member);
+      }
+    })
   });
   console.log("memberList: ");
   console.log(memberList);
@@ -310,7 +317,7 @@ async function scheduleDailyUser(workspaceId, userId, token, day, threads) {
     }
     else {
     // TESTING PURPOSES
-      schedule.scheduleMsg(22, 36, warmupTask, dmThreadID, token);
+      schedule.scheduleMsg(21, 1, warmupTask, dmThreadID, token);
     }
   }
   else {
