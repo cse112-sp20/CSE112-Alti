@@ -191,14 +191,7 @@ app.action('warmup_puzzle_select', async ({ ack, body, context }) => {
 app.action('warmup_quote_select', async ({ ack, body, context }) => {
    warmupMessage.warmupQuoteSelect(ack,body,context);
  });
- 
- app.action('warmup_quote_select', async ({ ack, body, context }) => {
-   warmupMessage.warmupQuoteSelect(ack,body,context);
- });
-
-
-
- 
+  
  app.view('generic_close', async ({ ack, body, context }) => {
     ack({
 	  //clear the modal off the users screen

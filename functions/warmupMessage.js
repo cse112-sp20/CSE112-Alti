@@ -1147,7 +1147,7 @@ exports.sendCooldownButton = async function(targChannelID,app,token){
 sendMyWarmup = async function(body, context){
 	let prompt = await firestoreFuncs.getExercisePrompt(body.user.team_id, body.user.id, true);
 	try {
-		if (prompt == undefined) {
+		if (prompt === undefined) {
 			prompt = "no message sent";
 		}
 		const promptJSON = createConfirmationView("Warmup",prompt);
