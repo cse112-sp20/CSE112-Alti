@@ -10,6 +10,9 @@ else
     if [[ $OSTYPE == "darwin"* ]]; then
         sed -i '' -E "1 s/[^{]*//" .runtimeconfig.json
     fi
+    if [[ "$OSTYPE" == "linux-gnu"* ]]; then
+        sed -i "1s/.*/{/" .runtimeconfig.json
+    fi
     echo "$RunTimeConfig created"
 fi
 if test -f "$ServiceAccountKey"; then
@@ -18,6 +21,9 @@ else
     firebase functions:config:get service_account_key > serviceAccountKey.json
     if [[ $OSTYPE == "darwin"* ]]; then
         sed -i '' -E "1 s/[^{]*//" serviceAccountKey.json
+    fi
+    if [[ "$OSTYPE" == "linux-gnu"* ]]; then
+        sed -i "1s/.*/{/" serviceAccountKey.json
     fi
     echo "$ServiceAccountKey created"
 fi
@@ -29,6 +35,12 @@ if [[ $OSTYPE == "msys" ]]; then
 fi
 
 if [[ $OSTYPE == "darwin"* ]]; then
+    CurrPath=`pwd`
+    ServiceAccountKeyPath="$CurrPath/$ServiceAccountKey"
+    export GOOGLE_APPLICATION_CREDENTIALS="$ServiceAccountKeyPath"
+fi
+
+if [[ "$OSTYPE" == "linux-gnu"* ]]; then
     CurrPath=`pwd`
     ServiceAccountKeyPath="$CurrPath/$ServiceAccountKey"
     export GOOGLE_APPLICATION_CREDENTIALS="$ServiceAccountKeyPath"
