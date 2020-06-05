@@ -239,6 +239,10 @@ app.event('member_joined_channel', async ({ body, context }) => {
                 promises.push(firestoreFuncs.setCooldownTime(teamId, userId, "5:00 PM", day));
             }
         }
+
+        Promise.all(promises).catch((error) => {
+            console.log(error);
+        });
     }
 });
 
