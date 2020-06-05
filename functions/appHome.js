@@ -144,7 +144,6 @@ async function loadHomeTabUI(app, workspaceID, userId, context) {
   var timeZoneText;
   var partnerText;
   var partnerId;
-  var dmThreadText;
   var dmThreadID;
   if (ownerId === undefined) {
 	  ownerText = `Current Owner of Alti is...there is no current owner of Alti! :scream: You can easily set an owner in the *Pick a folk* section.`;
@@ -155,12 +154,11 @@ async function loadHomeTabUI(app, workspaceID, userId, context) {
   if (channelId === undefined) {
 	  channelText = `Current Pairing Channel: None`;
 	  partnerText = `Current partner: None`;
-	  dmThreadText = `Current pairing thread: None`
   }
   else {
 	  channelText = `Current Pairing Channel: #${  channelName  }`;
 	  let pairingData = await firestoreFuncs.getUserPairingData(workspaceID, userId);
-	  dmThreadID = pairingData.dmThreadID;
+	  dmThreadID = pairingData === undefined ? undefined : pairingData.dmThreadID;
 	  partnerId = await firestoreFuncs.getPartner(workspaceID, channelId, userId).then((obj)=>{
 		return obj;
 	  }).catch((error) => {
@@ -173,12 +171,6 @@ async function loadHomeTabUI(app, workspaceID, userId, context) {
 	partnerText = `Current partner: None`;
   }else {
 	  partnerText = `Current partner:  <@${  partnerId  }>`;
-  }
-
-  if (dmThreadID === undefined) {
-	dmThreadText = `Current pairing thread: None`;
-  }else {
-	  dmThreadText = `Current pairing thread:  ${  dmThreadID  }`;
   }
 
   //if (partnerId === undefined)
@@ -231,13 +223,7 @@ async function loadHomeTabUI(app, workspaceID, userId, context) {
 						"text": partnerText,
 					}
 				},
-				{
-					"type": "section",
-					"text": {
-						"type": "mrkdwn",
-						"text": dmThreadText,
-					}
-				},/*
+				/*
 				{
 					"type": "section",
 					"text": {
