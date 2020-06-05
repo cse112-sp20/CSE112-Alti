@@ -77,7 +77,7 @@ async function createOnBoardingChannel(app, token, team_id, channelName) {
             });
 
             // invite people
-            app.client.conversations.invite({
+            await app.client.conversations.invite({
                 token: token, 
                 channel: conversationObj.channel.id,
                 users: userString
@@ -190,9 +190,7 @@ async function findUsersChannel(app, token, channelId) {
     }).catch((error) => {
         console.log(error);
     });
-
     return users;
-
 }
 
 
@@ -277,3 +275,5 @@ app.event('member_left_channel', async ({ body, context }) => {
 
 exports.onBoard = createOnBoardingChannel;
 exports.onBoardExisting = boardExistingChannel;
+exports.onBoardFindUsersWorkspace = findUsersWorkSpace;
+exports.onBoardFindUsersChannel = findUsersChannel;
