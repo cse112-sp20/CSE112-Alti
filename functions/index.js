@@ -37,6 +37,7 @@ const appHome = require('./appHome');
 const appHomeSchedule = require('./appHomeSchedule');
 const createNewChannel = require('./createNewChannel');
 const leaderboard = require('./leaderboard');
+const changePairingChannel = require('./changePairingChannel');
 exports.scheduledPairUp = pubsubScheduler.scheduledPairUp;
 exports.scheduleWarmup = pubsubScheduler.scheduleWarmup;
 exports.scheduleDaily = pubsubScheduler.scheduleDaily;

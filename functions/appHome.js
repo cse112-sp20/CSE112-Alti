@@ -150,7 +150,7 @@ async function loadHomeTabUI(app, workspaceID, userId, context) {
 	  ownerText = `Current Owner of Alti is...there is no current owner of Alti! :scream: You can easily set an owner in the *Pick a folk* section.`;
   }
   else {
-	  ownerText = `Current Owner of Alti is <@${  ownerId  }>, you can ask the owner for changing paring channel of the team.`;
+	  ownerText = `Current Owner of Alti is <@${  ownerId  }>, you can ask the owner about changing the pairing channel of the team.`;
   }
   if (channelId === undefined) {
 	  channelText = `Current Pairing Channel: None`;
@@ -301,8 +301,8 @@ async function loadHomeTabUI(app, workspaceID, userId, context) {
 								  "text": "Are you sure?"
 							  },
 							  "text": {
-								  "type": "plain_text",
-								  "text": "❗️*NOTE*❗️: Switching pairing channel will remove all data previously associated with that channel. Also, users that were in the previous pairing-channel will not be transferred over to the new one, they will have to manually join that new channel"
+								  "type": "mrkdwn",
+								  "text": "❗️*NOTE*❗: Switching pairing channels will remove all data associated with the previous channel. Users who were in the previous pairing channel will not be transferred over to the new one; they will have to manually join the new channel. \nThe pairing channel will not be changed immediately; this change will take effect on Saturday."
 							  },
 							  "confirm": {
 								  "type": "plain_text",
