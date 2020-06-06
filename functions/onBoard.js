@@ -5,10 +5,10 @@ const appHome = require('./appHome');
 const firestoreFuncs = require('./firestore');
 const index = require('./index');
 const app = index.getBolt();
-
 var days = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"];
+var pairingChannelDNE = true;
 
-// Listen for slash command /setup which creates new channel alti-pairing, 
+// Listen for slash command /setup which creates new channel alti-pairing,
 // invites all users in workspace, and designate as active pairing channel
 app.command('/setup', async ({payload, body, ack, say, context}) => {
     ack();
@@ -32,20 +32,31 @@ app.action('pairing_channel_selected', async({body, ack, say, context}) => {
     const newChannel = body.actions[0].selected_channel; // channel to be switched to
 
     // TODO make the update run after the db is updated in boardExistingChannel call
-    
+
     // TODO MOVE THIS !!
-    await boardExistingChannel(app, context.botToken, team_id, newChannel);
-    
-    //console.log("After boardExisting -> Before update app home");
-    appHome.updateAppHome(body.user.id, body.team.id, context);
+
+    //If there is not a channel that exists, create one. Else use pubsub to create a new channel on weekend
+    if (pairingChannelDNE)
+    {
+      pairingChannelDNE = false;
+      await boardExistingChannel(app, context.botToken, team_id, newChannel);
+      //console.log("After boardExisting -> Before update app home");
+      appHome.updateAppHome(body.user.id, body.team.id, context);
+    }
+    else
+    {
+      //There will always be a previous channel from this point forward, only update channel from pubsub
+      firestoreFuncs.setChannel(team_id,newChannel);
+    }
+
 });
 
 
 // Create a channel with all the users in the workspace and set as active pairing channel
 async function createOnBoardingChannel(app, token, team_id, channelName) {
+
     try {
         var promises = [];
-        
         var channels = await app.client.conversations.list({
             token: token
         }).catch((error) => {
@@ -84,7 +95,7 @@ async function createOnBoardingChannel(app, token, team_id, channelName) {
 
             // invite people
             app.client.conversations.invite({
-                token: token, 
+                token: token,
                 channel: conversationObj.channel.id,
                 users: userString
             }).catch((error) => {
@@ -95,11 +106,11 @@ async function createOnBoardingChannel(app, token, team_id, channelName) {
             app.client.chat.postMessage({
                 token: token,
                 channel: conversationObj.channel.id,
-                text: `Hi everyone! This is where we'll pair you up to participate in quick 
+                text: `Hi everyone! This is where we'll pair you up to participate in quick
                         and fun warm up and cool down activities :)
                         (To opt out, just leave the channel.)`
             });
-            
+
             promises.push(firestoreFuncs.storeNewPairingChannel(team_id, conversationObj.channel.id));
 
             for (var userId in usersDict) {
@@ -111,7 +122,7 @@ async function createOnBoardingChannel(app, token, team_id, channelName) {
                 firestoreFuncs.resetWeeklyPoints(team_id,userId);
                 firestoreFuncs.resetMonthlyPoints(team_id,userId);
             }
-            
+
             Promise.all(promises).catch((error) => {
                 console.log(error);
             });
@@ -137,10 +148,10 @@ async function boardExistingChannel(app, token, team_id, channelId) {
         app.client.chat.postMessage({
             token: token,
             channel: channelId,
-            text: `Hey I've just been added to this channel! Everyone here will participate in quick 
+            text: `Hey I've just been added to this channel! Everyone here will participate in quick
                     and fun warm up and cool down activities :)
                     `
-            
+
         });
         await firestoreFuncs.storeNewPairingChannel(team_id, channelId);
         for (var userId of userList) {
@@ -148,7 +159,7 @@ async function boardExistingChannel(app, token, team_id, channelId) {
                 promises.push(firestoreFuncs.setWarmupTime(team_id, userId, "9:00 AM", day));
                 promises.push(firestoreFuncs.setCooldownTime(team_id, userId, "5:00 PM", day));
             }
-            
+
             // reset everyone's weekly and monthly points
             promises.push(firestoreFuncs.resetWeeklyPoints(team_id,userId));
             promises.push(firestoreFuncs.resetMonthlyPoints(team_id,userId));
@@ -181,7 +192,7 @@ async function findUsersWorkSpace(app, token) {
             usersDict[id] = u.name;
         }
     });
-    
+
     return usersDict;
 }
 
@@ -238,7 +249,7 @@ app.event('member_joined_channel', async ({ body, context }) => {
             console.log(error);
         });
 
-        if (!time) { 
+        if (!time) {
             var promises = [];
             for (var day of days) {
                 promises.push(firestoreFuncs.setWarmupTime(teamId, userId, "9:00 AM", day));
@@ -258,7 +269,7 @@ app.event('member_left_channel', async ({ body, context }) => {
     if (activeChannel === body.event.channel) {
         console.log("Member left pairing channel");
     }
- 
+
         var conversation = await app.client.conversations.open({
             token: context.botToken,
             users: body.event.user

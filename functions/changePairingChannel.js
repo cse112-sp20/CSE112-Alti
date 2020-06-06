@@ -7,7 +7,7 @@ const app = index.getBolt();
     scheduledChangePairingChannel
 
     If admin selected a new pairing channel during the week,
-    switches pairing channels at 12:55 PM Pacific Time 
+    switches pairing channels at 12:55 PM Pacific Time
     (before scheduledPairUp runs).
 */
 exports.scheduledChangePairingChannel = functions.pubsub
@@ -17,7 +17,7 @@ exports.scheduledChangePairingChannel = functions.pubsub
 
     // get all workspaces
     const allWorkspaces = await firestoreFuncs.getAllWorkspaces();
-  
+
     let promise = Promise.resolve();
 
     // go through all workspaces
@@ -31,7 +31,7 @@ exports.scheduledChangePairingChannel = functions.pubsub
                 return firestoreFuncs.getAPIPair(workspace);
             });
             promise = promise.then(res => {
-                return handleChangePairingChannel(workspace, res)
+                return handleChangePairingChannel(context, workspace)
             });
         }
     }
@@ -42,27 +42,12 @@ exports.scheduledChangePairingChannel = functions.pubsub
 /*
     handleChangePairingChannel(workspace, res)
 
-    
-*/
-async function handleChangePairingChannel(workspaceID, apiPair) {
-    if (apiPair !== null) {
-        const token = apiPair.botToken;
-        try {
-            // TODO
-            // set current pairing channel equal to new pairing channel
 
-            return Promise.resolve();
-        } catch (error) {
-            console.error(error);
-        }
-    }
-    else {
-        console.error("Pairing channel in workspace " + workspaceID + 
-                        " not changed because the api pair is not stored in firestore");
-    }
-    return Promise.reject(new Error("Workspace " + workspaceID + 
-                                    " pairing channel could not be changed"));
-  }
-  promise.catch(err => console.error(err));
-  await promise;
-});
+*/
+async function handleChangePairingChannel(context,team_id) {
+	var newChannel = firestoreFuncs.getChannel(team_id);
+	await onboard.js.boardExistingChannel(app, context.botToken, team_id, newChannel);
+
+	//have to update the app home
+	//appHome.updateAppHome(body.user.id, body.team.id, context);
+}
