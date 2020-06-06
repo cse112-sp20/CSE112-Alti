@@ -39,6 +39,7 @@ app.action('pairing_channel_selected', async({body, ack, say, context}) => {
     if (pairingChannelDNE)
     {
       pairingChannelDNE = false;
+      firestoreFuncs.setChannel(team_id,newChannel);
       await boardExistingChannel(app, context.botToken, team_id, newChannel);
       //console.log("After boardExisting -> Before update app home");
       appHome.updateAppHome(body.user.id, body.team.id, context);
