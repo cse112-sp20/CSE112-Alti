@@ -331,6 +331,9 @@ exports.getExercisePrompt = async function getExercisePrompt(workspaceID, userID
         partner's userID, or undefined if error or cannot find the user passed in
 */
 exports.getPartner = function getPartner(workspaceID, channelID, userID) {
+    console.log(workspaceID);
+    console.log(channelID);
+    console.log(userID);
     let userRef = db.collection("workspaces").doc(workspaceID).collection("activeChannels")
                     .doc(channelID).collection('pairedUsers').doc(userID);
     
@@ -362,22 +365,27 @@ exports.getPartner = function getPartner(workspaceID, channelID, userID) {
         If u1 is paired with u2 (in dm thread 'd1'), and u3 paired with u4 (in dm thread 'd2'),
         this function will return:
             [{users: [u1, u2], dmThreadID: 'd1'}, {users: [u3, u4], dmThreadID: 'd2'}]
-*/
+        If there is an odd number of people in the workspace and users u1, u2, and u3 are paired
+        in a circular way, returns that entry in the format:
+            {users: [u1, u2, u3], dmThreadID: 'd1'}
+*/  
 exports.getPairedUsers = async function getPairedUsers(workspaceID) {
     let channelID = await this.getPairingChannel(workspaceID);
     let userRef = db.collection("workspaces").doc(workspaceID).collection("activeChannels")
                     .doc(channelID).collection('pairedUsers');
-    
     return userRef.get().then((querySnapshot) => {
-        let partnerIDs = [];
-        let pairings = [];
+        let threadHash = {};
         querySnapshot.forEach((doc) => {
-            let partner = doc.data().partnerID;
-            if (!partnerIDs.includes(doc.id)) {
-                pairings.push({users: [doc.id, partner], dmThreadID: doc.data().dmThreadID});
-                partnerIDs.push(partner);
+            let thread = doc.data().dmThreadID;
+            if(threadHash[thread] === undefined){
+                threadHash[thread] = [];
             }
+            threadHash[thread].push(doc.id);
         });
+        let pairings = [];
+        for(var thread in threadHash){
+            pairings.push({users: threadHash[thread], dmThreadID: thread});
+        }
         return pairings;
     });
 };
