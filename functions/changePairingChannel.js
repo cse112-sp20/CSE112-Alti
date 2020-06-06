@@ -13,9 +13,9 @@ const app = index.getBolt();
     (before scheduledPairUp runs).
 */
 exports.scheduledChangePairingChannel = functions.pubsub
-									    .schedule('every sunday 12:55')
-										.timeZone('America/Los_Angeles')
-										.onRun(async (context) => {
+							            .schedule('every sunday 12:55')
+							            .timeZone('America/Los_Angeles')
+                                        .onRun(async (context) => {
 
     // get all workspaces
     const allWorkspaces = await firestoreFuncs.getAllWorkspaces();

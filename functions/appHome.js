@@ -146,6 +146,7 @@ async function loadHomeTabUI(app, workspaceID, userId, context) {
   var partnerId;
   var dmThreadText;
   var dmThreadID;
+  var newChannelID, newChannelName;
   if (ownerId === undefined) {
 	  ownerText = `Current Owner of Alti is...there is no current owner of Alti! :scream: You can easily set an owner in the *Pick a folk* section.`;
   }
@@ -159,6 +160,20 @@ async function loadHomeTabUI(app, workspaceID, userId, context) {
   }
   else {
 	  channelText = `Current Pairing Channel: #${  channelName  }`;
+	  // display new pairing channel if exists
+	  newChannelID = firestoreFuncs.getNewPairingChannelID(workspaceID);
+	  if (newChannelID !== undefined) {
+		  // get new channel name
+		  newChannelName = await app.client.conversations.info({
+			token: context.botToken,
+			channel: newChannelID
+		  }).then((obj)=>{
+			return obj.channel.name;
+		  }).catch((error) => {
+			console.log(error);
+		  });
+		  channelText += ` (Changing to #${  newChannelName  } on Saturday)`
+	  }
 	  let pairingData = await firestoreFuncs.getUserPairingData(workspaceID, userId);
 	  dmThreadID = pairingData.dmThreadID;
 	  partnerId = await firestoreFuncs.getPartner(workspaceID, channelId, userId).then((obj)=>{
