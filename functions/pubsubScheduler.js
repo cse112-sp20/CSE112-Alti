@@ -172,6 +172,7 @@ async function scheduleDailyWorkspace(workspaceId) {
     day = days[n];
   }
   else {
+    // TESTING PURPOSES
     day = "Tuesday";
   }
 
