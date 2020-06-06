@@ -6,7 +6,6 @@ const firestoreFuncs = require('./firestore');
 const index = require('./index');
 const app = index.getBolt();
 var days = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"];
-var pairingChannelDNE = true;
 
 // Listen for slash command /setup which creates new channel alti-pairing,
 // invites all users in workspace, and designate as active pairing channel
@@ -29,27 +28,29 @@ app.action('pairing_channel_selected', async({body, ack, say, context}) => {
     });
     var team_id = body.team.id;
 
-    const newChannel = body.actions[0].selected_channel; // channel to be switched to
+    const newChannel = body.actions[0].selected_channel;
 
     // TODO make the update run after the db is updated in boardExistingChannel call
 
-    // TODO MOVE THIS !!
+    // Get the current pairing channel
+    var currentPairingChannel = await firestoreFuncs.getPairingChannel(body.team_id);
 
-    //If there is not a channel that exists, create one. Else use pubsub to create a new channel on weekend
-    if (pairingChannelDNE)
+    // If the current pairing channel is undefined, then set it normally.
+    if (currentPairingChannel === undefined)
     {
-      pairingChannelDNE = false;
-      firestoreFuncs.setChannel(team_id,newChannel);
-      await boardExistingChannel(app, context.botToken, team_id, newChannel);
-      //console.log("After boardExisting -> Before update app home");
-      appHome.updateAppHome(body.user.id, body.team.id, context);
-    }
-    else
+        await boardExistingChannel(app, context.botToken, team_id, newChannel);
+        //console.log("After boardExisting -> Before update app home");
+        appHome.updateAppHome(body.user.id, body.team.id, context);
+    } 
+    // If the current pairing channel is not the same as the new channel,
+    // call the PubSub function to set the new pairing channel on Saturday.
+    else if (currentPairingChannel !== newChannel) 
     {
-      //There will always be a previous channel from this point forward, only update channel from pubsub
-      firestoreFuncs.setChannel(team_id,newChannel);
+        // There will always be a previous channel from this point forward
+        // Set newChannel field in Firestore to new channel's ID
+        firestoreFuncs.setNewPairingChannelID(team_id, newChannel);
     }
-
+    // Else, if the current and new pairing channels are the same, do nothing.
 });
 
 

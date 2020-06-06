@@ -116,18 +116,6 @@ exports.storeNewPairing = async function storeNewPairing(workspace, dmThreadID, 
         partnerID: pairedUsers[0],
     }, {merge: true});
 };
-exports.setChannel = async function setChannel(workspaceID,newChannel) {
-    let data = {
-        newChannel: newChannel
-    };
-    let setDoc = db.collection('workspaces')
-                .doc(workspaceID)
-                .set(data, {merge: true});
-};
-exports.getChannel = async function getChannel(workspaceID) {
-  const snapshot = await db.collection('workspaces').doc(workspaceID).get();
-  return snapshot.data().newChannel;
-};
 
 /*
     Stores a new pairing (DM thread ids + partnerIDs) in the corresponding place (with the corresponding
@@ -597,7 +585,8 @@ exports.getUserPairingData = async function getUserData(workspaceID, userID) {
 
     Increments a user's weeklyPoints and monthlyPoints by 1.
     Called when a user sends either a warmup or cooldown to their partner.
-    PARAMS:
+
+    Inputs:
         workspaceID - current workspace ID
         userID      - ID of user whose points will be incremented
 */
@@ -618,7 +607,8 @@ exports.updatePoints = async function updatePoints(workspaceID, userID) {
     Resets a user's weeklyPoints to 0.
     Called when a new user joins the pairing channel AND
     at the end of the week.
-    PARAMS:
+
+    Inputs:
         workspaceID - current workspace ID
         userID      - ID of user whose points will be reset
 */
@@ -639,7 +629,8 @@ exports.resetWeeklyPoints = async function resetWeeklyPoints(workspaceID, userID
     Resets a user's monthlyPoints to 0.
     Called when a new user joins the pairing channel AND
     at the end of the month.
-    PARAMS:
+
+    Inputs:
         workspaceID - current workspace ID
         userID      - ID of user whose points will be reset
 */
@@ -659,7 +650,8 @@ exports.resetMonthlyPoints = async function resetMonthlyPoints(workspaceID, user
 
     Returns an array of all users in the pairing channel,
     along with their weekly points and monthly points.
-    PARAMS:
+
+    Inputs:
         workspaceID - current workspace ID
 */
 exports.getRankings = async function getRankings(workspaceID) {
@@ -676,4 +668,41 @@ exports.getRankings = async function getRankings(workspaceID) {
         });
         return rankings;
     });
+};
+
+/*
+    setNewPairingChannelID(workspaceID, newChannel)
+
+    Given a workspace, stores the ID for the new pairing channel,
+    in the newChannel field in Firestore.
+
+    Inputs:
+        workspaceID - the workspace of the new pairing channel
+        newChannel - the new pairing channel's ID
+*/
+exports.setNewPairingChannelID = async function setNewPairingChannelID(workspaceID, newChannel) {
+    let data = {
+        newChannel: newChannel
+    };
+    let setDoc = db.collection('workspaces')
+                .doc(workspaceID)
+                .set(data, {merge: true});
+};
+
+/*
+    getNewPairingChannelID(workspaceID)
+
+    Given a workspace, retrieves the ID for the new pairing channel,
+    in the newChannel field in Firestore.
+
+    Inputs:
+        workspaceID - the workspace of the new pairing channel
+
+    Returns:
+        The ID of the new pairing channel
+
+*/
+exports.getNewPairingChannelID = async function getNewPairingChannelID(workspaceID) {
+    const snapshot = await db.collection('workspaces').doc(workspaceID).get();
+    return snapshot.data().newChannel;
 };
