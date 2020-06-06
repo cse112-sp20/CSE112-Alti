@@ -1071,6 +1071,48 @@ exports.sendGetWarmupButton = async function(targChannelID,app,token) {
 	
 }
 
+//generate the get warmup button JSON block
+exports.generateGetWarmupJSON = function() {
+	const getWarmupButton = [
+		{
+			"type": "actions",
+			"elements": [
+				{
+					"action_id": "getMyWarmupClick",
+					"type": "button",
+					"text": {
+						"type": "plain_text",
+						"text": "Get your warmup!",
+						"emoji": true
+					}
+				}
+			]
+		}
+	];
+	return getWarmupButton;
+}
+
+//generate the get cooldown button JSON block
+exports.generateGetCooldownJSON = function() {
+	const getWarmupButton = [
+		{
+			"type": "actions",
+			"elements": [
+				{
+					"action_id": "getMyCooldownClick",
+					"type": "button",
+					"text": {
+						"type": "plain_text",
+						"text": "Get your cooldown!",
+						"emoji": true
+					}
+				}
+			]
+		}
+	];
+	return getWarmupButton;
+}
+
 //sends a get cooldown button to a channel
 exports.sendGetCooldownButton = async function(targChannelID,app,token) {
 	//notification to be sent when button is posted into chat
