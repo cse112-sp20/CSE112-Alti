@@ -91,14 +91,22 @@ async function scheduleDailyHelper() {
   }
   else {
   // TESTING PURPOSES
-    // scheduleDailyWorkspace("T012US11G4X");
+     scheduleDailyWorkspace("T012US11G4X");
     //scheduleDailyWorkspace("T011H6FAPV4");
-    scheduleDailyWorkspace("T0132EDC3M4");
+    //scheduleDailyWorkspace("T0132EDC3M4");
 
   }
   return null;
 }
 
+/* Helper method to build threads object
+ / Dict of objects where each object a thread and an object of 
+ / earliest warmup time and cooldown time
+ / threads = { G0146LGD4TV: { warmupTime: '7:00 AM', 
+                              cooldownTime: '5:00 PM',
+                              warmupUser: 'U0', 
+                              cooldownUser: 'U1' } }
+ */
 async function addToThreads(workspaceId, memberList, token, threads, day) {
   var promises = [];
   for (var mem of memberList) {
@@ -112,51 +120,82 @@ async function addUserToThreads(workspaceId, userId, token, threads, day) {
     console.log(userId + " has no user id");
     return;
   }
-
+  let warmupTime = await firestoreFuncs.getWarmupTime(workspaceId, userId, day);
+  let cooldownTime = await firestoreFuncs.getCooldownTime(workspaceId, userId, day);
+  if (!warmupTime) {
+    return;
+  }
+  if (!cooldownTime) {
+    return;
+  }
   var dmThreadID = pairingData.dmThreadID;
   if (dmThreadID in threads) {
-    let cooldownTime = await firestoreFuncs.getCooldownTime(workspaceId, userId, day);
-    if (!cooldownTime) {
-      return;
-    }
+    // normal vars are current in object, 2's are the current user we are looking at
     var hour, min, mid, hour2, min2, mid2;
-    hour = Number(threads[dmThreadID].split(" ")[0].split(":")[0]);
-    min = Number(threads[dmThreadID].split(" ")[0].split(":")[1]);
-    mid = threads[dmThreadID].split(" ")[1];
+    hour = Number(threads[dmThreadID].cooldownTime.split(" ")[0].split(":")[0]);
+    min = Number(threads[dmThreadID].cooldownTime.split(" ")[0].split(":")[1]);
+    mid = threads[dmThreadID].cooldownTime.split(" ")[1];
     hour2 = Number(cooldownTime.split(" ")[0].split(":")[0]);
     min2 = Number(cooldownTime.split(" ")[0].split(":")[1]);
     mid2 = cooldownTime.split(" ")[1];
 
     if (mid2 === "AM" && mid === "PM") {
-      threads[dmThreadID] = userId;
-      return;
-    }
-    else if (mid2 === "PM" && mid === "AM") {
-      return;
+      threads[dmThreadID].cooldownUser = userId;
+      threads[dmThreadID].cooldownTime = cooldownTime;
     }
     else if (mid2 === mid) {
-      if (hour < hour2) {
-        return;
-      }
-      else if (hour2 < hour) {
-        threads[dmThreadID] = userId;
+      if (hour2 < hour && hour !== 12) {
+        threads[dmThreadID].cooldownUser = userId;
+        threads[dmThreadID].cooldownTime = cooldownTime;
       }
       else if (hour === hour2) {
-        if (min < min2) {
-          return;
-        }
-        else if (min2 < min) {
-          threads[dmThreadID] = userId;
-        }
-        else if (min === min2) {
-          return;
+        if (min2 < min) {
+          threads[dmThreadID].cooldownUser = userId;
+          threads[dmThreadID].cooldownTime = cooldownTime;
         }
       }
+      else if (hour2 > hour && hour2 === 12) {
+        threads[dmThreadID].cooldownUser = userId;
+        threads[dmThreadID].cooldownTime = cooldownTime;
+      }
     }
+
+    // normal vars are current in object, 2's are the current user we are looking at
+    hour = Number(threads[dmThreadID].warmupTime.split(" ")[0].split(":")[0]);
+    min = Number(threads[dmThreadID].warmupTime.split(" ")[0].split(":")[1]);
+    mid = threads[dmThreadID].warmupTime.split(" ")[1];
+    hour2 = Number(warmupTime.split(" ")[0].split(":")[0]);
+    min2 = Number(warmupTime.split(" ")[0].split(":")[1]);
+    mid2 = warmupTime.split(" ")[1];
+
+    if (mid2 === "AM" && mid === "PM") {
+      threads[dmThreadID].warmupUser = userId;
+      threads[dmThreadID].warmupTime = warmupTime;
+    }
+    else if (mid2 === mid) {
+      if (hour2 < hour && hour !== 12) {
+        threads[dmThreadID].warmupUser = userId;
+        threads[dmThreadID].warmupTime = warmupTime;
+      }
+      else if (hour === hour2) {
+        if (min2 < min) {
+          threads[dmThreadID].warmupUser = userId;
+          threads[dmThreadID].warmupTime = warmupTime;
+        }
+      }
+      else if (hour2 > hour && hour2 === 12) {
+        threads[dmThreadID].warmupUser = userId;
+        threads[dmThreadID].warmupTime = warmupTime;
+      }
+    }
+
   }
   else {
-    threads[dmThreadID] = userId;
-    console.log(dmThreadID + " not in threads");
+    threads[dmThreadID] = {cooldownUser: userId, 
+                          warmupUser: userId, 
+                          cooldownTime: cooldownTime,
+                          warmupTime: warmupTime }; 
+    console.log(dmThreadID + " not in threads so setting user " + userId + " as defaults" );
     return;
   }
   
@@ -174,6 +213,7 @@ async function scheduleDailyWorkspace(workspaceId) {
     day = days[n];
   }
   else {
+    // TESTING PURPOSES
     day = "Tuesday";
   }
 
@@ -269,7 +309,7 @@ async function scheduleDailyUser(workspaceId, userId, token, day, threads) {
   var cooldownTask;
   var dmThreadID = pairingData.dmThreadID;
   var quote;
-
+/*
   if (day === "Monday") {
     //TODO generate hardcoded tasks for monday quote and retrospective
     quote = generateTaskData.generateQuote();
@@ -295,6 +335,7 @@ async function scheduleDailyUser(workspaceId, userId, token, day, threads) {
   }
 
   var hour, min, mid;
+  // Move necessary logic to app.action of button clicks
 
   if (warmupTask) {
 
@@ -350,8 +391,41 @@ async function scheduleDailyUser(workspaceId, userId, token, day, threads) {
   else {
     console.log("No cooldown task");
   }
+*/
+  var hour, min, mid;
 
-  if (day !== 'Friday' && userId === threads[dmThreadID]) {
+  if (userId === threads[dmThreadID].warmupUser) {
+    console.log("Warmup button is being sent for user " + `<@${  userId  }>` + " in thread " + dmThreadID);
+
+    split = warmupTime.split(" ");
+    hour = warmupTime.split(" ")[0].split(":")[0];
+    min = warmupTime.split(" ")[0].split(":")[1];
+    mid = warmupTime.split(" ")[1];
+    if (mid === "PM") {
+      hour = String(Number(hour) + 12);
+    }
+    else if (mid === "AM" && hour === "12") {
+      hour = "0";
+    }
+
+    const warmupButtonText = "Hi! Click here for your warmup :smile:";
+    if (test === 0) { 
+      console.log("Schedule warmup button for " + hour + ":" + min + " for userId " + `<@${  userId  }>`);
+      await schedule.scheduleMsg(hour, min, warmupButtonText, dmThreadID, token, warmupMessage.getWarmupGetView())
+      .catch((error) => {
+        console.log(error);
+      }); 
+    }
+    else {
+      // TESTING PURPOSES
+      await schedule.scheduleMsg(3, 45, warmupButtonText, dmThreadID, token, warmupMessage.getWarmupGetView())
+      .catch((error) => {
+        console.log(error);
+      });     
+    }
+  }
+
+  if (day !== 'Friday' && userId === threads[dmThreadID].cooldownUser) {
     console.log("Prompting is run for user " + `<@${  userId  }>` + " in thread " + dmThreadID);
     split = cooldownTime.split(" ");
     hour = cooldownTime.split(" ")[0].split(":")[0];
@@ -373,10 +447,12 @@ async function scheduleDailyUser(workspaceId, userId, token, day, threads) {
     }
     else {
       // TESTING PURPOSES
-      await schedule.scheduleMsg(4, 13, exerciseSelectNotificationText, dmThreadID, token, warmupMessage.getExerciseSelectView())
+      
+      await schedule.scheduleMsg(3, 45, exerciseSelectNotificationText, dmThreadID, token, warmupMessage.getExerciseSelectView())
               .catch((err) => {
                 console.error(err);
               });
+              
     }
   }
   else {
