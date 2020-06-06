@@ -2,7 +2,7 @@
 */
 
 const appHome = require('./appHome');
-const firestoreFuncs = require('./firestore');
+const firestoreFuncs = require('../util/firestore');
 const index = require('./index');
 const app = index.getBolt();
 

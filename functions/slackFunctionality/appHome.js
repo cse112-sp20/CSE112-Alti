@@ -1,8 +1,8 @@
 const index = require('./index');
 const app = index.getBolt();
 
-const appHomeObjects = require('./appHomeObjects');
-const firestoreFuncs = require('./firestore');
+const appHomeObjects = require('../util/appHomeObjects');
+const firestoreFuncs = require('../util/firestore');
 const leaderboard = require('./leaderboard');
 
 var days = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"];

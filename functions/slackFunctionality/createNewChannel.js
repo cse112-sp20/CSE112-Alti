@@ -1,6 +1,6 @@
 const index = require('./index');
 const app = index.getBolt();
-const firestoreFuncs = require('./firestore');
+const firestoreFuncs = require('../util/firestore');
 
 var days = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"];
 var channelNames = [];

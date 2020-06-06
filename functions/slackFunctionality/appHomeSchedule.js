@@ -2,8 +2,8 @@ const index = require('./index');
 const app = index.getBolt();
 
 const appHome = require('./appHome');
-const appHomeObjects = require('./appHomeObjects');
-const firestoreFuncs = require('./firestore');
+const appHomeObjects = require('../util/appHomeObjects');
+const firestoreFuncs = require('../util/firestore');
 
 // variables to remember what the user has set
 var warmupTime1 = null;

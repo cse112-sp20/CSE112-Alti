@@ -5,9 +5,9 @@ const admin = require('firebase-admin');
 const config = functions.config();
 const signingSecret = config.slack.signing_secret;
 
-const firestoreFuncs = require('./firestore');
+const firestoreFuncs = require('../util/firestore');
 //OAuth Endpoint for Authentication
-const oauthEndpoint = require('./oauth');
+const oauthEndpoint = require('../util/oauth');
 
 
 const expressReceiver = new ExpressReceiver({
