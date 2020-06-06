@@ -9,7 +9,6 @@
 // 	logLeveL: 3,
 // });
 const index = require('./index')
-const functions = require('firebase-functions');
 const app = index.getBolt();
 
 
@@ -99,3 +98,4 @@ const app = index.getBolt();
 							});
 		
 };
+

@@ -1072,9 +1072,8 @@ exports.sendGetWarmupButton = async function(targChannelID,app,token) {
 }
 
 //generate the get warmup button JSON block
-exports.generateGetWarmupJSON = function() {
-	const getWarmupButton = [
-		{
+function generateGetWarmupJSON() {
+	const getWarmupButton = {
 			"type": "actions",
 			"elements": [
 				{
@@ -1087,15 +1086,13 @@ exports.generateGetWarmupJSON = function() {
 					}
 				}
 			]
-		}
-	];
+		};
 	return getWarmupButton;
 }
 
 //generate the get cooldown button JSON block
-exports.generateGetCooldownJSON = function() {
-	const getWarmupButton = [
-		{
+function generateGetCooldownJSON() {
+	const getWarmupButton = {
 			"type": "actions",
 			"elements": [
 				{
@@ -1108,9 +1105,66 @@ exports.generateGetCooldownJSON = function() {
 					}
 				}
 			]
+	};
+	return getWarmupButton;
+}
+
+function generateSetExercisesJSON(){
+	const view =  [
+		{
+			"type": "section",
+			"text": {
+				"type": "mrkdwn",
+				"text": "Select your partner's warmup for tomorrow: "
+			}
+		},
+		{
+			"type": "actions",
+			"elements": [
+				{
+					"action_id": "sendWarmupButtonClick",
+					"type": "button",
+					"text": {
+						"type": "plain_text",
+						"text": "Send A Warmup",
+						"emoji": true
+					}
+				}
+			]
+		},{
+			"type": "section",
+			"text": {
+				"type": "mrkdwn",
+				"text": "Select your partner's cooldown for tomorrow: "
+			}
+		},
+		{
+			"type": "actions",
+			"elements": [
+				{
+					"action_id": "sendCooldownButtonClick",
+					"type": "button",
+					"text": {
+						"type": "plain_text",
+						"text": "Send A Cooldown",
+						"emoji": true
+					}
+				}
+			]
 		}
 	];
-	return getWarmupButton;
+	return view;
+} 
+
+exports.getStartDayBlocks = function(){
+	return [generateGetWarmupJSON()];
+}
+
+exports. getEndDayBlocks = function(){
+	let blocks = []
+	blocks.push(generateGetCooldownJSON());
+	blocks = blocks.concat(generateSetExercisesJSON());
+	return blocks;
 }
 
 //sends a get cooldown button to a channel
@@ -1228,7 +1282,7 @@ sendMyWarmup = async function(body, context){
 	let prompt = await firestoreFuncs.getExercisePrompt(body.user.team_id, body.user.id, true);
 	try {
 		if (prompt === undefined) {
-			prompt = "no message sent";
+			prompt = "Your partner didn't choose a warmup for you :(";
 		}
 		const promptJSON = createConfirmationView("Warmup",prompt);
 		//make a call to the web api to post the promp as a modal
@@ -1309,78 +1363,3 @@ app.action('confirmation', ({view, ack, body, context }) => {
 	});
 });
 
-exports.getExerciseSelectView = function getExerciseSelectView(){
-	const view =  [
-		{
-			"type": "section",
-			"text": {
-				"type": "plain_text",
-				"emoji": true,
-				"text": "Hey there! You can pick exercises for your buddy to complete tomorrow!"
-			}
-		},
-		{
-			"type": "divider"
-		},
-		{
-			"type": "section",
-			"text": {
-				"type": "mrkdwn",
-				"text": "Select your partner's warmup: "
-			}
-		},
-		{
-			"type": "actions",
-			"elements": [
-				{
-					"action_id": "sendWarmupButtonClick",
-					"type": "button",
-					"text": {
-						"type": "plain_text",
-						"text": "Send A Warmup",
-						"emoji": true
-					}
-				}
-			]
-		},{
-			"type": "section",
-			"text": {
-				"type": "mrkdwn",
-				"text": "Select your partner's cooldown: "
-			}
-		},
-		{
-			"type": "actions",
-			"elements": [
-				{
-					"action_id": "sendCooldownButtonClick",
-					"type": "button",
-					"text": {
-						"type": "plain_text",
-						"text": "Send A Cooldown",
-						"emoji": true
-					}
-				}
-			]
-		}
-	];
-	return view;
-} 
-
-exports.getWarmupGetView = function getWarmupGetView(){
-	const button =  {
-		"type": "actions",
-		"elements": [
-			{
-				"action_id": "getMyWarmupClick",
-				"type": "button",
-				"text": {
-					"type": "plain_text",
-					"text": "Get your warmup!",
-					"emoji": true
-				}
-			}
-		]
-	};
-	return [button];
-} 

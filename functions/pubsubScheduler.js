@@ -4,9 +4,6 @@ const schedule = require('./schedule');
 const functions = require('firebase-functions');
 const firestoreFuncs = require('./firestore');
 const warmupMessage = require('./warmupMessage');
-const generateTaskData = require('./generateTaskData');
-const retros = require('./retros');
-const retroQuestions = retros.getRetrosObj();
 const app = index.getBolt();
 
 var days = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
@@ -242,7 +239,7 @@ async function scheduleDailyWorkspace(workspaceId) {
 
   let memberList = [];
   let pairedUsers = await firestoreFuncs.getPairedUsers(workspaceId);
-  console.log(pairedUsers);
+  // console.log(pairedUsers);
   pairedUsers.forEach( (obj) => {
     obj.users.forEach(member =>{
       if(!memberList.includes(member)){
@@ -250,13 +247,13 @@ async function scheduleDailyWorkspace(workspaceId) {
       }
     })
   });
-  console.log("memberList: ");
-  console.log(memberList);
+  // console.log("memberList: ");
+  // console.log(memberList);
 
   // TODO make dict of threads of earliest user times
   await addToThreads(workspaceId, memberList, w_token, threads, day);
-  console.log("Threads:");
-  console.log(threads);
+  // console.log("Threads:");
+  // console.log(threads);
   for (var m of memberList) {
     scheduleDailyUser(workspaceId, m, w_token, day, threads);
   }
@@ -309,89 +306,6 @@ async function scheduleDailyUser(workspaceId, userId, token, day, threads) {
   var cooldownTask;
   var dmThreadID = pairingData.dmThreadID;
   var quote;
-/*
-  if (day === "Monday") {
-    //TODO generate hardcoded tasks for monday quote and retrospective
-    quote = generateTaskData.generateQuote();
-    quote = quote.split("-")[1] + "-" + quote.split("-")[2];
-    var index = Math.floor(Math.random() * retroQuestions.length);
-    warmupTask = `Your partner sent you a motivational quote to help you start your day right!\n${quote}`;
-    cooldownTask = "Your partner sent you this retro: '" + retroQuestions[index].retro +
-    "' to complete";
-  }
-  else {
-    warmupTask = pairingData.warmupTask;
-    cooldownTask = pairingData.cooldownTask;
-  }
-
-
-  if (!warmupTask) {
-    quote = generateTaskData.generateQuote();
-    quote = quote.split("-")[1] + "-" + quote.split("-")[2];
-    warmupTask = `Your partner didn't send you a warmup for today :frowning: <@${  userId  }>`;
-  }
-  if (!cooldownTask) {
-    cooldownTask = `Your partner didn't send a cooldown for today :frowning: <@${  userId  }>`;
-  }
-
-  var hour, min, mid;
-  // Move necessary logic to app.action of button clicks
-
-  if (warmupTask) {
-
-    split = warmupTime.split(" ");
-    hour = warmupTime.split(" ")[0].split(":")[0];
-    min = warmupTime.split(" ")[0].split(":")[1];
-    mid = warmupTime.split(" ")[1];
-    if (mid === "PM") {
-      hour = String(Number(hour) + 12);
-    }
-    else if (mid === "AM" && hour === "12") {
-      hour = "0";
-    }
-
-    if (test === 0) { 
-      console.log("Schedule warm up message for " + hour + ":" + min + " for userId " + `<@${  userId  }>`);
-      await schedule.scheduleMsg(hour, min, warmupTask, dmThreadID, token).catch((error) => {
-        console.log(error);
-      }); 
-    }
-    else {
-    // TESTING PURPOSES
-      // schedule.scheduleMsg(21, 53, warmupTask, dmThreadID, token);
-    }
-  }
-  else {
-    console.log("No warmup task");
-  }
-
-  if (cooldownTask) {
-    split = cooldownTime.split(" ");
-    hour = cooldownTime.split(" ")[0].split(":")[0];
-    min = cooldownTime.split(" ")[0].split(":")[1];
-    mid = cooldownTime.split(" ")[1];
-
-    if (mid === "PM" && hour !== "12") {
-      hour = String(Number(hour) + 12);
-    }
-    else if (mid === "AM" && hour === "12") {
-      hour = "0";
-    }
-    if (test === 0) {
-      console.log("Schedule cooldown message for " + hour + ":" + min + " for userId " + `<@${  userId  }>`);
-      await schedule.scheduleMsg(hour, min, cooldownTask, dmThreadID, token).catch((error) => {
-        console.log(error);
-      });
-    }
-    else {
-    // TESTING PURPOSES
-      // await schedule.scheduleMsg(22, 36, cooldownTask, dmThreadID, token);
-    }
-  }
-  else {
-    console.log("No cooldown task");
-  }
-*/
   var hour, min, mid;
 
   if (userId === threads[dmThreadID].warmupUser) {
@@ -408,19 +322,19 @@ async function scheduleDailyUser(workspaceId, userId, token, day, threads) {
       hour = "0";
     }
 
-    const warmupButtonText = "Hi! Click here for your warmup :smile:";
+    const warmupButtonText = "Hi! Click here for your warmup! I will remind you when it's time :smile:";
     if (test === 0) { 
       console.log("Schedule warmup button for " + hour + ":" + min + " for userId " + `<@${  userId  }>`);
-      await schedule.scheduleMsg(hour, min, warmupButtonText, dmThreadID, token, warmupMessage.getWarmupGetView())
+      await schedule.scheduleMsg(hour, min, warmupButtonText, dmThreadID, token, warmupMessage.getStartDayBlocks())
       .catch((error) => {
-        console.log(error);
+        console.error(error);
       }); 
     }
     else {
       // TESTING PURPOSES
-      await schedule.scheduleMsg(3, 45, warmupButtonText, dmThreadID, token, warmupMessage.getWarmupGetView())
+      await schedule.scheduleMsg(15, 27, warmupButtonText, dmThreadID, token, warmupMessage.getStartDayBlocks())
       .catch((error) => {
-        console.log(error);
+        console.error(error);
       });     
     }
   }
@@ -438,9 +352,9 @@ async function scheduleDailyUser(workspaceId, userId, token, day, threads) {
     else if (mid === "AM" && hour === "12") {
       hour = "0";
     }
-    const exerciseSelectNotificationText = "You can send your buddy the exercises for tomorrow. I will remind this to you at the end of your workday!";
+    const exerciseSelectNotificationText = "Here is your cooldown for the day. I will remind this to you at the end of your workday!";
     if (test === 0) {
-      await schedule.scheduleMsg(hour, min, exerciseSelectNotificationText, dmThreadID, token, warmupMessage.getExerciseSelectView())
+      await schedule.scheduleMsg(hour, min, exerciseSelectNotificationText, dmThreadID, token, warmupMessage.getEndDayBlocks())
               .catch((err) => {
                 console.error(err);
               });
@@ -448,7 +362,7 @@ async function scheduleDailyUser(workspaceId, userId, token, day, threads) {
     else {
       // TESTING PURPOSES
       
-      await schedule.scheduleMsg(3, 45, exerciseSelectNotificationText, dmThreadID, token, warmupMessage.getExerciseSelectView())
+      await schedule.scheduleMsg(15, 27, exerciseSelectNotificationText, dmThreadID, token, warmupMessage.getEndDayBlocks())
               .catch((err) => {
                 console.error(err);
               });
@@ -458,8 +372,6 @@ async function scheduleDailyUser(workspaceId, userId, token, day, threads) {
   else {
     console.log("Prompting not run");
   }
-  
-
   return null;
 }
 
