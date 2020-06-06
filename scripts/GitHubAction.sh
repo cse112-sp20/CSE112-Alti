@@ -77,7 +77,8 @@ export FIREBASE_TOKEN=`cat firebase_token.txt`
 echo "Local" > Local.env
 
 if [[ $OSTYPE == "msys" ]]; then
-    dos2unix RunTest.sh
+    dos2unix ../scripts/RunTest.sh
+    dos2unix ../scripts/Coverage.sh
 fi
 
 cd ..
