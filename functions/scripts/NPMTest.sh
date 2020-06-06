@@ -22,3 +22,5 @@ then
 else
     echo "A Test Failed!!"
 fi
+
+rm TestOutput.txt
