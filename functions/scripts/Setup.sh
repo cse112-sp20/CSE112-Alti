@@ -1,7 +1,13 @@
 #!/bin/bash
 
+if [[ `pwd` == *"scripts"* ]]; then
+    cd ..
+fi
+
 RunTimeConfig=".runtimeconfig.json"
 ServiceAccountKey="serviceAccountKey.json"
+
+npm install
 
 if test -f "$RunTimeConfig"; then
     echo "$RunTimeConfig exist"
@@ -27,23 +33,3 @@ else
     fi
     echo "$ServiceAccountKey created"
 fi
-
-if [[ $OSTYPE == "msys" ]]; then
-    CurrPath=`pwd`
-    ServiceAccountKeyPath="$CurrPath\\$ServiceAccountKey"
-    export GOOGLE_APPLICATION_CREDENTIALS="$ServiceAccountKeyPath"
-fi
-
-if [[ $OSTYPE == "darwin"* ]]; then
-    CurrPath=`pwd`
-    ServiceAccountKeyPath="$CurrPath/$ServiceAccountKey"
-    export GOOGLE_APPLICATION_CREDENTIALS="$ServiceAccountKeyPath"
-fi
-
-if [[ "$OSTYPE" == "linux-gnu"* ]]; then
-    CurrPath=`pwd`
-    ServiceAccountKeyPath="$CurrPath/$ServiceAccountKey"
-    export GOOGLE_APPLICATION_CREDENTIALS="$ServiceAccountKeyPath"
-fi
-
-nyc --reporter=lcov --reporter=text --reporter=text-summary mocha
