@@ -3,6 +3,7 @@ const app = index.getBolt();
 
 const appHomeObjects = require('./appHomeObjects');
 const firestoreFuncs = require('./firestore');
+const leaderboard = require('./leaderboard');
 
 var days = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"];
 
@@ -12,10 +13,6 @@ app.event("app_home_opened", async ({ body, context }) => {
   appHome(app, body, context);
 });
 
-app.action("selectTimeZone", async({body, ack, context}) => {
-  ack();
-  setTimeZone(app, body, context);
-});
 app.action("selectOwner", async({body, ack, context}) => {
   ack();
   setOwner(app, body, context);
@@ -125,15 +122,7 @@ async function loadHomeTabUI(app, workspaceID, userId, context) {
 	}).catch((error) => {
         console.log(error);
   	});
-  	console.log("Pairing channel: " + channelId);
-  /*
-	var timeZone = await firestoreFuncs.getTimeZone(workspaceID).then((obj)=>{
-		return obj;
-	}).catch((error) => {
-        console.log(error);
-	});
-	// TODO store default LA timezone, probably on installation so in oauth.js
-*/
+
   var channelName;
   if (typeof(channelId) !== "undefined") {
     channelName = await app.client.conversations.info({
@@ -153,18 +142,48 @@ async function loadHomeTabUI(app, workspaceID, userId, context) {
   var ownerText;
   var channelText;
   var timeZoneText;
+  var partnerText;
+  var partnerId;
+  var dmThreadText;
+  var dmThreadID;
   if (ownerId === undefined) {
 	  ownerText = `Current Owner of Alti is...there is no current owner of Alti! :scream: You can easily set an owner in the *Pick a folk* section.`;
   }
   else {
-	  ownerText = `Current Owner of Alti is <@${  ownerId  }>, you can ask the owner for modifying the time zone and change paring channel of the team.`;
+	  ownerText = `Current Owner of Alti is <@${  ownerId  }>, you can ask the owner for changing paring channel of the team.`;
   }
   if (channelId === undefined) {
 	  channelText = `Current Pairing Channel: None`;
+	  partnerText = `Current partner: None`;
+	  dmThreadText = `Current pairing thread: None`
   }
   else {
 	  channelText = `Current Pairing Channel: #${  channelName  }`;
+	  let pairingData = await firestoreFuncs.getUserPairingData(workspaceID, userId);
+	  dmThreadID = pairingData.dmThreadID;
+	  partnerId = await firestoreFuncs.getPartner(workspaceID, channelId, userId).then((obj)=>{
+		return obj;
+	  }).catch((error) => {
+		  console.log(error);
+	  });
+	  console.log(partnerId);
   }
+
+  if (partnerId === undefined) {
+	partnerText = `Current partner: None`;
+  }else {
+	  partnerText = `Current partner:  <@${  partnerId  }>`;
+  }
+
+  if (dmThreadID === undefined) {
+	dmThreadText = `Current pairing thread: None`;
+  }else {
+	  dmThreadText = `Current pairing thread:  ${  dmThreadID  }`;
+  }
+
+  //if (partnerId === undefined)
+
+
   /*
   if (timeZone === undefined) {
 	  timeZoneText = `Working Time Zone: None`;
@@ -174,6 +193,11 @@ async function loadHomeTabUI(app, workspaceID, userId, context) {
   }
   */
 
+	// get leaderboard strings
+	const leaderboards = await leaderboard.getLeaderboards(app, context.botToken, workspaceID);
+	const weeklyLeaderboard = leaderboards[0];
+	const monthlyLeaderboard = leaderboards[1];
+	
 	if(await checkOwner(workspaceID, userId)){
 		view = {
 			"type": "home",
@@ -199,6 +223,20 @@ async function loadHomeTabUI(app, workspaceID, userId, context) {
 						"type": "mrkdwn",
 						"text": channelText,
 					}
+				},
+				{
+					"type": "section",
+					"text": {
+						"type": "mrkdwn",
+						"text": partnerText,
+					}
+				},
+				{
+					"type": "section",
+					"text": {
+						"type": "mrkdwn",
+						"text": dmThreadText,
+					}
 				},/*
 				{
 					"type": "section",
@@ -213,7 +251,7 @@ async function loadHomeTabUI(app, workspaceID, userId, context) {
 					"block_id": "section678",
 					"text": {
 						"type": "mrkdwn",
-						"text": "🤝 *Pick a folk* to be the leader of Alti. The leader can pick pairing channel or change the time zone of the workspace"
+						"text": "🤝 *Pick a folk* to be the leader of Alti. The leader can pick pairing channel of the workspace"
 					},
 					"accessory": {
 						"action_id": "selectOwner",
@@ -293,42 +331,7 @@ async function loadHomeTabUI(app, workspaceID, userId, context) {
 							"emoji": true
 						}
 					}
-				},/*
-				{
-					"type": "section",
-					"text": {
-						"type": "mrkdwn",
-						"text": "🌏 *Pick a time zone* for your workspace"
-					},
-					"accessory": {
-						"action_id": "selectTimeZone",
-						"type": "static_select",
-						"placeholder": {
-							"type": "plain_text",
-							"text": "Select a time zone...atn",
-							"emoji": true
-						},
-						"options": appHomeObjects.time_zones,
-						"confirm": {
-							"title": {
-								"type": "plain_text",
-								"text": "Are you sure?"
-							},
-							"text": {
-								"type": "plain_text",
-								"text": "Designate this as working time zone?"
-							},
-							"confirm": {
-								"type": "plain_text",
-								"text": "Do it"
-							},
-							"deny": {
-								"type": "plain_text",
-								"text": "Stop, I've changed my mind!"
-							}
-						}
-					}
-				},*/
+				},
 				{
 					"type": "divider"
 				},
@@ -470,6 +473,28 @@ async function loadHomeTabUI(app, workspaceID, userId, context) {
 					}
 				  },
 				{
+                    "type": "divider"
+                },
+                {
+                    "type": "section",
+                    "text":
+                    {
+                        "type": "mrkdwn",
+                        "text": weeklyLeaderboard
+                    }
+                },
+                {
+                    "type": "section",
+                    "text":
+                    {
+                        "type": "mrkdwn",
+                        "text": monthlyLeaderboard
+                    }
+				},
+				{
+                    "type": "divider"
+                },
+				{
 					"type": "context",
 					"elements": [
 						{
@@ -512,15 +537,7 @@ async function loadHomeTabUI(app, workspaceID, userId, context) {
 						"text": channelText,
 						"emoji": true
 					}
-				},/*
-				{
-					"type": "section",
-					"text": {
-						"type": "plain_text",
-						"text": timeZoneText,
-						"emoji": true
-					}
-				},*/
+				},
 				{
 					"type": "divider"
 				  },
@@ -652,6 +669,25 @@ async function loadHomeTabUI(app, workspaceID, userId, context) {
 				{
 					"type": "divider"
 				},
+                {
+                    "type": "section",
+                    "text":
+                    {
+                        "type": "mrkdwn",
+                        "text": weeklyLeaderboard
+                    }
+                },
+                {
+                    "type": "section",
+                    "text":
+                    {
+                        "type": "mrkdwn",
+                        "text": monthlyLeaderboard
+                    }
+				},
+				{
+                    "type": "divider"
+                },
 				{
 					"type": "context",
 					"elements": [
@@ -668,15 +704,10 @@ async function loadHomeTabUI(app, workspaceID, userId, context) {
 	return view;
 }
 
-async function setTimeZone(app, body, context){
-  firestoreFuncs.setTimeZone(body.team.id, body.actions[0].selected_option.value);
-  updateAppHome(body.user.id, body.team.id, context);
-}
 async function setOwner(app, body, context){
   firestoreFuncs.setOwner(body.team.id, body.actions[0].selected_user);
   updateAppHome(body.user.id, body.team.id, context);
 }
-exports.setTimeZone = setTimeZone;
 exports.setOwner = setOwner;
 exports.updateAppHome = updateAppHome;
 exports.getAllTimes = getAllTimes;
