@@ -85,8 +85,8 @@ const app = index.getBolt();
 				}
 			}
 		];
+		blocks = textSection.concat(blocks);
 	}
-	blocks = textSection.concat(blocks);
 	//call api
 	return await app.client.chat.scheduleMessage({
 										token: token,
