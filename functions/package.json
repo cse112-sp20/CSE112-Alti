@@ -8,7 +8,7 @@
     "Local_Action_Build": "bash ./scripts/GitHubAction.sh build",
     "Local_Action_Deploy": "bash ./scripts/.sh deploy",
     "coverage": "bash ./scripts/Coverage.sh",
-    "lint": "eslint .",
+    "lint": "eslint -c ./dot_files/.eslintrc.json .",
     "serve": "firebase emulators:start --only functions",
     "shell": "firebase functions:shell",
     "start": "npm run shell",

@@ -8,7 +8,7 @@ const firestoreFuncs = require('./firestore');
 // console.log(typeof(process.env.FUNCTIONS_EMULATOR));
 if(process.env.FUNCTIONS_EMULATOR === "true"){
     
-    var serviceAccount = require('./serviceAccountKey.json');
+    var serviceAccount = require('../serviceAccountKey.json');
     
     admin.initializeApp({
         credential: admin.credential.cert(serviceAccount),
