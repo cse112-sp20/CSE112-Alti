@@ -101,7 +101,11 @@ async function createOnBoardingChannel(app, token, team_id, channelName) {
                     promises.push(firestoreFuncs.setWarmupTime(team_id, userId, "9:00 AM", day));
                     promises.push(firestoreFuncs.setCooldownTime(team_id, userId, "5:00 PM", day));
                 }
+                // reset everyone's weekly and monthly points
+                firestoreFuncs.resetWeeklyPoints(team_id,userId);
+                firestoreFuncs.resetMonthlyPoints(team_id,userId);
             }
+            
             Promise.all(promises).catch((error) => {
                 console.log(error);
             });
@@ -132,13 +136,16 @@ async function boardExistingChannel(app, token, team_id, channelId) {
                     `
             
         });
-        // TODO (To opt out, just leave the channel.)
         await firestoreFuncs.storeNewPairingChannel(team_id, channelId);
         for (var userId of userList) {
             for (var day of days) {
                 promises.push(firestoreFuncs.setWarmupTime(team_id, userId, "9:00 AM", day));
                 promises.push(firestoreFuncs.setCooldownTime(team_id, userId, "5:00 PM", day));
             }
+            
+            // reset everyone's weekly and monthly points
+            promises.push(firestoreFuncs.resetWeeklyPoints(team_id,userId));
+            promises.push(firestoreFuncs.resetMonthlyPoints(team_id,userId));
         }
         Promise.all(promises).catch((error) => {
             console.log(error);
@@ -187,6 +194,85 @@ async function findUsersChannel(app, token, channelId) {
     return users;
 
 }
+
+
+app.event('member_joined_channel', async ({ body, context }) => {
+    console.log("Member joined channel");
+    var activeChannel = await firestoreFuncs.getPairingChannel(body.team_id);
+    if (activeChannel === body.event.channel) {
+        var userId = body.event.user;
+        var teamId = body.team_id;
+        console.log("Member joined pairing channel");
+
+        var conversation = await app.client.conversations.open({
+            token: context.botToken,
+            users: userId
+        }).catch((error) => {
+            console.log(error);
+        });
+        console.log(conversation);
+
+        if(!conversation.ok) {
+            console.log("Open DM failed!");
+            return;
+        }
+        var text;
+        var time = await firestoreFuncs.getWarmupTime(teamId, userId, "Monday");
+        if (time) {
+            text = "You have rejoined the alti pairing channel!";
+        }
+        else {
+            text = "You have joined the alti pairing channel! Your default warmup time is 9:00 AM and cooldown time is 5:00 PM.";
+        }
+        var result = await app.client.chat.postMessage({
+            token: context.botToken,
+            channel: conversation.channel.id,
+            text: text
+        }).catch((error) => {
+            console.log(error);
+        });
+
+        if (!time) { 
+            var promises = [];
+            for (var day of days) {
+                promises.push(firestoreFuncs.setWarmupTime(teamId, userId, "9:00 AM", day));
+                promises.push(firestoreFuncs.setCooldownTime(teamId, userId, "5:00 PM", day));
+            }
+        }
+
+        Promise.all(promises).catch((error) => {
+            console.log(error);
+        });
+    }
+});
+
+app.event('member_left_channel', async ({ body, context }) => {
+    console.log("Member left channel");
+    var activeChannel = await firestoreFuncs.getPairingChannel(body.team_id);
+    if (activeChannel === body.event.channel) {
+        console.log("Member left pairing channel");
+    }
+ 
+        var conversation = await app.client.conversations.open({
+            token: context.botToken,
+            users: body.event.user
+        }).catch((error) => {
+            console.log(error);
+        });
+
+        if(!conversation.ok) {
+            console.log("Open DM failed!");
+            return;
+        }
+
+        var result = await app.client.chat.postMessage({
+            token: context.botToken,
+            channel: conversation.channel.id,
+            text: "You have left the alti pairing channel! You will not be paired in next week."
+        }).catch((error) => {
+            console.log(error);
+        });
+});
 
 
 exports.onBoard = createOnBoardingChannel;

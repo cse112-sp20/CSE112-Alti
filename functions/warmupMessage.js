@@ -798,7 +798,7 @@ handleQuoteSelect = async function(ack,body,context) {
 	// console.log(body);
 	var workspaceId = body.team.id;
 	var userId = body.user.id;
-	firestoreFuncs.storeTypeOfExercise(workspaceId, userId, true, text);
+	await firestoreFuncs.storeTypeOfExercise(workspaceId, userId, true, text);
 
 	
 	let confirmationJSON = createConfirmationView("Alti-Confirmation","*Your buddy will receive the motiviational quote for warmup tomorrow!*");
@@ -826,7 +826,7 @@ handlePuzzleSelect = async function(ack,body,context) {
 	// console.log(text);
 	var workspaceId = body.team.id;
 	var userId = body.user.id;
-	var storeReturn = firestoreFuncs.storeTypeOfExercise(workspaceId, userId, true, text);
+	var storeReturn = await firestoreFuncs.storeTypeOfExercise(workspaceId, userId, true, text);
 		let confirmationJSON = createConfirmationView("Alti-Confirmation","*Your buddy will receive the puzzle for warmup tomorrow!*");
     try {
 		if(body.view.id !== undefined){
@@ -852,7 +852,7 @@ handleTypingSelect = async function(ack,body,context) {
 
 	var workspaceId = body.team.id;
 	var userId = body.user.id;
-	var storeReturn = firestoreFuncs.storeTypeOfExercise(workspaceId, userId, true, text);
+	var storeReturn = await firestoreFuncs.storeTypeOfExercise(workspaceId, userId, true, text);
 	let confirmationJSON = createConfirmationView("Alti-Confirmation","*Your buddy will receive the typing challenge for warmup tomorrow!*");
     try {
 		//push new view above old
@@ -879,7 +879,7 @@ handleRetroSelect = async function(ack,body,context) {
 
 	var workspaceId = body.team.id;
 	var userId = body.user.id;
-	var storeReturn = firestoreFuncs.storeTypeOfExercise(workspaceId, userId, false, text);
+	var storeReturn = await firestoreFuncs.storeTypeOfExercise(workspaceId, userId, false, text);
 	let confirmationJSON = createConfirmationView("Alti-Confirmation","*Your buddy will receive the retro for their cooldown tomorrow!*");
     try {
 		//push new view above old
@@ -921,7 +921,7 @@ handleArticleSelect = async function(view,ack,body,context) {
 	//gets the userID from the action
 	const userId = body['user']['id'];
 	var text = generateData.generateMessageToSend('article', quoteToSend);
-	var storeReturn = firestoreFuncs.storeTypeOfExercise(workspaceId, userId, true, text);
+	var storeReturn = await firestoreFuncs.storeTypeOfExercise(workspaceId, userId, true, text);
 	let confirmationJSON = createConfirmationView("Alti-Confirmation","*Your buddy will receive the article for warmup tomorrow!*");
     try {
 			const result = await app.client.views.open({
@@ -957,7 +957,7 @@ handleCooldownArticleSelect = async function(view,ack,body,context) {
 	//gets the userID from the action
 	const userId = body['user']['id'];
 	var text = generateData.generateMessageToSend('cooldownArticle', quoteToSend); //TODO UPDATE
-	var storeReturn = firestoreFuncs.storeTypeOfExercise(workspaceId, userId, false, text);
+	var storeReturn = await firestoreFuncs.storeTypeOfExercise(workspaceId, userId, false, text);
 	let confirmationJSON = createConfirmationView("Alti-Confirmation","*Your buddy will receive the article for cooldown tomorrow!*");
     try {
 			const result = await app.client.views.open({
@@ -993,7 +993,7 @@ handleVideoSelect = async function(view,ack,body,context) {
 	//gets the userID from the action
 	const userId = body['user']['id'];
 	var text = generateData.generateMessageToSend('video', quoteToSend);
-	var storeReturn = firestoreFuncs.storeTypeOfExercise(workspaceId, userId, false, text);
+	var storeReturn = await firestoreFuncs.storeTypeOfExercise(workspaceId, userId, false, text);
 	let confirmationJSON = createConfirmationView("Alti-Confirmation","*Your buddy will receive the video for cooldown tomorrow!*");
     try {
 			const result = await app.client.views.open({
@@ -1148,7 +1148,7 @@ exports.sendWarmupButton = async function(targChannelID,app,token){
 //sends a cooldown button to a target channel 
 exports.sendCooldownButton = async function(targChannelID,app,token){
 	const notificationString = "Alert to send a cooldown to your buddy!";
-		const warmupButton = [
+		const cooldownButton = [
 		{
 			"type": "actions",
 			"elements": [
@@ -1172,7 +1172,7 @@ exports.sendCooldownButton = async function(targChannelID,app,token){
 		  token: token,
 		  channel: targChannelID,
 		  text: notificationString,
-		  blocks: warmupButton
+		  blocks: cooldownButton
 		});
 	}
 	//catch any errors
@@ -1186,7 +1186,7 @@ sendMyWarmup = async function(body, context){
 	let prompt = await firestoreFuncs.getExercisePrompt(body.user.team_id, body.user.id, true);
 	try {
 		if (prompt === undefined) {
-			prompt = "Your partner didn't choose a warmup for you :(";
+			prompt = "no message sent";
 		}
 		const promptJSON = createConfirmationView("Warmup",prompt);
 		//make a call to the web api to post the promp as a modal
@@ -1267,3 +1267,78 @@ app.action('confirmation', ({view, ack, body, context }) => {
 	});
 });
 
+exports.getExerciseSelectView = function getExerciseSelectView(){
+	const view =  [
+		{
+			"type": "section",
+			"text": {
+				"type": "plain_text",
+				"emoji": true,
+				"text": "Hey there! You can pick exercises for your buddy to complete tomorrow!"
+			}
+		},
+		{
+			"type": "divider"
+		},
+		{
+			"type": "section",
+			"text": {
+				"type": "mrkdwn",
+				"text": "Select your partner's warmup: "
+			}
+		},
+		{
+			"type": "actions",
+			"elements": [
+				{
+					"action_id": "sendWarmupButtonClick",
+					"type": "button",
+					"text": {
+						"type": "plain_text",
+						"text": "Send A Warmup",
+						"emoji": true
+					}
+				}
+			]
+		},{
+			"type": "section",
+			"text": {
+				"type": "mrkdwn",
+				"text": "Select your partner's cooldown: "
+			}
+		},
+		{
+			"type": "actions",
+			"elements": [
+				{
+					"action_id": "sendCooldownButtonClick",
+					"type": "button",
+					"text": {
+						"type": "plain_text",
+						"text": "Send A Cooldown",
+						"emoji": true
+					}
+				}
+			]
+		}
+	];
+	return view;
+} 
+
+exports.getWarmupGetView = function getWarmupGetView(){
+	const button =  {
+		"type": "actions",
+		"elements": [
+			{
+				"action_id": "getMyWarmupClick",
+				"type": "button",
+				"text": {
+					"type": "plain_text",
+					"text": "Get your warmup!",
+					"emoji": true
+				}
+			}
+		]
+	};
+	return [button];
+} 

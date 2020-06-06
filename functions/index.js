@@ -36,9 +36,12 @@ const onBoard = require('./onBoard');
 const appHome = require('./appHome');
 const appHomeSchedule = require('./appHomeSchedule');
 const createNewChannel = require('./createNewChannel');
+const leaderboard = require('./leaderboard');
 exports.scheduledPairUp = pubsubScheduler.scheduledPairUp;
 exports.scheduleWarmup = pubsubScheduler.scheduleWarmup;
 exports.scheduleDaily = pubsubScheduler.scheduleDaily;
+exports.scheduleResetWeeklyPoints = leaderboard.scheduleResetWeeklyPoints;
+exports.scheduleResetMonthlyPoints = leaderboard.scheduleResetMonthlyPoints;
 
 
 //Test Ruixian 
@@ -195,14 +198,7 @@ app.action('warmup_puzzle_select', async ({ ack, body, context }) => {
 app.action('warmup_quote_select', async ({ ack, body, context }) => {
    warmupMessage.warmupQuoteSelect(ack,body,context);
  });
- 
- app.action('warmup_quote_select', async ({ ack, body, context }) => {
-   warmupMessage.warmupQuoteSelect(ack,body,context);
- });
-
-
-
- 
+  
  app.view('generic_close', async ({ ack, body, context }) => {
     ack({
 	  //clear the modal off the users screen
