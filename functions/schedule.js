@@ -74,6 +74,19 @@ const app = index.getBolt();
 	//console.log(dateString);
 	var newDate = new Date(dateString);
 
+	var textSection;
+	if (blocks !== undefined) {
+		textSection =[
+			{
+				"type": "section",
+				"text": {
+					"type": "mrkdwn",
+					"text": text
+				}
+			}
+		];
+	}
+	blocks = textSection.concat(blocks);
 	//call api
 	return await app.client.chat.scheduleMessage({
 										token: token,
