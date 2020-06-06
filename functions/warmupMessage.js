@@ -1071,6 +1071,44 @@ exports.sendGetWarmupButton = async function(targChannelID,app,token) {
 	
 }
 
+//sends a get cooldown button to a channel
+exports.sendGetCooldownButton = async function(targChannelID,app,token) {
+	//notification to be sent when button is posted into chat
+	const notificationString = "Your cooldown is ready!";
+	//button blocks object.
+	const getterButton = [
+		{
+			"type": "actions",
+			"elements": [
+				{
+					"action_id": "getMyCooldownClick",
+					"type": "button",
+					"text": {
+						"type": "plain_text",
+						"text": "Get your cooldown!",
+						"emoji": true
+					}
+				}
+			]
+		}
+	];
+	//try function logic
+	try {
+		//make a call to the web api to post button in targ channel
+		const result = await app.client.chat.postMessage({
+		  token: token,
+		  channel: targChannelID,
+		  text: notificationString,
+		  blocks: getterButton
+		});
+	}
+	//catch any errors
+	catch(error) {
+		console.log(error);
+	}
+	
+}
+
 exports.sendWarmupButton = async function(targChannelID,app,token){
 	const notificationString = "Alert to send a warmup to your buddy!";
 		const warmupButton = [
@@ -1147,10 +1185,31 @@ exports.sendCooldownButton = async function(targChannelID,app,token){
 sendMyWarmup = async function(body, context){
 	let prompt = await firestoreFuncs.getExercisePrompt(body.user.team_id, body.user.id, true);
 	try {
-		if (prompt == undefined) {
-			prompt = "no message sent";
+		if (prompt === undefined) {
+			prompt = "Your partner didn't choose a warmup for you :(";
 		}
 		const promptJSON = createConfirmationView("Warmup",prompt);
+		//make a call to the web api to post the promp as a modal
+		const result = await app.client.views.open({
+			token: context.botToken,
+			trigger_id: body.trigger_id,
+			view: JSON.stringify(promptJSON)
+		});
+	}
+	//catch any errors
+	catch(error) {
+		console.log(error);
+	}
+}
+
+//sends a cooldown modal to the user with their prompt   
+sendMyCooldown = async function(body, context){
+	let prompt = await firestoreFuncs.getExercisePrompt(body.user.team_id, body.user.id, false);
+	try {
+		if (prompt === undefined) {
+			prompt = "Your partner didn't choose a cooldown for you :(";
+		}
+		const promptJSON = createConfirmationView("Cooldown",prompt);
 		//make a call to the web api to post the promp as a modal
 		const result = await app.client.views.open({
 			token: context.botToken,
@@ -1193,6 +1252,14 @@ app.action('getMyWarmupClick', ({ack,body,context }) => {
 	sendMyWarmup(body,context);
 	
 });
+
+//listen for and acknowledge a getMyCooldownClick Action and handle by calling the sendMyCooldown function
+app.action('getMyCooldownClick', ({ack,body,context }) => {
+	ack(); //acknowledge the click 
+	sendMyCooldown(body,context);
+	
+});
+
 
 app.action('confirmation', ({view, ack, body, context }) => {
 	ack({

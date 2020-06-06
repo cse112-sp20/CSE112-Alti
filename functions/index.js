@@ -108,6 +108,13 @@ app.command('/getwarmup', async ({ command, ack, say, context }) => {
     warmupMessage.sendGetWarmupButton(command.channel_id, app, context.botToken);
 });
 
+// Handle '/getcooldown' command invocations
+app.command('/getcooldown', async ({ command, ack, say, context }) => {
+    // Acknowledge command request
+    ack();
+
+    warmupMessage.sendGetCooldownButton(command.channel_id, app, context.botToken);
+});
 
 /*
 generic_button Action Listener
