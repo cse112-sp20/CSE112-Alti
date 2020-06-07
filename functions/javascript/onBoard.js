@@ -21,6 +21,7 @@ app.command('/setup', async ({payload, body, ack, say, context}) => {
 // Listen to channel dropdown select menu for new pairing channel
 app.action('pairing_channel_selected', async({body, ack, say, context}) => {
     ack();
+    console.log("hi inside action");
     // block action payload type
     var team_info = await app.client.team.info({
         token: context.botToken
@@ -29,17 +30,19 @@ app.action('pairing_channel_selected', async({body, ack, say, context}) => {
     });
     var team_id = body.team.id;
     // TODO make the update run after the db is updated in boardExistingChannel call
-    const newChannel = body.actions[0].selected_channel;
+    var newChannel = body.actions[0].selected_channel;
+    console.log("newchannel="+newChannel);
+
 
     // Get the current pairing channel
-    var currentPairingChannel = await firestoreFuncs.getPairingChannel(body.team_id);
+    var currentPairingChannel = await firestoreFuncs.getPairingChannel(team_id);
+    console.log("currpair="+currentPairingChannel);
 
     // If the current pairing channel is undefined, then set it normally.
     if (currentPairingChannel === undefined)
     {
         await boardExistingChannel(app, context.botToken, team_id, newChannel);
         //console.log("After boardExisting -> Before update app home");
-        appHome.updateAppHome(body.user.id, body.team.id, context);
     } 
     // If the current pairing channel is not the same as the new channel,
     // call the PubSub function to set the new pairing channel on Saturday.
@@ -47,9 +50,11 @@ app.action('pairing_channel_selected', async({body, ack, say, context}) => {
     {
         // There will always be a previous channel from this point forward
         // Set newChannel field in Firestore to new channel's ID
-        firestoreFuncs.setNewPairingChannelID(team_id, newChannel);
+        await firestoreFuncs.setNewPairingChannelID(team_id, newChannel);
     }
     // Else, if the current and new pairing channels are the same, do nothing.
+    appHome.updateAppHome(body.user.id, team_id, context);
+
 });
 
 

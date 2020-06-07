@@ -159,7 +159,8 @@ async function loadHomeTabUI(app, workspaceID, userId, context) {
   else {
 	  channelText = `Current Pairing Channel: #${  channelName  }`;
 	  // display new pairing channel if exists
-	  newChannelID = firestoreFuncs.getNewPairingChannelID(workspaceID);
+	  newChannelID = await firestoreFuncs.getNewPairingChannelID(workspaceID);
+	  console.log("newchanid="+newChannelID);
 	  if (newChannelID !== undefined) {
 		  // get new channel name
 		  newChannelName = await app.client.conversations.info({
@@ -170,7 +171,9 @@ async function loadHomeTabUI(app, workspaceID, userId, context) {
 		  }).catch((error) => {
 			console.log(error);
 		  });
-		  channelText += ` (Changing to #${  newChannelName  } on Saturday)`
+		  if (newChannelName !== undefined) {
+			channelText += ` → #${  newChannelName  } (Changing on Saturday)`
+		  }
 	  }
 	  let pairingData = await firestoreFuncs.getUserPairingData(workspaceID, userId);
 	  dmThreadID = pairingData === undefined ? undefined : pairingData.dmThreadID;
@@ -302,8 +305,8 @@ async function loadHomeTabUI(app, workspaceID, userId, context) {
 								  "text": "Are you sure?"
 							  },
 							  "text": {
-								  "type": "mrkdwn",
-								  "text": "❗️*NOTE*❗: Switching pairing channels will remove all data associated with the previous channel. Users who were in the previous pairing channel will not be transferred over to the new one; they will have to manually join the new channel. \nThe pairing channel will not be changed immediately; this change will take effect on Saturday."
+								  "type": "plain_text",
+								  "text": "❗️*NOTE*❗: Switching pairing channels will remove all data associated with the previous channel. Users who were in the previous pairing channel will not be transferred over to the new one; they will have to manually join the new channel. Also, the pairing channel will be changed on Saturday."
 							  },
 							  "confirm": {
 								  "type": "plain_text",

@@ -300,7 +300,7 @@ exports.getExercisePrompt = async function getExercisePrompt(workspaceID, userID
     return userRef.get()
         .then(doc => {
             if (!doc.exists) {
-                console.log('No such document!');
+                console.log('No such document! prompt');
                 return undefined;
             }
             else {
@@ -340,7 +340,7 @@ exports.getPartner = function getPartner(workspaceID, channelID, userID) {
     return userRef.get()
         .then(doc => {
             if (!doc.exists) {
-                console.log('No such document!');
+                console.log('No such document! partner');
                 return undefined;
             }
             else {
@@ -422,7 +422,7 @@ exports.getWarmupTime = function getWarmupTime(workspaceID, userID, day) {
     return userDocRef.get()
         .then(doc => {
             if (!doc.exists) {
-                console.log('No such document!');
+                console.log('No such document! warmuptime');
                 return undefined;
             }
             else {
@@ -472,7 +472,7 @@ exports.getCooldownTime = function getWarmupTime(workspaceID, userID, day) {
     return userDocRef.get()
         .then(doc => {
             if (!doc.exists) {
-                console.log('No such document!');
+                console.log('No such document! cooldown time');
                 return undefined;
             }
             else {
@@ -499,7 +499,7 @@ exports.getOwner = function getOwner(workspaceID) {
     return workspaceDocRef.get()
         .then(doc => {
             if (!doc.exists) {
-                console.log('No such document!');
+                console.log('No such document! owner');
                 return undefined;
             }
             else {
@@ -565,7 +565,7 @@ exports.getUserPairingData = async function getUserData(workspaceID, userID) {
     return userDocRef.get()
         .then(doc => {
             if (!doc.exists) {
-                console.log('No such document!');
+                console.log('No such document! pairingdata');
                 return undefined;
             }
             else {

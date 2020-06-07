@@ -27,7 +27,7 @@ exports.scheduledChangePairingChannel = functions.pubsub
     for(i = 0; i < allWorkspaces.length; i++) {
         let workspace = allWorkspaces[i];
         // get new channel ID from Firestore
-        newChannel = firestoreFuncs.getNewPairingChannelID(workspace);
+        newChannel = await firestoreFuncs.getNewPairingChannelID(workspace);
         // if newChannel is NOT undefined, then change the pairing channel
         if (newChannel !== undefined) {
             changePairingChannel(context, workspace, newChannel);
