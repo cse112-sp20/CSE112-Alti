@@ -127,15 +127,15 @@ async function boardExistingChannel(app, token, team_id, channelId) {
         var promises = [];
         var userList = await findUsersChannel(app, token, channelId);
 
+        let welcomeText = "Hi everyone! 😄 My name is Alti and I just got added to this channel to make sure everyone in here gets paired up every week!\n\nIf you don't want to be paired up next week, you can simply leave this channel."
         // send welcome message
-        app.client.chat.postMessage({
+        await app.client.chat.postMessage({
             token: token,
             channel: channelId,
-            text: `Hey I've just been added to this channel! Everyone here will participate in quick 
-                    and fun warm up and cool down activities :)
-                    `
+            text: welcomeText
             
         });
+
         await firestoreFuncs.storeNewPairingChannel(team_id, channelId);
         for (var userId of userList) {
             for (var day of days) {
