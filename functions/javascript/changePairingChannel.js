@@ -6,13 +6,13 @@ const onBoard = require('./onBoard');
 const app = index.getBolt();
 
 /*
-    scheduledChangePairingChannel
+    scheduleChangePairingChannel
 
     If the owner selected a new pairing channel during the week,
     switches pairing channels at 12:55 PM Pacific Time
     (before scheduledPairUp runs).
 */
-exports.scheduledChangePairingChannel = functions.pubsub
+exports.scheduleChangePairingChannel = functions.pubsub
 							            .schedule('every sunday 12:55')
 							            .timeZone('America/Los_Angeles')
                                         .onRun(async (context) => {
@@ -24,8 +24,8 @@ exports.scheduledChangePairingChannel = functions.pubsub
     await Promise.all(allWorkspaces.map(async (workspace) => {
         // get new channel ID from Firestore
         var newChannel = await firestoreFuncs.getNewPairingChannelID(workspace);
-        // if newChannel is NOT undefined, then change the pairing channel
-        if (newChannel !== undefined) {
+        // if newChannel is NOT undefined (or 0), then change the pairing channel
+        if (newChannel !== undefined && newChannel !== 0) {
             changePairingChannel(context, workspace, newChannel);
         }
     }));

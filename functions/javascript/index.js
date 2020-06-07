@@ -43,7 +43,7 @@ exports.scheduleWarmup = pubsubScheduler.scheduleWarmup;
 exports.scheduleDaily = pubsubScheduler.scheduleDaily;
 exports.scheduleResetWeeklyPoints = leaderboard.scheduleResetWeeklyPoints;
 exports.scheduleResetMonthlyPoints = leaderboard.scheduleResetMonthlyPoints;
-exports.scheduledChangePairingChannel = changePairingChannel.scheduledChangePairingChannel;
+exports.scheduleChangePairingChannel = changePairingChannel.scheduleChangePairingChannel;
 
 
 //Test Ruixian 

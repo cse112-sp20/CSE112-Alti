@@ -33,7 +33,6 @@ app.action('pairing_channel_selected', async({body, ack, say, context}) => {
     var newChannel = body.actions[0].selected_channel;
     console.log("newchannel="+newChannel);
 
-
     // Get the current pairing channel
     var currentPairingChannel = await firestoreFuncs.getPairingChannel(team_id);
     console.log("currpair="+currentPairingChannel);
@@ -52,7 +51,12 @@ app.action('pairing_channel_selected', async({body, ack, say, context}) => {
         // Set newChannel field in Firestore to new channel's ID
         await firestoreFuncs.setNewPairingChannelID(team_id, newChannel);
     }
-    // Else, if the current and new pairing channels are the same, do nothing.
+    // Else, if the current and new pairing channels are the same, 
+    // set new pairing channel to 0 in Firestore.
+    else 
+    {
+        await firestoreFuncs.setNewPairingChannelID(team_id, 0);
+    }
     appHome.updateAppHome(body.user.id, team_id, context);
 
 });
@@ -150,15 +154,15 @@ async function boardExistingChannel(app, token, team_id, channelId) {
         var promises = [];
         var userList = await findUsersChannel(app, token, channelId);
 
+        let welcomeText = "Hi everyone! 😄 My name is Alti and I just got added to this channel to make sure everyone in here gets paired up every week!\n\nIf you don't want to be paired up next week, you can simply leave this channel."
         // send welcome message
-        app.client.chat.postMessage({
+        await app.client.chat.postMessage({
             token: token,
             channel: channelId,
-            text: `Hey I've just been added to this channel! Everyone here will participate in quick 
-                    and fun warm up and cool down activities :)
-                    `
+            text: welcomeText
             
         });
+
         await firestoreFuncs.storeNewPairingChannel(team_id, channelId);
         for (var userId of userList) {
             for (var day of days) {
