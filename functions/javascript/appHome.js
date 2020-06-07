@@ -190,568 +190,457 @@ async function loadHomeTabUI(app, workspaceID, userId, context) {
 	const weeklyLeaderboard = leaderboards[0];
 	const monthlyLeaderboard = leaderboards[1];
 	
-	if(await checkOwner(workspaceID, userId)){
-		view = {
-			"type": "home",
-			"blocks": [
-				{
-					"type": "section",
-					"text": {
-						"type": "mrkdwn",
-						"text": `*Welcome home, <@${  userId  }> :house:*`
-					}
-				},
-				{
-					"type": "section",
-					"text": {
-						"type": "mrkdwn",
-						"text": "Alti pairs people up from a specific channel to help each other transition in 🌞 and out 😴 of your work days. *If you haven't yet, get started by choosing a channel to set up with* 😄"
-					}
-				},
-				{
-					"type": "section", // spacing
-					"text": {
-						"type": "mrkdwn",
-						"text": " "
-					}
-				},
-				{
-					"type": "section", // spacing
-					"text": {
-						"type": "mrkdwn",
-						"text": " "
-					}
-				},
-				{
-					"type": "section", // spacing
-					"text": {
-						"type": "mrkdwn",
-						"text": " "
-					}
-				},
-				{
-					"type": "section", // spacing
-					"text": {
-						"type": "mrkdwn",
-						"text": " "
-					}
-				},
-				{
-					"type": "section",
-					"text": {
-						"type": "mrkdwn",
-						"text": "*Pairing Channel*"
-					}
-				},
-				{
-					"type": "divider"
-				},
-				{
-					"type": "section",
-					"text": {
-						"type": "mrkdwn",
-						"text": channelText,
-					}
-				},
-				{
-					"type": "section",
-					"text": {
-						"type": "mrkdwn",
-						"text": "👉 *Pick a channel* to add me to and I'll introduce myself and start pairing people up. I'm usually added to a team or project channel."
+	view = {
+		"type": "home",
+		"blocks": [
+			{
+				"type": "section",
+				"text": {
+					"type": "mrkdwn",
+					"text": `:house: *Welcome home, <@${  userId  }>*`
+				}
+			},
+			{
+				"type": "section",
+				"text": {
+					"type": "mrkdwn",
+					"text": "Alti pairs people up from a specific channel to help each other transition in 🌞 and out 😴 of your work days. *If you haven't yet, get started by choosing a channel to set up with* 😄"
+				}
+			},
+			{
+				"type": "section", // spacing
+				"text": {
+					"type": "mrkdwn",
+					"text": " "
+				}
+			},
+			{
+				"type": "section", // spacing
+				"text": {
+					"type": "mrkdwn",
+					"text": " "
+				}
+			},
+			{
+				"type": "section", // spacing
+				"text": {
+					"type": "mrkdwn",
+					"text": " "
+				}
+			},
+			{
+				"type": "section", // spacing
+				"text": {
+					"type": "mrkdwn",
+					"text": " "
+				}
+			},
+			{
+				"type": "section",
+				"text": {
+					"type": "mrkdwn",
+					"text": "👥 *Pairing Information*"
+				}
+			},
+			{
+				"type": "divider"
+			},
+			{
+				"type": "section",
+				"text": {
+					"type": "mrkdwn",
+					"text": channelText,
+				}
+			},
+			{
+				"type": "section",
+				"text": {
+					"type": "mrkdwn",
+					"text": partnerText,
+				}
+			},
+			{
+				"type": "section", // spacing
+				"text": {
+					"type": "mrkdwn",
+					"text": " "
+				}
+			},
+			{
+				"type": "section", // spacing
+				"text": {
+					"type": "mrkdwn",
+					"text": " "
+				}
+			},
+			{
+				"type": "section", // spacing
+				"text": {
+					"type": "mrkdwn",
+					"text": " "
+				}
+			},
+			{
+				"type": "section", // spacing
+				"text": {
+					"type": "mrkdwn",
+					"text": " "
+				}
+			},
+			{
+				"type": "section",
+				"text": {
+					"type": "mrkdwn",
+					"text": "📆 *Current Work Schedule* 🕰"
+				}
+			},	
+			{
+				"type": "divider"
+			},
+			{
+			"type": "section",
+			"text": {
+				"type": "mrkdwn",
+				"text": "Current schedule:"
+			}
+			},
+			sched.Monday,
+			sched.Tuesday,
+			sched.Wednesday,
+			sched.Thursday,
+			sched.Friday,
+			{
+				"type": "section", // spacing
+				"text": {
+					"type": "mrkdwn",
+					"text": " "
+				}
+			},
+			{
+				"type": "section", // spacing
+				"text": {
+					"type": "mrkdwn",
+					"text": " "
+				}
+			},
+			{
+				"type": "section", // spacing
+				"text": {
+					"type": "mrkdwn",
+					"text": " "
+				}
+			},
+			{
+				"type": "section", // spacing
+				"text": {
+					"type": "mrkdwn",
+					"text": " "
+				}
+			},
+			{
+				"type": "section",
+				"text": {
+					"type": "mrkdwn",
+					"text": ":pencil2: *Change Work Schedule* 📆"
+				}
+			},	
+			{
+				"type": "divider"
+			},
+			{
+				"type": "section",
+				"text": {
+					"type": "mrkdwn",
+					"text": "Pick a daily warm up time!"
+				}
+			},
+			{
+				"type": "actions",
+				"block_id": "warm up block",
+				"elements": [
+					{
+					"type": "static_select",
+					"action_id": "warmup_time1_selected",
+					"placeholder": {
+						"type": "plain_text",
+						"text": "Select a time",
+						"emoji": true
 					},
-					"accessory": {
-					  "action_id": "pairing_channel_selected",
-						"type": "channels_select",
-						"placeholder": {
+					"options": appHomeObjects.times
+					},
+					{
+					"type": "static_select",
+					"action_id": "warmup_time2_selected",
+					"placeholder": {
+						"type": "plain_text",
+						"text": "AM/PM",
+						"emoji": true
+					},
+					"options": appHomeObjects.ampm
+					},
+					{
+					"type":"button",
+					"action_id":"warmup_time_set_button",
+					"text":{
+						"type":"plain_text",
+						"text":"set",
+						"emoji":true
+					}
+					},
+				]
+			},
+			{
+				"type": "section",
+				"text": {
+					"type": "mrkdwn",
+					"text": "Pick a daily cooldown time!"
+				}
+			},
+			{
+				"type": "actions",
+				"block_id": "cooldown block",
+				"elements": [
+					
+					{
+					"type": "static_select",
+					"action_id": "cooldown_time1_selected",
+					"placeholder": {
+						"type": "plain_text",
+						"text": "Select a time",
+						"emoji": true
+					},
+					"options": appHomeObjects.times
+					},
+					{
+					"type": "static_select",
+					"action_id": "cooldown_time2_selected",
+					"placeholder": {
+						"type": "plain_text",
+						"text": "AM/PM",
+						"emoji": true
+					},
+					"options": appHomeObjects.ampm
+					},
+					{
+					"type":"button",
+					"action_id":"cooldown_time_set_button",
+					"text":{
+						"type":"plain_text",
+						"text":"set",
+						"emoji":true
+					}
+					},
+				]
+			},
+			{
+				"type": "section",
+				"text": {
+					"type": "mrkdwn",
+					"text": "or... set custom times for each day!"
+				},
+				"accessory": {
+					"type":"button",
+					"action_id": "set_custom_times",
+					"text":{
+						"type":"plain_text",
+						"text":"Customize",
+						"emoji":true
+					}
+				}
+			},
+			{
+				"type": "section", // spacing
+				"text": {
+					"type": "mrkdwn",
+					"text": " "
+				}
+			},
+			{
+				"type": "section", // spacing
+				"text": {
+					"type": "mrkdwn",
+					"text": " "
+				}
+			},
+			{
+				"type": "section", // spacing
+				"text": {
+					"type": "mrkdwn",
+					"text": " "
+				}
+			},
+			{
+				"type": "section", // spacing
+				"text": {
+					"type": "mrkdwn",
+					"text": " "
+				}
+			},
+			{
+				"type": "section",
+				"text": {
+					"type": "mrkdwn",
+					"text": "🏆 *Leaderboard* 🏅"
+				}
+			},
+			{
+				"type": "divider"
+			},
+			{
+				"type": "section",
+				"text":
+				{
+					"type": "mrkdwn",
+					"text": weeklyLeaderboard
+				}
+			},
+			{
+				"type": "section",
+				"text":
+				{
+					"type": "mrkdwn",
+					"text": monthlyLeaderboard
+				}
+			},
+			{
+				"type": "section", // spacing
+				"text": {
+					"type": "mrkdwn",
+					"text": " "
+				}
+			},
+			{
+				"type": "section", // spacing
+				"text": {
+					"type": "mrkdwn",
+					"text": " "
+				}
+			}
+		]
+	};
+	if (await checkOwner(workspaceID, userId)) {
+		// Add admin zone header
+		view.blocks.splice(6, 0, {
+			"type": "section",
+			"text":
+			{
+				"type": "mrkdwn",
+				"text": "👔 *Admin Zone*"
+			}
+		});
+
+		// Add divider
+		view.blocks.splice(7, 0, { "type": "divider" });
+		
+		// Add pick pairing channel under admin zone
+		view.blocks.splice(8, 0, {
+			"type": "section",
+			"text": {
+				"type": "mrkdwn",
+				"text": "👉 *Pick a channel* to add me to and I'll introduce myself and start pairing people up. I'm usually added to a team or project channel."
+			},
+			"accessory": {
+				"action_id": "pairing_channel_selected",
+				"type": "channels_select",
+				"placeholder": {
+					"type": "plain_text",
+					"text": "Select a channel...",
+					"emoji": true
+				},
+				"confirm": 
+					{
+						"title": {
 							"type": "plain_text",
-							"text": "Select a channel...",
-							"emoji": true
+							"text": "Are you sure?"
 						},
-						"confirm": 
-						  {
-							  "title": {
-								  "type": "plain_text",
-								  "text": "Are you sure?"
-							  },
-							  "text": {
-								  "type": "plain_text",
-								  "text": "❗️*NOTE*❗️: Switching pairing channel will remove all data previously associated with that channel. Also, users that were in the previous pairing-channel will not be transferred over to the new one, they will have to manually join that new channel"
-							  },
-							  "confirm": {
-								  "type": "plain_text",
-								  "text": "Do it"
-							  },
-							  "deny": {
-								  "type": "plain_text",
-								  "text": "Stop, I've changed my mind!"
-							  }
-						  }
-					}
-				},
-				// Create a new pairing channel
-				{
-					"type": "section",
-					"text": {
-						"type": "mrkdwn",
-						"text": "Or, *create a new pairing channel*. "
-					},
-					"accessory": {
-						"type": "button",
-						"action_id": "new_channel_button",
 						"text": {
 							"type": "plain_text",
-							"text": "Create",
-							"emoji": true
-						}
-					}
-				},
-				{
-					"type": "section", // spacing
-					"text": {
-						"type": "mrkdwn",
-						"text": " "
-					}
-				},
-				{
-					"type": "section", // spacing
-					"text": {
-						"type": "mrkdwn",
-						"text": " "
-					}
-				},
-				{
-					"type": "section", // spacing
-					"text": {
-						"type": "mrkdwn",
-						"text": " "
-					}
-				},
-				{
-					"type": "section", // spacing
-					"text": {
-						"type": "mrkdwn",
-						"text": " "
-					}
-				},
-				{
-					"type": "section",
-					"text": {
-						"type": "mrkdwn",
-						"text": "*Partner*"
-					}
-				},
-				{
-					"type": "divider"
-				},
-				{
-					"type": "section",
-					"text": {
-						"type": "mrkdwn",
-						"text": partnerText,
-					}
-				},
-				{
-					"type": "section",
-					"block_id": "section678",
-					"text": {
-						"type": "mrkdwn",
-						"text": "🤝 *Pick a folk* to be the leader of Alti. The leader can pick pairing channel of the workspace"
-					},
-					"accessory": {
-						"action_id": "selectOwner",
-						"type": "users_select",
-						"placeholder": {
-							"type": "plain_text",
-							"text": "Select a folk..."
+							"text": "❗️*NOTE*❗️: Switching pairing channel will remove all data previously associated with that channel. Also, users that were in the previous pairing-channel will not be transferred over to the new one, they will have to manually join that new channel"
 						},
 						"confirm": {
-							"title": {
-								"type": "plain_text",
-								"text": "Are you sure?"
-							},
-							"text": {
-								"type": "plain_text",
-								"text": "Designate this as the team leader?"
-							},
-							"confirm": {
-								"type": "plain_text",
-								"text": "Do it"
-							},
-							"deny": {
-								"type": "plain_text",
-								"text": "Stop, I've changed my mind!"
-							}
-						}
-					}
-				},
-				
-				{
-					"type": "divider"
-				},
-				{
-					"type": "context",
-					"elements": [
-						{
-							"type": "mrkdwn",
-							"text": "or... do `/setup` to create an #alti-pair channel with everyone in the workspace\nif you have never set a schedule before, you'll have a default 9am to 5pm"
-						}
-					]
-				},
-				{
-					"type": "divider"
-          },
-          {
-            "type": "section",
-            "text": {
-              "type": "mrkdwn",
-              "text": "Current schedule:"
-            }
-          },
-          sched.Monday,
-          sched.Tuesday,
-          sched.Wednesday,
-          sched.Thursday,
-          sched.Friday,
-          {
-            "type": "divider",
-          },
-				  {
-					"type": "section",
-					"text": {
-					  "type": "mrkdwn",
-					  "text": "Pick a daily warm up time!"
-					}
-				  },
-				  {
-					"type": "actions",
-					"block_id": "warm up block",
-					"elements": [
-					  {
-						"type": "static_select",
-						"action_id": "warmup_time1_selected",
-						"placeholder": {
-						  "type": "plain_text",
-						  "text": "Select a time",
-						  "emoji": true
+							"type": "plain_text",
+							"text": "Do it"
 						},
-						"options": appHomeObjects.times
-					  },
-					  {
-						"type": "static_select",
-						"action_id": "warmup_time2_selected",
-						"placeholder": {
-						  "type": "plain_text",
-						  "text": "AM/PM",
-						  "emoji": true
-						},
-						"options": appHomeObjects.ampm
-					  },
-					  {
-						"type":"button",
-						"action_id":"warmup_time_set_button",
-						"text":{
-							"type":"plain_text",
-							"text":"set",
-							"emoji":true
+						"deny": {
+							"type": "plain_text",
+							"text": "Stop, I've changed my mind!"
 						}
-					  },
-					]
-				  },
-				  {
-					"type": "section",
-					"text": {
-					  "type": "mrkdwn",
-					  "text": "Pick a daily cooldown time!"
 					}
-				  },
-				  {
-					"type": "actions",
-					"block_id": "cooldown block",
-					"elements": [
-					  
-					  {
-						"type": "static_select",
-						"action_id": "cooldown_time1_selected",
-						"placeholder": {
-						  "type": "plain_text",
-						  "text": "Select a time",
-						  "emoji": true
-						},
-						"options": appHomeObjects.times
-					  },
-					  {
-						"type": "static_select",
-						"action_id": "cooldown_time2_selected",
-						"placeholder": {
-						  "type": "plain_text",
-						  "text": "AM/PM",
-						  "emoji": true
-						},
-						"options": appHomeObjects.ampm
-					  },
-					  {
-						"type":"button",
-						"action_id":"cooldown_time_set_button",
-						"text":{
-							"type":"plain_text",
-							"text":"set",
-							"emoji":true
-						}
-					  },
-					]
-				  },
-				  {
-					"type": "context",
-					"elements": [
-					  {
-						"type": "mrkdwn",
-						"text": "Pssst you gotta select a time AND am/pm"
-					  }
-					]
-				  },
-				  {
-					"type": "section",
-					"text": {
-					  "type": "mrkdwn",
-					  "text": "or... set custom times for each day!"
-					},
-					"accessory": {
-					  "type":"button",
-					  "action_id": "set_custom_times",
-					  "text":{
-						  "type":"plain_text",
-						  "text":"Customize",
-						  "emoji":true
-					  }
-					}
-				  },
-				{
-                    "type": "divider"
-                },
-                {
-                    "type": "section",
-                    "text":
-                    {
-                        "type": "mrkdwn",
-                        "text": weeklyLeaderboard
-                    }
-                },
-                {
-                    "type": "section",
-                    "text":
-                    {
-                        "type": "mrkdwn",
-                        "text": monthlyLeaderboard
-                    }
+			}
+		});
+		
+		// Add create new pairing channel button under Admin Zone
+		view.blocks.splice(9, 0, {
+				"type": "section",
+				"text": {
+					"type": "mrkdwn",
+					"text": "Or, *create a new pairing channel*. "
 				},
-				{
-                    "type": "divider"
-                },
-				{
-					"type": "context",
-					"elements": [
-						{
-							"type": "mrkdwn",
-							"text": "Psssst this home tab was designed using <https://api.slack.com/tools/block-kit-builder|*Block Kit Builder*>"
-						}
-					]
-				}
-			]
-		};
-	}else {
-		view = {
-			"type": "home",
-			"blocks": [
-				{
-					"type": "section",
-					"text": {
-						"type": "mrkdwn",
-						"text": `Welcome home, <@${  userId  }> :house:`
-					}
-				},
-				{
-					"type": "section",
-					"text": {
-						"type": "mrkdwn",
-						"text": "Hey there 👋 I'm Alti. I'm here to help you smoothly enter and exit your workflow! Get started by choosing a channel to set up with :)"
-					}
-				},
-				{
-					"type": "section",
-					"text": {
-						"type": "mrkdwn",
-						"text": ownerText
-					}
-				},
-				{
-					"type": "section",
+				"accessory": {
+					"type": "button",
+					"action_id": "new_channel_button",
 					"text": {
 						"type": "plain_text",
-						"text": channelText,
+						"text": "Create",
 						"emoji": true
 					}
-				},
-				{
-					"type": "divider"
-				  },
-				  {
-					"type": "section",
-					"text": {
-					  "type": "mrkdwn",
-					  "text": "Current schedule:"
-					}
-				  },
-				  sched.Monday,
-				  sched.Tuesday,
-				  sched.Wednesday,
-				  sched.Thursday,
-				  sched.Friday,
-				  {
-					"type": "divider",
-				  },
-				  {
-					"type": "section",
-					"text": {
-					  "type": "mrkdwn",
-					  "text": "Pick a daily warm up time!"
-					}
-				  },
-				  {
-					"type": "actions",
-					"block_id": "warm up block",
-					"elements": [
-					  {
-						"type": "static_select",
-						"action_id": "warmup_time1_selected",
-						"placeholder": {
-						  "type": "plain_text",
-						  "text": "Select a time",
-						  "emoji": true
-						},
-						"options": appHomeObjects.times
-					  },
-					  {
-						"type": "static_select",
-						"action_id": "warmup_time2_selected",
-						"placeholder": {
-						  "type": "plain_text",
-						  "text": "AM/PM",
-						  "emoji": true
-						},
-						"options": appHomeObjects.ampm
-					  },
-					  {
-						"type":"button",
-						"action_id":"warmup_time_set_button",
-						"text":{
-							"type":"plain_text",
-							"text":"set",
-							"emoji":true
-						}
-					  },
-					]
-				  },
-				  {
-					"type": "section",
-					"text": {
-					  "type": "mrkdwn",
-					  "text": "Pick a daily cooldown time!"
-					}
-				  },
-				  {
-					"type": "actions",
-					"block_id": "cooldown block",
-					"elements": [
-					  
-					  {
-						"type": "static_select",
-						"action_id": "cooldown_time1_selected",
-						"placeholder": {
-						  "type": "plain_text",
-						  "text": "Select a time",
-						  "emoji": true
-						},
-						"options": appHomeObjects.times
-					  },
-					  {
-						"type": "static_select",
-						"action_id": "cooldown_time2_selected",
-						"placeholder": {
-						  "type": "plain_text",
-						  "text": "AM/PM",
-						  "emoji": true
-						},
-						"options": appHomeObjects.ampm
-					  },
-					  {
-						"type":"button",
-						"action_id":"cooldown_time_set_button",
-						"text":{
-							"type":"plain_text",
-							"text":"set",
-							"emoji":true
-						}
-					  },
-					]
-				  },
-				  {
-					"type": "context",
-					"elements": [
-					  {
-						"type": "mrkdwn",
-						"text": "Pssst you gotta select a time AND am/pm"
-					  }
-					]
-				  },
-				  {
-					"type": "section",
-					"text": {
-					  "type": "mrkdwn",
-					  "text": "or... set custom times for each day!"
-					},
-					"accessory": {
-					  "type":"button",
-					  "action_id": "set_custom_times",
-					  "text":{
-						  "type":"plain_text",
-						  "text":"customize",
-						  "emoji":true
-					  }
-					}
-				  },
-				{
-					"type": "divider"
-				},
-                {
-                    "type": "section",
-                    "text":
-                    {
-                        "type": "mrkdwn",
-                        "text": weeklyLeaderboard
-                    }
-                },
-                {
-                    "type": "section",
-                    "text":
-                    {
-                        "type": "mrkdwn",
-                        "text": monthlyLeaderboard
-                    }
-				},
-				{
-                    "type": "divider"
-                },
-				{
-					"type": "context",
-					"elements": [
-						{
-							"type": "mrkdwn",
-							"text": "Psssst this home tab was designed using <https://api.slack.com/tools/block-kit-builder|*Block Kit Builder*>"
-						}
-					]
 				}
-			]
-		};
+		});
+
+		view.blocks.splice(10, 0, {
+			"type": "section", // spacing
+			"text": {
+				"type": "mrkdwn",
+				"text": " "
+			}
+		});
+
+		// Add choose another admin under Admin Zone
+		view.blocks.splice(11, 0, {
+			"type": "section",
+			"block_id": "section678",
+			"text": {
+				"type": "mrkdwn",
+				"text": "🤝 *Pick a folk* to be the leader of Alti. The leader can pick pairing channel of the workspace"
+			},
+			"accessory": {
+				"action_id": "selectOwner",
+				"type": "users_select",
+				"placeholder": {
+					"type": "plain_text",
+					"text": "Select a folk..."
+				},
+				"confirm": {
+					"title": {
+						"type": "plain_text",
+						"text": "Are you sure?"
+					},
+					"text": {
+						"type": "plain_text",
+						"text": "Designate this as the team leader?"
+					},
+					"confirm": {
+						"type": "plain_text",
+						"text": "Do it"
+					},
+					"deny": {
+						"type": "plain_text",
+						"text": "Stop, I've changed my mind!"
+					}
+				}
+			}
+		});
+
+		// Add 4 spacing blocks
+		for (var i = 0; i < 4; i++) {
+			view.blocks.splice(12 + i, 0, {
+				"type": "section", // spacing
+				"text": {
+					"type": "mrkdwn",
+					"text": " "
+				}
+			});
+		}
 	}
 
 	return view;
