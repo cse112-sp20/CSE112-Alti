@@ -294,7 +294,7 @@ describe('Setup Warmup Callbacks', () => {
     let text1 = motivationalQuotes[randomQuoteIndex1].text;
     let actualPrompt1 = ""
 
-    if( author1 == null || author1 == 'Unknown' )
+    if( author1 === null || author1 === 'Unknown' )
       actualPrompt1 = `Your partner sent you a motivational quote to help you start your day right! ${text1}`;
     else
       actualPrompt1 = `Your partner sent you a motivational quote to help you start your day right! ${author1} says: ${text1}`;
@@ -303,7 +303,7 @@ describe('Setup Warmup Callbacks', () => {
     let text2 = motivationalQuotes[randomQuoteIndex2].text;
     let actualPrompt2 = ""
 
-    if( author2 == null || author2 == 'Unknown' )
+    if( author2 === null || author2 === 'Unknown' )
       actualPrompt2 = `Your partner sent you a motivational quote to help you start your day right! ${text2}`;
     else
       actualPrompt2 = `Your partner sent you a motivational quote to help you start your day right! ${author2} says: ${text2}`;
