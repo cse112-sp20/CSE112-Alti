@@ -21,7 +21,6 @@ app.command('/setup', async ({payload, body, ack, say, context}) => {
 // Listen to channel dropdown select menu for new pairing channel
 app.action('pairing_channel_selected', async({body, ack, say, context}) => {
     ack();
-    console.log("hi inside action");
     // block action payload type
     var team_info = await app.client.team.info({
         token: context.botToken
@@ -31,11 +30,9 @@ app.action('pairing_channel_selected', async({body, ack, say, context}) => {
     var team_id = body.team.id;
     // TODO make the update run after the db is updated in boardExistingChannel call
     var newChannel = body.actions[0].selected_channel;
-    console.log("newchannel="+newChannel);
 
     // Get the current pairing channel
     var currentPairingChannel = await firestoreFuncs.getPairingChannel(team_id);
-    console.log("currpair="+currentPairingChannel);
 
     // If the current pairing channel is undefined, then set it normally.
     if (currentPairingChannel === undefined)
@@ -58,7 +55,6 @@ app.action('pairing_channel_selected', async({body, ack, say, context}) => {
         await firestoreFuncs.setNewPairingChannelID(team_id, 0);
     }
     appHome.updateAppHome(body.user.id, team_id, context);
-
 });
 
 
