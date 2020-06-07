@@ -146,10 +146,10 @@ async function loadHomeTabUI(app, workspaceID, userId, context) {
   var partnerId;
   var dmThreadID;
   if (ownerId === undefined) {
-	  ownerText = `Current Owner of Alti is...there is no current owner of Alti! :scream: You can easily set an owner in the *Pick a folk* section.`;
+	  ownerText = `There is no current admin for Alti! :scream:`;
   }
   else {
-	  ownerText = `Current Owner of Alti is <@${  ownerId  }>, you can ask the owner for changing paring channel of the team.`;
+	  ownerText = `*Alti admin*: <@${  ownerId  }> – The admin can change the pairing channel, and can also choose a different admin.`;
   }
   if (channelId === undefined) {
 	  channelText = `You have not picked a pairing channel yet 😟. If you're the Atli admin, choose or create one below to get started!`;
@@ -205,6 +205,27 @@ async function loadHomeTabUI(app, workspaceID, userId, context) {
 				"text": {
 					"type": "mrkdwn",
 					"text": "Alti pairs people up from a specific channel to help you ease in 🌞 and out 😴 of your work routines with warmup and cooldown activities. *If you haven't yet, get started by choosing a pairing channel (or tell the Alti admin to)*"
+				}
+			},
+			{
+				"type": "section", // spacing
+				"text": {
+					"type": "mrkdwn",
+					"text": " "
+				}
+			},
+			{
+				"type": "section", // spacing
+				"text": {
+					"type": "mrkdwn",
+					"text": " "
+				}
+			},
+			{
+				"type": "section",
+				"text": {
+					"type": "mrkdwn",
+					"text": ownerText
 				}
 			},
 			{
@@ -480,6 +501,15 @@ async function loadHomeTabUI(app, workspaceID, userId, context) {
 				"type": "divider"
 			},
 			{
+				"type": "context",
+				"elements": [
+					{
+						"type": "mrkdwn",
+						"text": "Points are awarded based on how many warmups and cooldowns you select for your parnter!"
+					}
+				]
+			},
+			{
 				"type": "section",
 				"text":
 				{
@@ -513,7 +543,7 @@ async function loadHomeTabUI(app, workspaceID, userId, context) {
 	};
 	if (await checkOwner(workspaceID, userId)) {
 		// Add admin zone header
-		view.blocks.splice(6, 0, {
+		view.blocks.splice(9, 0, {
 			"type": "section",
 			"text":
 			{
@@ -523,10 +553,10 @@ async function loadHomeTabUI(app, workspaceID, userId, context) {
 		});
 
 		// Add divider
-		view.blocks.splice(7, 0, { "type": "divider" });
+		view.blocks.splice(10, 0, { "type": "divider" });
 		
 		// Add pick pairing channel under admin zone
-		view.blocks.splice(8, 0, {
+		view.blocks.splice(11, 0, {
 			"type": "section",
 			"text": {
 				"type": "mrkdwn",
@@ -563,7 +593,7 @@ async function loadHomeTabUI(app, workspaceID, userId, context) {
 		});
 		
 		// Add create new pairing channel button under Admin Zone
-		view.blocks.splice(9, 0, {
+		view.blocks.splice(12, 0, {
 				"type": "section",
 				"text": {
 					"type": "mrkdwn",
@@ -580,7 +610,7 @@ async function loadHomeTabUI(app, workspaceID, userId, context) {
 				}
 		});
 
-		view.blocks.splice(10, 0, {
+		view.blocks.splice(13, 0, {
 			"type": "section", // spacing
 			"text": {
 				"type": "mrkdwn",
@@ -589,7 +619,7 @@ async function loadHomeTabUI(app, workspaceID, userId, context) {
 		});
 
 		// Add choose another admin under Admin Zone
-		view.blocks.splice(11, 0, {
+		view.blocks.splice(14, 0, {
 			"type": "section",
 			"block_id": "section678",
 			"text": {
@@ -601,7 +631,7 @@ async function loadHomeTabUI(app, workspaceID, userId, context) {
 				"type": "users_select",
 				"placeholder": {
 					"type": "plain_text",
-					"text": "Select a folk..."
+					"text": "Select someone..."
 				},
 				"confirm": {
 					"title": {
@@ -626,7 +656,7 @@ async function loadHomeTabUI(app, workspaceID, userId, context) {
 
 		// Add 4 spacing blocks
 		for (var i = 0; i < 4; i++) {
-			view.blocks.splice(12 + i, 0, {
+			view.blocks.splice(15 + i, 0, {
 				"type": "section", // spacing
 				"text": {
 					"type": "mrkdwn",
