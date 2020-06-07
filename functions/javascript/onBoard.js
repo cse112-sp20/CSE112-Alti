@@ -77,7 +77,7 @@ async function createOnBoardingChannel(app, token, team_id, channelName) {
             });
 
             // invite people
-            app.client.conversations.invite({
+            await app.client.conversations.invite({
                 token: token, 
                 channel: conversationObj.channel.id,
                 users: userString
@@ -127,15 +127,15 @@ async function boardExistingChannel(app, token, team_id, channelId) {
         var promises = [];
         var userList = await findUsersChannel(app, token, channelId);
 
+        let welcomeText = "Hi everyone! 😄 My name is Alti and I just got added to this channel to make sure everyone in here gets paired up every week!\n\nIf you don't want to be paired up next week, you can simply leave this channel."
         // send welcome message
-        app.client.chat.postMessage({
+        await app.client.chat.postMessage({
             token: token,
             channel: channelId,
-            text: `Hey I've just been added to this channel! Everyone here will participate in quick 
-                    and fun warm up and cool down activities :)
-                    `
+            text: welcomeText
             
         });
+
         await firestoreFuncs.storeNewPairingChannel(team_id, channelId);
         for (var userId of userList) {
             for (var day of days) {
@@ -190,9 +190,7 @@ async function findUsersChannel(app, token, channelId) {
     }).catch((error) => {
         console.log(error);
     });
-
     return users;
-
 }
 
 
@@ -277,3 +275,5 @@ app.event('member_left_channel', async ({ body, context }) => {
 
 exports.onBoard = createOnBoardingChannel;
 exports.onBoardExisting = boardExistingChannel;
+exports.onBoardFindUsersWorkspace = findUsersWorkSpace;
+exports.onBoardFindUsersChannel = findUsersChannel;

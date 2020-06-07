@@ -201,10 +201,10 @@ function getWeeklyLeaderboardStr(rankingsArr) {
     var rank, name, weeklyPoints;
     var rankings = rankingsArr.sort(compareWeekly);
     // if first person in rankings has 0 points, everyone has 0 points
-    if (rankings[0]['weeklyPoints'] === 0 || rankings[0]['weeklyPoints'] === undefined) {
-        return "*Weekly Leaderboard*\n```No one is on the leaderboard!```";
+    if (rankings[0] === undefined || rankings[0]['weeklyPoints'] === 0 || rankings[0]['weeklyPoints'] === undefined) {
+        return "Weekly Leaderboard\n```No one is on the leaderboard!```";
     }
-    var weeklyLeaderboard = "*Weekly Leaderboard*\n" + 
+    var weeklyLeaderboard = "Weekly Leaderboard\n" + 
                             "```Rank     Name                      Points\n";
 
     var i = 0;
@@ -269,10 +269,10 @@ function getMonthlyLeaderboardStr(rankingsArr) {
     var rankings = rankingsArr.sort(compareMonthly);
     var currMonthStr = getMonthStr();
     // if first person in rankings has 0 points, everyone has 0 points
-    if (rankings[0]['monthlyPoints'] === 0 || rankings[0]['monthlyPoints'] === undefined) {
-        return "*" + currMonthStr + " Leaderboard*\n```No one is on the leaderboard!```";
+    if (rankings[0] === undefined || rankings[0]['monthlyPoints'] === 0 || rankings[0]['monthlyPoints'] === undefined) {
+        return currMonthStr + " Leaderboard\n```No one is on the leaderboard!```";
     }
-    var monthlyLeaderboard = "*" + currMonthStr + " Leaderboard*\n" +
+    var monthlyLeaderboard = currMonthStr + " Leaderboard\n" +
                              "```Rank     Name                      Points\n";
  
     var i = 0;

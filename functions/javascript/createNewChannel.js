@@ -75,13 +75,12 @@ async function createNewPairingChannel(app, token, team_id, channelName) {
             console.log(error);
         });
 
+        let welcomeMessage = "Hi everyone! 😄 My name is Alti and I just got added to this channel to make sure everyone in here gets paired up every week!\n\nIf you don't want to be paired up next week, you can simply leave this channel.";
         // send welcome message
         app.client.chat.postMessage({
             token: token,
             channel: conversationObj.channel.id,
-            text: `Hi everyone! This is where we'll pair you up to participate in quick 
-                    and fun warm up and cool down activities :)
-                    (To opt out, just leave the channel.)`
+            text: welcomeMessage
         });
 
         // store new channel in firestore
