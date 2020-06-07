@@ -20,19 +20,15 @@ exports.scheduledChangePairingChannel = functions.pubsub
     // get all workspaces
     const allWorkspaces = await firestoreFuncs.getAllWorkspaces();
 
-    // new channel ID
-    var newChannel;
-
     // go through all workspaces
-    for(i = 0; i < allWorkspaces.length; i++) {
-        let workspace = allWorkspaces[i];
+    await Promise.all(allWorkspaces.map(async (workspace) => {
         // get new channel ID from Firestore
-        newChannel = await firestoreFuncs.getNewPairingChannelID(workspace);
+        var newChannel = await firestoreFuncs.getNewPairingChannelID(workspace);
         // if newChannel is NOT undefined, then change the pairing channel
         if (newChannel !== undefined) {
             changePairingChannel(context, workspace, newChannel);
         }
-    }
+    }));
 });
 
 /*

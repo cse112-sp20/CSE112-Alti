@@ -300,7 +300,7 @@ exports.getExercisePrompt = async function getExercisePrompt(workspaceID, userID
     return userRef.get()
         .then(doc => {
             if (!doc.exists) {
-                console.log('No such document! prompt');
+                console.log('No such document! ex');
                 return undefined;
             }
             else {
@@ -422,7 +422,7 @@ exports.getWarmupTime = function getWarmupTime(workspaceID, userID, day) {
     return userDocRef.get()
         .then(doc => {
             if (!doc.exists) {
-                console.log('No such document! warmuptime');
+                console.log('No such document! wtime');
                 return undefined;
             }
             else {
@@ -472,7 +472,7 @@ exports.getCooldownTime = function getWarmupTime(workspaceID, userID, day) {
     return userDocRef.get()
         .then(doc => {
             if (!doc.exists) {
-                console.log('No such document! cooldown time');
+                console.log('No such document! cooltime');
                 return undefined;
             }
             else {
@@ -565,7 +565,7 @@ exports.getUserPairingData = async function getUserData(workspaceID, userID) {
     return userDocRef.get()
         .then(doc => {
             if (!doc.exists) {
-                console.log('No such document! pairingdata');
+                console.log('No such document! pairingdat');
                 return undefined;
             }
             else {

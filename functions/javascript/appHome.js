@@ -160,7 +160,7 @@ async function loadHomeTabUI(app, workspaceID, userId, context) {
 	  channelText = `Current Pairing Channel: #${  channelName  }`;
 	  // display new pairing channel if exists
 	  newChannelID = await firestoreFuncs.getNewPairingChannelID(workspaceID);
-	  console.log("newchanid="+newChannelID);
+	  console.log("newChannelID="+newChannelID);
 	  if (newChannelID !== undefined) {
 		  // get new channel name
 		  newChannelName = await app.client.conversations.info({
@@ -171,6 +171,7 @@ async function loadHomeTabUI(app, workspaceID, userId, context) {
 		  }).catch((error) => {
 			console.log(error);
 		  });
+		  console.log("name="+newChannelName);
 		  if (newChannelName !== undefined) {
 			channelText += ` → #${  newChannelName  } (Changing on Saturday)`
 		  }
