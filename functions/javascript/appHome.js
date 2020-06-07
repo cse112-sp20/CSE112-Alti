@@ -152,8 +152,8 @@ async function loadHomeTabUI(app, workspaceID, userId, context) {
 	  ownerText = `Current Owner of Alti is <@${  ownerId  }>, you can ask the owner for changing paring channel of the team.`;
   }
   if (channelId === undefined) {
-	  channelText = `Current Pairing Channel: None`;
-	  partnerText = `Current partner: None`;
+	  channelText = `You have not picked a pairing channel yet 😟. If you're the Atli admin, choose or create one below to get started!`;
+	  partnerText = `There's no pairing channel selected, so no pairings have been made 😢. The Alti admin needs to select a pairing channel to get started, and then make sure to join it!`;
   }
   else {
 	  channelText = `Current Pairing Channel: #${  channelName  }`;
@@ -168,8 +168,8 @@ async function loadHomeTabUI(app, workspaceID, userId, context) {
   }
 
   if (partnerId === undefined) {
-	partnerText = `Current partner: None`;
-  }else {
+	partnerText = `You are not currently paired with anyone! To get paired, join the pairing channel that you see above, and wait for the next pairing cycle!`;
+  } else {
 	  partnerText = `Current partner:  <@${  partnerId  }>`;
   }
 
@@ -205,65 +205,52 @@ async function loadHomeTabUI(app, workspaceID, userId, context) {
 					"type": "section",
 					"text": {
 						"type": "mrkdwn",
-						"text": "Hi there 👋 I'm Alti. I'm here to help you smoothly enter and exit your workflow! Get started by choosing a channel to set up with :)"
+						"text": "Alti pairs people up from a specific channel to help each other transition in 🌞 and out 😴 of your work days. *If you haven't yet, get started by choosing a channel to set up with* 😄"
 					}
 				},
-
+				{
+					"type": "section", // spacing
+					"text": {
+						"type": "mrkdwn",
+						"text": " "
+					}
+				},
+				{
+					"type": "section", // spacing
+					"text": {
+						"type": "mrkdwn",
+						"text": " "
+					}
+				},
+				{
+					"type": "section", // spacing
+					"text": {
+						"type": "mrkdwn",
+						"text": " "
+					}
+				},
+				{
+					"type": "section", // spacing
+					"text": {
+						"type": "mrkdwn",
+						"text": " "
+					}
+				},
+				{
+					"type": "section",
+					"text": {
+						"type": "mrkdwn",
+						"text": "*Pairing Channel*"
+					}
+				},
+				{
+					"type": "divider"
+				},
 				{
 					"type": "section",
 					"text": {
 						"type": "mrkdwn",
 						"text": channelText,
-					}
-				},
-				{
-					"type": "section",
-					"text": {
-						"type": "mrkdwn",
-						"text": partnerText,
-					}
-				},
-				/*
-				{
-					"type": "section",
-					"text": {
-						"type": "plain_text",
-						"text": timeZoneText,
-						"emoji": true
-					}
-				},*/
-				{
-					"type": "section",
-					"block_id": "section678",
-					"text": {
-						"type": "mrkdwn",
-						"text": "🤝 *Pick a folk* to be the leader of Alti. The leader can pick pairing channel of the workspace"
-					},
-					"accessory": {
-						"action_id": "selectOwner",
-						"type": "users_select",
-						"placeholder": {
-							"type": "plain_text",
-							"text": "Select a folk..."
-						},
-						"confirm": {
-							"title": {
-								"type": "plain_text",
-								"text": "Are you sure?"
-							},
-							"text": {
-								"type": "plain_text",
-								"text": "Designate this as the team leader?"
-							},
-							"confirm": {
-								"type": "plain_text",
-								"text": "Do it"
-							},
-							"deny": {
-								"type": "plain_text",
-								"text": "Stop, I've changed my mind!"
-							}
-						}
 					}
 				},
 				{
@@ -319,6 +306,86 @@ async function loadHomeTabUI(app, workspaceID, userId, context) {
 					}
 				},
 				{
+					"type": "section", // spacing
+					"text": {
+						"type": "mrkdwn",
+						"text": " "
+					}
+				},
+				{
+					"type": "section", // spacing
+					"text": {
+						"type": "mrkdwn",
+						"text": " "
+					}
+				},
+				{
+					"type": "section", // spacing
+					"text": {
+						"type": "mrkdwn",
+						"text": " "
+					}
+				},
+				{
+					"type": "section", // spacing
+					"text": {
+						"type": "mrkdwn",
+						"text": " "
+					}
+				},
+				{
+					"type": "section",
+					"text": {
+						"type": "mrkdwn",
+						"text": "*Partner*"
+					}
+				},
+				{
+					"type": "divider"
+				},
+				{
+					"type": "section",
+					"text": {
+						"type": "mrkdwn",
+						"text": partnerText,
+					}
+				},
+				{
+					"type": "section",
+					"block_id": "section678",
+					"text": {
+						"type": "mrkdwn",
+						"text": "🤝 *Pick a folk* to be the leader of Alti. The leader can pick pairing channel of the workspace"
+					},
+					"accessory": {
+						"action_id": "selectOwner",
+						"type": "users_select",
+						"placeholder": {
+							"type": "plain_text",
+							"text": "Select a folk..."
+						},
+						"confirm": {
+							"title": {
+								"type": "plain_text",
+								"text": "Are you sure?"
+							},
+							"text": {
+								"type": "plain_text",
+								"text": "Designate this as the team leader?"
+							},
+							"confirm": {
+								"type": "plain_text",
+								"text": "Do it"
+							},
+							"deny": {
+								"type": "plain_text",
+								"text": "Stop, I've changed my mind!"
+							}
+						}
+					}
+				},
+				
+				{
 					"type": "divider"
 				},
 				{
@@ -326,7 +393,7 @@ async function loadHomeTabUI(app, workspaceID, userId, context) {
 					"elements": [
 						{
 							"type": "mrkdwn",
-							"text": "or... do `/setup` to create an #alti-pair channel with everyone in the workspace\nIf you have never set a schedule before, you'll have a default 9am to 5pm"
+							"text": "or... do `/setup` to create an #alti-pair channel with everyone in the workspace\nif you have never set a schedule before, you'll have a default 9am to 5pm"
 						}
 					]
 				},
