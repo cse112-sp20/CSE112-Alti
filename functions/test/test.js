@@ -131,7 +131,8 @@ describe('Setup Warmup Callbacks', () => {
   // UserId2 is the one being assigned the exercise
   var userId1, userId2;
 
-  var fakeBody; 
+  var fakeBody;
+  var fakeView; 
 
   async function fakeAck(){
     ackCalled = true;
@@ -165,7 +166,11 @@ describe('Setup Warmup Callbacks', () => {
           user: {id:userId1},
           view: {id:undefined},
           // The value needs to be set based on the type of exercise
-          actions: [{value:''}]
+          actions: [{values:''}]
+        };
+
+        fakeView = {
+          state: {values:{input_text : {value:''} }  }
         };
         return Promise.resolve();
       });
@@ -257,41 +262,5 @@ describe('Setup Warmup Callbacks', () => {
 
     assert.equal(prompt1, actualPrompt1);
     assert.equal(prompt2, actualPrompt2);
-  });
-
-  it('handleArticleSelect', async function() {
-    //fakeBody.actions[0].value = 'sudoku';
-
-    //let check1 = await handleArticleSelect(fakeAck, fakeBody, fakeContext);
-    // console.log(check1);
-    // let check2 = await firestoreFuncs.getExercisePrompt(workspaceId, userId2, true);
-    // console.log(check2);
-
-    let actualPrompt1 = "Your partner sent you a tech article to read! Here is the link: ";
-    let actualPrompt2 = "Your partner sent you a tech article to read! Here is the link: ";
-  });
-
-  it('handleCooldownArticleSelect', async function() {
-    //fakeBody.actions[0].value = 'sudoku';
-
-    //let check1 = await handleCooldownArticleSelect(fakeAck, fakeBody, fakeContext);
-    // console.log(check1);
-    // let check2 = await firestoreFuncs.getExercisePrompt(workspaceId, userId2, false);
-    // console.log(check2);
-
-    let actualPrompt1 = "Your partner sent you a non-tech article to read! Here is the link: ";
-    let actualPrompt2 = "Your partner sent you a non-tech article to read! Here is the link: ";
-  });
-
-  it('handleVideoSelectle', async function() {
-    //fakeBody.actions[0].value = 'sudoku';
-
-    //let check1 = await handleVideoSelect(fakeAck, fakeBody, fakeContext);
-    // console.log(check1);
-    // let check2 = await firestoreFuncs.getExercisePrompt(workspaceId, userId2, false);
-    // console.log(check2);
-
-    let actualPrompt1 = "Your partner sent you this video to watch! : ";
-    let actualPrompt2 = "Your partner sent you this video to watch! : ";
   });
 });
