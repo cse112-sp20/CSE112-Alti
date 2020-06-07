@@ -92,7 +92,7 @@ async function createScheduleDisplay(workspaceId, userId) {
       "type": "section",
       "text": {
         "type": "mrkdwn",
-        "text": day + ": " + res[index] + "-" + res[index+1]
+        "text": "*" + day + "*: " + res[index] + "-" + res[index+1]
       }
     };
     sched[day] = block;
@@ -239,7 +239,7 @@ async function loadHomeTabUI(app, workspaceID, userId, context) {
 				"type": "section",
 				"text": {
 					"type": "mrkdwn",
-					"text": "👥 *Pairing Information*"
+					"text": "👥 *Pairing Information* 👋"
 				}
 			},
 			{
@@ -296,13 +296,6 @@ async function loadHomeTabUI(app, workspaceID, userId, context) {
 			},	
 			{
 				"type": "divider"
-			},
-			{
-			"type": "section",
-			"text": {
-				"type": "mrkdwn",
-				"text": "Current schedule:"
-			}
 			},
 			sched.Monday,
 			sched.Tuesday,
@@ -525,7 +518,7 @@ async function loadHomeTabUI(app, workspaceID, userId, context) {
 			"text":
 			{
 				"type": "mrkdwn",
-				"text": "👔 *Admin Zone*"
+				"text": "👔 *Admin Zone* 🕴"
 			}
 		});
 
