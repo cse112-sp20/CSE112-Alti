@@ -204,7 +204,7 @@ async function loadHomeTabUI(app, workspaceID, userId, context) {
 				"type": "section",
 				"text": {
 					"type": "mrkdwn",
-					"text": "Alti pairs people up from a specific channel to help each other transition in 🌞 and out 😴 of your work days. *If you haven't yet, get started by choosing a channel to set up with* 😄"
+					"text": "Alti pairs people up from a specific channel to help you ease in 🌞 and out 😴 of your work routines with warmup and cooldown activities. *If you haven't yet, get started by choosing a pairing channel (or tell the Alti admin to)*"
 				}
 			},
 			{
@@ -530,7 +530,7 @@ async function loadHomeTabUI(app, workspaceID, userId, context) {
 			"type": "section",
 			"text": {
 				"type": "mrkdwn",
-				"text": "👉 *Pick a channel* to add me to and I'll introduce myself and start pairing people up. I'm usually added to a team or project channel."
+				"text": "👉 *Pick a channel* to add me to and I'll start pairing people up every Sunday. I'm usually added to a team or project channel."
 			},
 			"accessory": {
 				"action_id": "pairing_channel_selected",
@@ -574,7 +574,7 @@ async function loadHomeTabUI(app, workspaceID, userId, context) {
 					"action_id": "new_channel_button",
 					"text": {
 						"type": "plain_text",
-						"text": "Create",
+						"text": "Create new pairing channel",
 						"emoji": true
 					}
 				}
@@ -594,7 +594,7 @@ async function loadHomeTabUI(app, workspaceID, userId, context) {
 			"block_id": "section678",
 			"text": {
 				"type": "mrkdwn",
-				"text": "🤝 *Pick a folk* to be the leader of Alti. The leader can pick pairing channel of the workspace"
+				"text": "🤝 *Pick someone* to replace you as the Alti admin."
 			},
 			"accessory": {
 				"action_id": "selectOwner",
