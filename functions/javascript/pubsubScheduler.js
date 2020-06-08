@@ -42,7 +42,7 @@ exports.scheduledPairUp = functions.pubsub
         return firestoreFuncs.getAPIPair(workspace);
       });
       promise = promise.then(res => {
-        handleWorkspacePairup(workspace, res).then(res => {
+        return handleWorkspacePairup(workspace, res).then(res => {
           //schedule all of the individual users random for monday 
           let memberList = [];
           let pairedUsers = await firestoreFuncs.getPairedUsers(workspace);
@@ -63,6 +63,7 @@ exports.scheduledPairUp = functions.pubsub
             //store cooldown 
             firestoreFuncs.storeTypeOfExercise(workspace, userId, false, cooldownTask)
           });
+            return Promise.resolve(); 
           },rej => {
             return Promise.reject(new Error("Workspace "+workspace+" has not been paired"));
           });
