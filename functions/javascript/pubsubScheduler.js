@@ -34,7 +34,7 @@ exports.scheduledPairUp = functions.pubsub
   // console.log(allWorkspaces);
 	for( i=0; i<allWorkspaces.length; i++){
     let workspace = allWorkspaces[i];
-    if(workspace === "T0137P851BJ") {
+    //if(workspace === "T0137P851BJ") {
 
    
 		  // if ( workspace !== "T011H6FAPV4" ){
@@ -77,7 +77,7 @@ exports.scheduledPairUp = functions.pubsub
           });
 
       });
-  }
+  //}
 }
   promise.catch(err => console.error(err));
   await promise;
