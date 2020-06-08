@@ -1,6 +1,7 @@
 const index = require('./index');
 const app = index.getBolt();
 const firestoreFuncs = require('./firestore');
+const appHome = require('./appHome');
 
 var days = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"];
 var channelNames = [];
@@ -41,9 +42,57 @@ app.view('new_modal', async ({ ack, body, view, context }) => {
         });
     } else {
         ack();
-        await createNewPairingChannel(app, context.botToken, body.team.id, newChannelName);
+        const team_id = body.team.id;
+        // Get the current pairing channel
+        var currentPairingChannel = await firestoreFuncs.getPairingChannel(team_id);
+
+        // If the current pairing channel is undefined, then create one normally.
+        if (currentPairingChannel === undefined)
+        {
+            await createNewPairingChannel(app, context.botToken, team_id, newChannelName);
+        } 
+        // Else, create a new channel, and use PubSub function to switch on Saturday.
+        else
+        {
+            // create new channel with name
+            var newChannelID = await createChannelWithName(app, context.botToken, team_id, newChannelName);
+            console.log(newChannelID);
+            await firestoreFuncs.setNewPairingChannelID(team_id, newChannelID);
+        }
+        appHome.updateAppHome(body.user.id, team_id, context);
     }
 });
+
+async function createChannelWithName(app, token, team_id, channelName) {
+    try {
+        // get owner id
+        var ownerId = await firestoreFuncs.getOwner(team_id).then((obj)=>{
+            return obj;
+        }).catch((error) => {
+            console.log(error);
+        });
+
+        // create channel
+        var conversationObj = await app.client.conversations.create({
+            token: token,
+            name: channelName
+        }).catch((error) => {
+            console.log(error);
+        });
+
+        // invite owner to channel
+        app.client.conversations.invite({
+            token: token, 
+            channel: conversationObj.channel.id,
+            users: ownerId
+        }).catch((error) => {
+            console.log(error);
+        });
+    } catch (error) {
+        console.log(error);
+    }
+    return conversationObj.channel.id;
+}
 
 // Creates a new pairing channel
 async function createNewPairingChannel(app, token, team_id, channelName) {
@@ -199,7 +248,7 @@ var new_channel_modal =
 			"block_id": "write_name",
 			"label": {
 				"type": "plain_text",
-				"text": "What would you like to name the channel?"
+				"text": "What would you like to name the channel? Also, if there is an existing pairing channel, keep in mind that this new channel will start to be used next Sunday."
 			},
 			"element": {
 				"type": "plain_text_input",

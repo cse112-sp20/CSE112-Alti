@@ -145,6 +145,7 @@ async function loadHomeTabUI(app, workspaceID, userId, context) {
   var partnerText;
   var partnerId;
   var dmThreadID;
+  var newChannelID, newChannelName;
   if (ownerId === undefined) {
 	  ownerText = `There is no current admin for Alti! :scream:`;
   }
@@ -157,6 +158,22 @@ async function loadHomeTabUI(app, workspaceID, userId, context) {
   }
   else {
 	  channelText = `Current Pairing Channel: #${  channelName  }`;
+	  // display new pairing channel if exists
+	  newChannelID = await firestoreFuncs.getNewPairingChannelID(workspaceID);
+	  if (newChannelID !== undefined && newChannelID !== 0) {
+		  // get new channel name
+		  newChannelName = await app.client.conversations.info({
+			token: context.botToken,
+			channel: newChannelID
+		  }).then((obj)=>{
+			return obj.channel.name;
+		  }).catch((error) => {
+			console.log(error);
+		  });
+		  if (newChannelName !== undefined && newChannelName !== 0) {
+			channelText += ` → #${  newChannelName  } (Changing on Sunday)`
+		  }
+	  }
 	  let pairingData = await firestoreFuncs.getUserPairingData(workspaceID, userId);
 	  dmThreadID = pairingData === undefined ? undefined : pairingData.dmThreadID;
 	  partnerId = await firestoreFuncs.getPartner(workspaceID, channelId, userId).then((obj)=>{
@@ -164,7 +181,6 @@ async function loadHomeTabUI(app, workspaceID, userId, context) {
 	  }).catch((error) => {
 		  console.log(error);
 	  });
-	  console.log(partnerId);
   }
 
   if (partnerId === undefined) {
@@ -397,7 +413,7 @@ async function loadHomeTabUI(app, workspaceID, userId, context) {
 					"action_id":"warmup_time_set_button",
 					"text":{
 						"type":"plain_text",
-						"text":"set",
+						"text":"Set",
 						"emoji":true
 					}
 					},
@@ -440,7 +456,7 @@ async function loadHomeTabUI(app, workspaceID, userId, context) {
 					"action_id":"cooldown_time_set_button",
 					"text":{
 						"type":"plain_text",
-						"text":"set",
+						"text":"Set",
 						"emoji":true
 					}
 					},
@@ -505,7 +521,7 @@ async function loadHomeTabUI(app, workspaceID, userId, context) {
 				"elements": [
 					{
 						"type": "mrkdwn",
-						"text": "Points are awarded based on how many warmups and cooldowns you select for your parnter!"
+						"text": "Points are awarded based on how many warmups and cooldowns you select for your partner!"
 					}
 				]
 			},
@@ -578,7 +594,7 @@ async function loadHomeTabUI(app, workspaceID, userId, context) {
 						},
 						"text": {
 							"type": "plain_text",
-							"text": "❗️*NOTE*❗️: Switching pairing channel will remove all data previously associated with that channel. Also, users that were in the previous pairing-channel will not be transferred over to the new one, they will have to manually join that new channel"
+							"text": "❗️*NOTE*❗️: The pairing channel will be changed on Sunday. Switching your pairing channel will remove all data previously associated with that channel. Also, users that were in the previous pairing channel will not be transferred over to the new one; they will have to manually join the channel."
 						},
 						"confirm": {
 							"type": "plain_text",
