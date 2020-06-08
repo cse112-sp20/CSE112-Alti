@@ -52,7 +52,7 @@ app.action('pairing_channel_selected', async({body, ack, say, context}) => {
     // set new pairing channel to 0 in Firestore.
     else 
     {
-        await firestoreFuncs.setNewPairingChannelID(team_id, 0);
+        await firestoreFuncs.setNewPairingChannelID(team_id, "0");
     }
     appHome.updateAppHome(body.user.id, team_id, context);
 });

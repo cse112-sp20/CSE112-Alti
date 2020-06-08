@@ -172,7 +172,7 @@ async function loadHomeTabUI(app, workspaceID, userId, context) {
 			console.log(error);
 		  });
 		  console.log("name="+newChannelName);
-		  if (newChannelName !== undefined && newChannelName !== 0) {
+		  if (newChannelName !== undefined && newChannelName !== "0") {
 			channelText += ` → #${  newChannelName  } (Changing on Saturday)`
 		  }
 	  }

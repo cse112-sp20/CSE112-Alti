@@ -20,13 +20,19 @@ exports.scheduleChangePairingChannel = functions.pubsub
     // get all workspaces
     const allWorkspaces = await firestoreFuncs.getAllWorkspaces();
 
+    var newChannel;
     // go through all workspaces
     await Promise.all(allWorkspaces.map(async (workspace) => {
+        console.log("sched. workspace = "+workspace);
         // get new channel ID from Firestore
-        var newChannel = await firestoreFuncs.getNewPairingChannelID(workspace);
+        newChannel = await firestoreFuncs.getNewPairingChannelID(workspace);
         // if newChannel is NOT undefined (or 0), then change the pairing channel
-        if (newChannel !== undefined && newChannel !== 0) {
+        if (newChannel !== undefined && newChannel !== "0") {
+            console.log("sched. newChannel = " + newChannel);
             changePairingChannel(context, workspace, newChannel);
+            console.log("successfully changed pairing channel for workspace " + workspace);
+            // set back to 0
+            firestoreFuncs.setNewPairingChannelID(workspace, "0");
         }
     }));
 });
@@ -42,6 +48,5 @@ exports.scheduleChangePairingChannel = functions.pubsub
         newChannel - the new channel ID to be switched to
 */
 async function changePairingChannel(context, workspaceID, newChannel) {
-    await onBoard.boardExistingChannel(app, context.botToken, workspaceID, newChannel);
-	appHome.updateAppHome(body.user.id, body.team.id, context); // update app home
+    await onBoard.onBoardExisting(app, context.botToken, workspaceID, newChannel);
 }

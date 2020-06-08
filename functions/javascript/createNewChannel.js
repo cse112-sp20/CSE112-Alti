@@ -46,7 +46,7 @@ app.view('new_modal', async ({ ack, body, view, context }) => {
 });
 
 // Creates a new pairing channel
-async function createNewPairingChannel(app, token, team_id, channelName) {
+exports.createNewPairingChannel = async function createNewPairingChannel(app, token, team_id, channelName) {
     try {
         var promises = [];
 
@@ -199,7 +199,7 @@ var new_channel_modal =
 			"block_id": "write_name",
 			"label": {
 				"type": "plain_text",
-				"text": "What would you like to name the channel?"
+				"text": "What would you like to name the channel? Also, keep in mind that this channel will be created on Saturday."
 			},
 			"element": {
 				"type": "plain_text_input",
