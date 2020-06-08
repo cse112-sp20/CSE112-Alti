@@ -160,8 +160,7 @@ async function loadHomeTabUI(app, workspaceID, userId, context) {
 	  channelText = `Current Pairing Channel: #${  channelName  }`;
 	  // display new pairing channel if exists
 	  newChannelID = await firestoreFuncs.getNewPairingChannelID(workspaceID);
-	  console.log("newChannelID="+newChannelID);
-	  if (newChannelID !== undefined) {
+	  if (newChannelID !== undefined && newChannelID !== 0) {
 		  // get new channel name
 		  newChannelName = await app.client.conversations.info({
 			token: context.botToken,
@@ -171,9 +170,8 @@ async function loadHomeTabUI(app, workspaceID, userId, context) {
 		  }).catch((error) => {
 			console.log(error);
 		  });
-		  console.log("name="+newChannelName);
-		  if (newChannelName !== undefined && newChannelName !== "0") {
-			channelText += ` → #${  newChannelName  } (Changing on Saturday)`
+		  if (newChannelName !== undefined && newChannelName !== 0) {
+			channelText += ` → #${  newChannelName  } (Changing on Sunday)`
 		  }
 	  }
 	  let pairingData = await firestoreFuncs.getUserPairingData(workspaceID, userId);
@@ -183,7 +181,6 @@ async function loadHomeTabUI(app, workspaceID, userId, context) {
 	  }).catch((error) => {
 		  console.log(error);
 	  });
-	  console.log(partnerId);
   }
 
   if (partnerId === undefined) {
@@ -416,7 +413,7 @@ async function loadHomeTabUI(app, workspaceID, userId, context) {
 					"action_id":"warmup_time_set_button",
 					"text":{
 						"type":"plain_text",
-						"text":"set",
+						"text":"Set",
 						"emoji":true
 					}
 					},
@@ -459,7 +456,7 @@ async function loadHomeTabUI(app, workspaceID, userId, context) {
 					"action_id":"cooldown_time_set_button",
 					"text":{
 						"type":"plain_text",
-						"text":"set",
+						"text":"Set",
 						"emoji":true
 					}
 					},

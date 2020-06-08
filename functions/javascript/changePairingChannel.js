@@ -1,7 +1,6 @@
 const index = require('./index');
 const functions = require('firebase-functions');
 const firestoreFuncs = require('./firestore');
-const appHome = require('./appHome');
 const onBoard = require('./onBoard');
 const app = index.getBolt();
 
@@ -13,40 +12,65 @@ const app = index.getBolt();
     (before scheduledPairUp runs).
 */
 exports.scheduleChangePairingChannel = functions.pubsub
-							            .schedule('every sunday 12:55')
-							            .timeZone('America/Los_Angeles')
-                                        .onRun(async (context) => {
+							        .schedule('every sunday 12:55')
+							        .timeZone('America/Los_Angeles')
+                                    .onRun(async (context) => {
 
     // get all workspaces
-    const allWorkspaces = await firestoreFuncs.getAllWorkspaces();
+    const workspaces = await firestoreFuncs.getAllWorkspaces();
 
-    var newChannel;
-    // go through all workspaces
-    await Promise.all(allWorkspaces.map(async (workspace) => {
-        console.log("sched. workspace = "+workspace);
-        // get new channel ID from Firestore
-        newChannel = await firestoreFuncs.getNewPairingChannelID(workspace);
-        // if newChannel is NOT undefined (or 0), then change the pairing channel
-        if (newChannel !== undefined && newChannel !== "0") {
-            console.log("sched. newChannel = " + newChannel);
-            changePairingChannel(context, workspace, newChannel);
-            console.log("successfully changed pairing channel for workspace " + workspace);
-            // set back to 0
-            firestoreFuncs.setNewPairingChannelID(workspace, "0");
-        }
-    }));
-});
+    let promise = Promise.resolve();
+
+    // go through each workspace
+    for (i = 0; i < workspaces.length; i++) {
+        let workspace = workspaces[i];
+        promise = promise.then(res => {
+            return firestoreFuncs.getAPIPair(workspace);
+        }, rej => {
+            return firestoreFuncs.getAPIPair(workspace);
+        });
+        promise = promise.then(res => {
+            return changePairingChannelHelper(workspace, res)
+    });
+}
 
 /*
-    changePairingChannel(context, workspaceID, newChannel)
+changePairingChannelHelper(workspaceID, apiPair)
 
-    Sets the new pairing channel in a given workspace.
+Changes the pairing channel in a given workspace
+(if it was requested to be changed mid-week).
 
-    Inputs:
-        context - current context
-        workspaceID - the workspace ID of where we want to change the pairing channel
-        newChannel - the new channel ID to be switched to
+Inputs:
+    workspaceID - the workspace ID
+    apiPair - API pair for the workspace
 */
-async function changePairingChannel(context, workspaceID, newChannel) {
-    await onBoard.onBoardExisting(app, context.botToken, workspaceID, newChannel);
-}
+async function changePairingChannelHelper(workspaceID, apiPair) {
+    if (apiPair !== null) {
+        const token = apiPair.botToken;
+        try {
+            // get new channel ID from Firestore
+            var newChannel = await firestoreFuncs.getNewPairingChannelID(workspaceID);
+
+            // if newChannel is NOT undefined or 0, then change the pairing channel
+            if (newChannel !== undefined && newChannel !== 0) {
+                // switch pairing channel
+                await onBoard.onBoardExisting(app, token, workspaceID, newChannel);
+                console.log("Changed pairing channel to " + newChannel + " in workspace " + workspaceID);
+                // set newChannel to 0
+                firestoreFuncs.setNewPairingChannelID(workspaceID, 0);
+            }
+            return Promise.resolve();
+        } catch (error) {
+            console.error(error);
+        }
+    }
+    else {
+        console.error("New pairing channel in workspace " + workspaceID + 
+                        " could not be checked/changed because the api pair is not stored in firestore");
+    }
+    return Promise.reject(new Error("Workspace " + workspaceID + 
+                                    " pairing channel could not be checked/changed"));
+    }
+    promise.catch(err => console.error(err));
+    await promise;
+});

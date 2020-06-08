@@ -38,10 +38,9 @@ app.action('pairing_channel_selected', async({body, ack, say, context}) => {
     if (currentPairingChannel === undefined)
     {
         await boardExistingChannel(app, context.botToken, team_id, newChannel);
-        //console.log("After boardExisting -> Before update app home");
     } 
     // If the current pairing channel is not the same as the new channel,
-    // call the PubSub function to set the new pairing channel on Saturday.
+    // call the PubSub function to set the new pairing channel on Sunday.
     else if (currentPairingChannel !== newChannel) 
     {
         // There will always be a previous channel from this point forward
@@ -52,7 +51,7 @@ app.action('pairing_channel_selected', async({body, ack, say, context}) => {
     // set new pairing channel to 0 in Firestore.
     else 
     {
-        await firestoreFuncs.setNewPairingChannelID(team_id, "0");
+        await firestoreFuncs.setNewPairingChannelID(team_id, 0);
     }
     appHome.updateAppHome(body.user.id, team_id, context);
 });
