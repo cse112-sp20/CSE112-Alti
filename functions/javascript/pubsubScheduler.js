@@ -42,9 +42,32 @@ exports.scheduledPairUp = functions.pubsub
         return firestoreFuncs.getAPIPair(workspace);
       });
       promise = promise.then(res => {
-        return handleWorkspacePairup(workspace, res)
+        handleWorkspacePairup(workspace, res).then(res => {
+          //schedule all of the individual users random for monday 
+          let memberList = [];
+          let pairedUsers = await firestoreFuncs.getPairedUsers(workspace);
+          pairedUsers.forEach( (obj) => {
+            memberList = memberList.concat(obj.users); 
+          });
+          memberList.forEach((userId)=> {
+            //store warmup and cooldown
+
+            var warmuptext = generateTaskData.generateQuote();
+            quote = generateTaskData.generateQuote();
+            quote = quote.split("-")[1] + "-" + quote.split("-")[2];
+            var index = Math.floor(Math.random() * retroQuestions.length);
+            warmupTask = `Your partner sent you a motivational quote to help you start your day right!\n${quote}`;
+            cooldownTask = "Your partner sent you this retro: '" + retroQuestions[index].retro +
+            "' to complete";
+            firestoreFuncs.storeTypeOfExercise(workspace, userId, true, warmuptext);
+            //store cooldown 
+            firestoreFuncs.storeTypeOfExercise(workspace, userId, false, cooldownTask)
+          });
+          },rej => {
+            return Promise.reject(new Error("Workspace "+workspace+" has not been paired"));
+          });
+
       });
-    // }
   }
   promise.catch(err => console.error(err));
   await promise;
@@ -55,7 +78,7 @@ async function handleWorkspacePairup(workspace, apiPair){
 					const botToken = apiPair.botToken;
 					try{
 						const pairUpResult = await pairUp.pairUp(undefined, botToken);
-						console.log("Paired up workspace " + workspace)
+						console.log("Paired up workspace " + workspace);
 						return Promise.resolve();
 					}catch(error){
 						console.error("Could not schedule pair up for workspace " + workspace +
