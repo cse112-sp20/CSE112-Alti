@@ -34,21 +34,25 @@ exports.scheduledPairUp = functions.pubsub
   // console.log(allWorkspaces);
 	for( i=0; i<allWorkspaces.length; i++){
     let workspace = allWorkspaces[i];
-		// if ( workspace !== "T011H6FAPV4" ){
+    if(workspace === "T0137P851BJ") {
+
+   
+		  // if ( workspace !== "T011H6FAPV4" ){
       // console.log("AT: " + workspace);
       promise = promise.then(res => {
         return firestoreFuncs.getAPIPair(workspace);
       },rej => {
         return firestoreFuncs.getAPIPair(workspace);
       });
+      //getl is ist of users
+      let memberList = [];
+      let pairedUsers = await firestoreFuncs.getPairedUsers(workspace);
+      pairedUsers.forEach( (obj) => {
+        memberList = memberList.concat(obj.users); 
+      });
       promise = promise.then(res => {
         return handleWorkspacePairup(workspace, res).then(res => {
           //schedule all of the individual users random for monday 
-          let memberList = [];
-          let pairedUsers = await firestoreFuncs.getPairedUsers(workspace);
-          pairedUsers.forEach( (obj) => {
-            memberList = memberList.concat(obj.users); 
-          });
           memberList.forEach((userId)=> {
             //store warmup and cooldown
 
@@ -57,8 +61,12 @@ exports.scheduledPairUp = functions.pubsub
             quote = quote.split("-")[1] + "-" + quote.split("-")[2];
             var index = Math.floor(Math.random() * retroQuestions.length);
             warmupTask = `Your partner sent you a motivational quote to help you start your day right!\n${quote}`;
-            cooldownTask = "Your partner sent you this retro: '" + retroQuestions[index].retro +
-            "' to complete";
+            cooldownTask = "Your partner sent you this retro: '" + retroQuestions[index].retro + "' to complete";
+            
+            //warmup warmup/cd propogation
+            console.log("workspace:" + workspace + "| uid: " + userId + "| warmupText:" + warmuptext);
+
+            //store warmup
             firestoreFuncs.storeTypeOfExercise(workspace, userId, true, warmuptext);
             //store cooldown 
             firestoreFuncs.storeTypeOfExercise(workspace, userId, false, cooldownTask)
@@ -70,9 +78,13 @@ exports.scheduledPairUp = functions.pubsub
 
       });
   }
+}
   promise.catch(err => console.error(err));
   await promise;
+  
 });
+
+
 
 async function handleWorkspacePairup(workspace, apiPair){
 				if(apiPair !== null){
