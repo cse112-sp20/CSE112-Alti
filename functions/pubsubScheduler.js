@@ -258,14 +258,6 @@ async function scheduleDailyWorkspace(workspaceId) {
     scheduleDailyUser(workspaceId, m, w_token, day, threads);
   }
 
-  if (workspaceId === "T012US11G4X") {
-    var offset = new Date().getTimezoneOffset();
-    app.client.chat.postMessage({
-      token: w_token,
-      channel: channel,
-      text: "Timezone offset: " + offset + " minutes"
-    });
-  }
   /*
   // TESTING PURPOSES
   var temp = await app.client.chat.scheduledMessages.list({
@@ -302,11 +294,69 @@ async function scheduleDailyUser(workspaceId, userId, token, day, threads) {
     return null;
   }
 
+  // Schedule warmup and cooldown reminders at warmup and cooldown times
+  const warmupReminderMessage = "Hi there! It's time to start your work day so remember to get your warmup!";
+  const cooldownReminderMessage = "Hey there it's time to cool off and exit your workflow. Remember to grab your cooldown!";
+
+  var conversation = await app.client.conversations.open({
+    token: token,
+    users: userId
+  }).catch((error) => {
+      console.log(error);
+  });
+
+  if(!conversation.ok) {
+    console.log("Open DM failed!");
+}
+
   var warmupTask;
   var cooldownTask;
   var dmThreadID = pairingData.dmThreadID;
   var quote;
   var hour, min, mid;
+
+  split = warmupTime.split(" ");
+  hour = warmupTime.split(" ")[0].split(":")[0];
+  min = warmupTime.split(" ")[0].split(":")[1];
+  mid = warmupTime.split(" ")[1];
+  if (mid === "PM") {
+    hour = String(Number(hour) + 12);
+  }
+  else if (mid === "AM" && hour === "12") {
+    hour = "0";
+  }
+  if (test === 0) { 
+    console.log("Schedule warm up reminder for " + hour + ":" + min + " for userId " + `<@${  userId  }>`);
+    await schedule.scheduleMsg(hour, min, warmupReminderMessage, conversation.channel.id, token).catch((error) => {
+      console.log(error);
+    }); 
+  }
+  else {
+  // TESTING PURPOSES
+    schedule.scheduleMsg(19, 49, warmupReminderMessage, conversation.channel.id, token);
+  }
+
+  split = cooldownTime.split(" ");
+  hour = cooldownTime.split(" ")[0].split(":")[0];
+  min = cooldownTime.split(" ")[0].split(":")[1];
+  mid = cooldownTime.split(" ")[1];
+  if (mid === "PM" && hour !== "12") {
+    hour = String(Number(hour) + 12);
+  }
+  else if (mid === "AM" && hour === "12") {
+    hour = "0";
+  }
+  if (test === 0) {
+    console.log("Schedule cooldown reminder for " + hour + ":" + min + " for userId " + `<@${  userId  }>`);
+    await schedule.scheduleMsg(hour, min, cooldownReminderMessage, conversation.channel.id, token).catch((error) => {
+      console.log(error);
+    });
+  }
+  else {
+  // TESTING PURPOSES
+   await schedule.scheduleMsg(19, 49, cooldownReminderMessage, conversation.channel.id, token);
+  }
+  
 
   if (userId === threads[dmThreadID].warmupUser) {
     console.log("Warmup button is being sent for user " + `<@${  userId  }>` + " in thread " + dmThreadID);
@@ -332,7 +382,7 @@ async function scheduleDailyUser(workspaceId, userId, token, day, threads) {
     }
     else {
       // TESTING PURPOSES
-      await schedule.scheduleMsg(15, 27, warmupButtonText, dmThreadID, token, warmupMessage.getStartDayBlocks())
+      await schedule.scheduleMsg(19, 49, warmupButtonText, dmThreadID, token, warmupMessage.getStartDayBlocks())
       .catch((error) => {
         console.error(error);
       });     
@@ -362,7 +412,7 @@ async function scheduleDailyUser(workspaceId, userId, token, day, threads) {
     else {
       // TESTING PURPOSES
       
-      await schedule.scheduleMsg(15, 27, exerciseSelectNotificationText, dmThreadID, token, warmupMessage.getEndDayBlocks())
+      await schedule.scheduleMsg(19, 49, exerciseSelectNotificationText, dmThreadID, token, warmupMessage.getEndDayBlocks())
               .catch((err) => {
                 console.error(err);
               });
