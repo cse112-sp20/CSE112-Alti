@@ -1,8 +1,8 @@
 const admin = require('firebase-admin');
-const index = require('../index');
+const index = require('../slackFunctionality/index');
 const app = index.getBolt();
 let db = admin.firestore();
-let firestoreFuncs = require('../firestore');
+let firestoreFuncs = require('../util/firestore');
 
 let defaultDocInfo = {'botToken':'fake_token', 'note': 'this is Alti-Test', 
 'owner' : 'U012HPHS2FR', 'time' : '-07:00'};

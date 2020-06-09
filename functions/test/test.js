@@ -2,17 +2,17 @@
 const assert = require('assert');
 const should = require('chai').should();
 const expect = require('chai').expect;
-const index = require('../index');
+const index = require('../slackFunctionality/index');
 const testUtil = require('./testUtil');
 const app = index.getBolt();
 
-var generateTaskData = require ('../generateTaskData');
-const quotes = require('../quotes');
-const retros = require('../retros');
+var generateTaskData = require ('../slackFunctionality/generateTaskData');
+const quotes = require('../util/quotes');
+const retros = require('../util/retros');
 const motivationalQuotes = quotes.getQuotesObj();
 const retroQuestions = retros.getRetrosObj();
 
-let firestoreFuncs = require('../firestore');
+let firestoreFuncs = require('../util/firestore');
 
 const functions = require('firebase-functions');
 const config = functions.config();
@@ -24,7 +24,7 @@ describe('Unit Testing', () => {
       // helps to find the channel ids
       let util;
       before(async () => {
-        util = require('../util');
+        util = require('../util/util');
       });
       
       it('Test with channel general', async function() {
@@ -267,6 +267,76 @@ describe('Unit Testing', () => {
       }
     });
   });
+
+  describe('onBoard Test', () => {
+    let onBoard;
+    let util;
+    let team_id = 'T0137P851BJ';
+    
+    before(async function() {
+      this.timeout(5000); // 5sec
+      onBoard = require('../slackFunctionality/onBoard');
+      util = require('../util/util')
+    });
+
+    it('Test getUsersWorkspace', async function() {
+      this.timeout(5000);
+      let users = { 
+        'U01236C905V': 'alermi',
+        'U012HPHS2FR': 'dfritsch',
+        'U012P9C053Q': 'jnjohnso',
+        'U012RQ0TQG6': 'ajz007',
+        'U012X3JJS78': 'sssaiya',
+        'U012YEB5HR8': 'j2leigh',
+        'U012YGB2M50': 'rrshenoy',
+        'U012YNT21C3': 'hili',
+        'U0132DWLTT7': 'lumamoto',
+        'U0133SAJ0E7': 'yid118',
+        'U01341THLV9': 'bvanzant',
+        'U01341VGSE7': 'tlimperi',
+        'U0134PZ89UL': 'e4wei',
+        'U013G97PNFK': 'rusong' 
+      };
+      let onBoardUsers = await onBoard.onBoardFindUsersWorkspace(app, token);
+      assert.deepEqual(users, onBoardUsers);
+    });
+
+    it('Test getUsersChannel on testing', async function() {
+      this.timeout(5000);
+      let channelId = "C012B6BTVDL"; // testing channel
+      let users = [
+        'U01236C905V',
+        'U012HPHS2FR',
+        'U012P9C053Q',
+        'U012RQ0TQG6',
+        'U012X3JJS78',
+        'U012YEB5HR8',
+        'U012YGB2M50',
+        'U012YNT21C3',
+        'U0132DWLTT7',
+        'U0133SAJ0E7',
+        'U01341THLV9',
+        'U01341VGSE7',
+        'U0134PZ89UL',
+        'U013G97PNFK',
+        'U0138LYQM4Z'
+      ];
+      let onBoardUsers = await onBoard.onBoardFindUsersChannel(app, token, channelId);
+      assert.deepEqual(new Set(users), new Set(onBoardUsers));
+      
+    });
+
+    it('Test getUsersChannel on testingother', async function() {
+      this.timeout(5000);
+      let channelId = "C013REGN18F"; // testingother channel
+      let users = [
+        'U012YGB2M50',
+        'U0133SAJ0E7'
+      ];
+      let onBoardUsers = await onBoard.onBoardFindUsersChannel(app, token, channelId);
+      assert.deepEqual(new Set(users), new Set(onBoardUsers));
+    });
+  });
 });
 
 // This functions assumes that the HandleQuoteSelect function
@@ -282,7 +352,8 @@ describe('Setup Warmup Callbacks', () => {
   // UserId2 is the one being assigned the exercise
   var userId1, userId2;
 
-  var fakeBody; 
+  var fakeBody;
+  var fakeView; 
 
   async function fakeAck(){
     ackCalled = true;
@@ -316,7 +387,11 @@ describe('Setup Warmup Callbacks', () => {
           user: {id:userId1},
           view: {id:undefined},
           // The value needs to be set based on the type of exercise
-          actions: [{value:''}]
+          actions: [{values:''}]
+        };
+
+        fakeView = {
+          state: {values:{input_text : {value:''} }  }
         };
         return Promise.resolve();
       });
@@ -349,5 +424,64 @@ describe('Setup Warmup Callbacks', () => {
 
     let expectedString = "Your partner sent you this sudoku puzzle to help you get those brain juices flowing!\nComplete it here: ";
     assert.equal(check2.substring(0,expectedString.length), expectedString);
+  });
+
+  it('handleQuoteSelect', async function() {
+    let quotePoolSize =  Object.keys(motivationalQuotes).length;
+
+    let randomQuoteIndex1 = Math.floor(Math.random() * quotePoolSize);
+    fakeBody.actions[0].value = randomQuoteIndex1;
+    await handleQuoteSelect(fakeAck, fakeBody, fakeContext);
+    let prompt1 = await firestoreFuncs.getExercisePrompt(workspaceId, userId2, true);
+    //console.log(prompt1);
+
+    let randomQuoteIndex2 = Math.floor(Math.random() * quotePoolSize);
+    fakeBody.actions[0].value = randomQuoteIndex2;
+    await handleQuoteSelect(fakeAck, fakeBody, fakeContext);
+    let prompt2 = await firestoreFuncs.getExercisePrompt(workspaceId, userId2, true);
+    //console.log(prompt2);
+
+    let author1 = motivationalQuotes[randomQuoteIndex1].author;
+    let text1 = motivationalQuotes[randomQuoteIndex1].text;
+    let actualPrompt1 = ""
+
+    if( author1 === null || author1 === 'Unknown' )
+      actualPrompt1 = `Your partner sent you a motivational quote to help you start your day right! ${text1}`;
+    else
+      actualPrompt1 = `Your partner sent you a motivational quote to help you start your day right! ${author1} says: ${text1}`;
+
+    let author2 = motivationalQuotes[randomQuoteIndex2].author;
+    let text2 = motivationalQuotes[randomQuoteIndex2].text;
+    let actualPrompt2 = ""
+
+    if( author2 === null || author2 === 'Unknown' )
+      actualPrompt2 = `Your partner sent you a motivational quote to help you start your day right! ${text2}`;
+    else
+      actualPrompt2 = `Your partner sent you a motivational quote to help you start your day right! ${author2} says: ${text2}`;
+    
+    assert.equal(prompt1, actualPrompt1);
+    assert.equal(prompt2, actualPrompt2);
+  });
+
+  it('handleRetroSelect', async function() {
+    let retroPoolSize =  Object.keys(retroQuestions).length;
+
+    let randomRetroIndex1 = Math.floor(Math.random() * retroPoolSize);
+    fakeBody.actions[0].value = randomRetroIndex1;
+    await handleRetroSelect(fakeAck, fakeBody, fakeContext);
+    let prompt1 = await firestoreFuncs.getExercisePrompt(workspaceId, userId2, false);
+    //console.log(prompt1);
+
+    let randomRetroIndex2 = Math.floor(Math.random() * retroPoolSize);
+    fakeBody.actions[0].value = randomRetroIndex2;
+    await handleRetroSelect(fakeAck, fakeBody, fakeContext);
+    let prompt2 = await firestoreFuncs.getExercisePrompt(workspaceId, userId2, false);
+    //console.log(prompt2);
+
+    let actualPrompt1 = "Your partner sent you this retro: '" + retroQuestions[randomRetroIndex1].retro + "' to complete";
+    let actualPrompt2 = "Your partner sent you this retro: '" + retroQuestions[randomRetroIndex2].retro + "' to complete";
+
+    assert.equal(prompt1, actualPrompt1);
+    assert.equal(prompt2, actualPrompt2);
   });
 });
