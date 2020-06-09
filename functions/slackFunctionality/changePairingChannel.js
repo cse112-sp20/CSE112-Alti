@@ -6,7 +6,6 @@ const app = index.getBolt();
 
 /*
     scheduleChangePairingChannel
-
     If the owner selected a new pairing channel during the week,
     switches pairing channels at 12:55 PM Pacific Time
     (before scheduledPairUp runs).
@@ -36,10 +35,8 @@ exports.scheduleChangePairingChannel = functions.pubsub
 
 /*
 changePairingChannelHelper(workspaceID, apiPair)
-
 Changes the pairing channel in a given workspace
 (if it was requested to be changed mid-week).
-
 Inputs:
     workspaceID - the workspace ID
     apiPair - API pair for the workspace
@@ -73,4 +70,4 @@ async function changePairingChannelHelper(workspaceID, apiPair) {
     }
     promise.catch(err => console.error(err));
     await promise;
-});
+}); 
