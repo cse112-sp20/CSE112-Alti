@@ -47,7 +47,7 @@ exports.generateRetro = function() {
 
 
 // TODO
-function generatePuzzle(typeOfPuzzle) {
+exports.generatePuzzle =function generatePuzzle(typeOfPuzzle) {
     // Hardcoded difficulty, can be changed but also need to
     // hardcode the upper limit for each game in that case
     const difficulty = "1";
@@ -58,15 +58,28 @@ function generatePuzzle(typeOfPuzzle) {
     // Append the query parameters based on the type of game
     switch(typeOfPuzzle){
         case "sudoku":
+            //For consideration:
+            //var difficulty = Math.floor(Math.random() * 5) + 1 
+            //difficulty = difficulty.toString();
             url += generateSudokuParameters(difficulty);
             break;
         case "3inarow":
+            //For consideration:
+            //var difficulty = Math.floor(Math.random() * 2) + 1 
+            //difficulty = difficulty.toString();
             url += generate3inarowParameters(difficulty);
             break;
         case "calcudoku":
+            //For consideration:
+            //var difficulty = Math.floor(Math.random() * 3) + 1 
+            //difficulty = difficulty.toString();
             url += generateCalcudokuParameters(difficulty);
             break;
         case "hitori":
+            //For consideration:
+            //var difficulty = Math.floor(Math.random() * 3) + 1 
+            //difficulty = difficulty.toString();
+
             url += generateHitoriParameters(difficulty);
             break;
         default:
@@ -224,23 +237,25 @@ exports.generateMessageToSend = function generateMessageToSend(exerciseType, arg
   var msg = "";  	//temporary msg to store
   switch(exerciseType) {
     case "puzzle":
-      url = generatePuzzle(arg);
+
+      url = exports.generatePuzzle(arg);
       message = "Your partner sent you this " + arg +
                 " puzzle to help you get those brain juices flowing!\nComplete it here: " + url;
       break;
-	case "retro":
-		var index = arg; 
-		message = "Your partner sent you this retro: '" + retroQuestions[index].retro +
+	  case "retro":
+		  var index = arg; 
+		  message = "Your partner sent you this retro: '" + retroQuestions[index].retro +
                 "' to complete";
-	  break;
-	 case "video":
-		msg = arg; 
-		message = "Your partner sent you this video to watch! : " + msg;
-	  break;
-	case "cooldownArticle":
-		msg = arg;
-		message = "Your partner sent you a non-tech article to read! Here is the link: " + arg;
-	  break;
+	    break;
+	  case "video":
+		  msg = arg; 
+		  message = "Your partner sent you this video to watch! : " + msg;
+	    break;
+	  case "cooldownArticle":
+		  msg = arg;
+		  message = "Your partner sent you a non-tech article to read! Here is the link: " + arg;
+	    break;
+
     case "typing":
       url = exports.generateCodingChallenge(arg);
       message = "Your partner sent you this cool speed coding challenge in " + arg +
@@ -257,11 +272,11 @@ exports.generateMessageToSend = function generateMessageToSend(exerciseType, arg
         message = `Your partner sent you a motivational quote to help you start your day right! ${author} says: ${quote}`;
       }
       break;
-	  
-	case "article":
-		url = arg;
-		message = "Your partner sent you a tech article to read! Here is the link: " + arg;
-	break; 
+	 
+	  case "article":
+		  url = arg;
+		  message = "Your partner sent you a tech article to read! Here is the link: " + arg;
+	  break; 
 	
     default:
       throw new Exception('Exercise Type did not match any of the provided types.');

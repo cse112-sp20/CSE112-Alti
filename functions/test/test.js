@@ -64,28 +64,178 @@ describe('Unit Testing', () => {
     it('Testing python', () => {
       url = generateTaskData.generateCodingChallenge('python',5);
       assert.equal(url.substring(0, 37),'http://www.speedcoder.net/lessons/py/');
+      assert((url.substring(37, 38) <= '9' && url.substring(37,38) >='7') || (url.substring(37,39) === '14'));
+      
+      url = generateTaskData.generateCodingChallenge('python',1);
+      assert.equal(url.substring(0, 37),'http://www.speedcoder.net/lessons/py/');
+      //checking if difficulty in correct range
+      assert((url.substring(37, 38) <= '6') || (url.substring(37,39) === '14') || (url.substring(37,39) === '12') ||(url.substring(37,39) === '13'));
+      
     });
 
     it('Testing javascript', () => {
       url = generateTaskData.generateCodingChallenge('javascript',1);
       assert.equal(url.substring(0, 37),'http://www.speedcoder.net/lessons/js/');
+      assert((url.substring(37, 38) ==='2') || (url.substring(37,38) === '3'));
+
+      //different time test so it picks a differnt set of exercises
+      url = generateTaskData.generateCodingChallenge('javascript',3);
+      assert.equal(url.substring(0, 37),'http://www.speedcoder.net/lessons/js/');
+      assert((url.substring(37, 38) ==='4') || (url.substring(37,38) === '5'));
+
     });
 
     it('Testing java', () => {
       url = generateTaskData.generateCodingChallenge('java',2);
       assert.equal(url.substring(0, 38),'http://www.speedcoder.net/lessons/java');
+      assert((url.substring(38, 39) ==='7') || (url.substring(38, 39) <= '5'));
+
+      //different time test so it picks a differnt set of exercises
+      url = generateTaskData.generateCodingChallenge('java',5);
+      assert.equal(url.substring(0, 38),'http://www.speedcoder.net/lessons/java');
+      assert((url.substring(39, 41) === '10') || (url.substring(39, 40) === '6') ||(url.substring(39, 40) === '8') || (url.substring(39, 40) === '9'));
+  
     });
 
     it('Testing c', () => {
       url = generateTaskData.generateCodingChallenge('c',3);
       assert.equal(url.substring(0, 35),'http://www.speedcoder.net/lessons/c');
+      assert((url.substring(36, 37) ==='4') || (url.substring(36, 37) === '5'));
+
+      url = generateTaskData.generateCodingChallenge('c',1);
+      assert.equal(url.substring(0, 35),'http://www.speedcoder.net/lessons/c');
+      assert((url.substring(36, 37) <= '3'));
+
     });
 
     it('Testing c++', () => {
       url = generateTaskData.generateCodingChallenge('c++',5);
       assert.equal(url.substring(0, 37),'http://www.speedcoder.net/lessons/cpp');
+      assert((url.substring(38, 39) ==='3') || (url.substring(38, 39) === '4'));
+
+      url = generateTaskData.generateCodingChallenge('c++',2);
+      assert.equal(url.substring(0, 37),'http://www.speedcoder.net/lessons/cpp');
+      assert((url.substring(38, 39) <= '3'));
+
+    });
+
+  });
+  
+  describe('generatePuzzle', () => {
+    var url;
+    it('Testing sudoku', () => {
+      //generatePuzzle();
+      url = generateTaskData.generatePuzzle('sudoku');
+      assert.equal(url.substring(0,35),'https://brainbashers.com/showsudoku');
+    });
+
+    it('Testing 3 in a row', () => {
+      url = generateTaskData.generatePuzzle('3inarow');
+      assert.equal(url.substring(0,36),'https://brainbashers.com/show3inarow');
+    });
+
+    it('Testing calcudoku', () => {
+      url = generateTaskData.generatePuzzle('calcudoku');
+      assert.equal(url.substring(0, 38),'https://brainbashers.com/showcalcudoku');
+    });
+
+    it('Testing hitori', () => {
+      url = generateTaskData.generatePuzzle('hitori');
+      assert.equal(url.substring(0, 35),'https://brainbashers.com/showhitori');
+    });
+    it('Testing Exception', () =>{
+      assert.throws( function() {  generateTaskData.generatePuzzle('neighbors'); }, Error );
     });
   });
+
+  describe('generateMessageToSend', () => {
+    var msg;
+    var expectedString;
+    it('Testing puzzle messages', () => {
+        msg = generateTaskData.generateMessageToSend('puzzle', 'sudoku');
+        expectedString = "Your partner sent you this sudoku puzzle to help you get those brain juices flowing!\n"
+        assert.equal(msg.substring(0, 85), expectedString);
+
+        msg = generateTaskData.generateMessageToSend('puzzle', '3inarow');
+        expectedString = "Your partner sent you this 3inarow puzzle to help you get those brain juices flowing!\n"
+        assert.equal(msg.substring(0, 86), expectedString);
+
+        msg = generateTaskData.generateMessageToSend('puzzle', 'calcudoku');
+        expectedString = "Your partner sent you this calcudoku puzzle to help you get those brain juices flowing!\n"
+        assert.equal(msg.substring(0, 88), expectedString);
+
+        msg = generateTaskData.generateMessageToSend('puzzle', 'hitori');
+        expectedString = "Your partner sent you this hitori puzzle to help you get those brain juices flowing!\n"
+        assert.equal(msg.substring(0, 85), expectedString);
+    
+    });
+
+    it('Testing retro message', () => {
+      msg = generateTaskData.generateMessageToSend('retro', 0)
+      expectedString = "Your partner sent you this retro:"
+      assert.equal(msg.substring(0, 33), expectedString);
+    });
+
+    it('Testing video message', () => {
+      msg = generateTaskData.generateMessageToSend('video', "youtube.com")
+      expectedString= "Your partner sent you this video to watch! : youtube.com"
+      assert.equal(msg, expectedString);
+    });
+
+    it('Testing cooldownArticle message', () => {
+      msg = generateTaskData.generateMessageToSend('cooldownArticle', "fivethirtyeight.com")
+      expectedString= "Your partner sent you a non-tech article to read! Here is the link: fivethirtyeight.com"
+      assert.equal(msg, expectedString);
+    });
+
+    it('Testing typing message', () => {
+      msg = generateTaskData.generateMessageToSend('typing', "english");
+      expectedString = "Your partner sent you this cool speed coding challenge in english to get your mind and fingers ready for the day!\n"
+      assert.equal(msg.substring(0, 114), expectedString);
+      
+      msg = generateTaskData.generateMessageToSend('typing', "python");
+      expectedString = "Your partner sent you this cool speed coding challenge in python to get your mind and fingers ready for the day!\n"
+      assert.equal(msg.substring(0, 113), expectedString);
+
+      msg = generateTaskData.generateMessageToSend('typing', "javascript");
+      expectedString = "Your partner sent you this cool speed coding challenge in javascript to get your mind and fingers ready for the day!\n"
+      assert.equal(msg.substring(0, 117), expectedString);
+
+      msg = generateTaskData.generateMessageToSend('typing', "java");
+      expectedString = "Your partner sent you this cool speed coding challenge in java to get your mind and fingers ready for the day!\n"
+      assert.equal(msg.substring(0, 111), expectedString);
+
+      msg = generateTaskData.generateMessageToSend('typing', "c");
+      expectedString = "Your partner sent you this cool speed coding challenge in c to get your mind and fingers ready for the day!\n"
+      assert.equal(msg.substring(0, 108), expectedString);
+
+      msg = generateTaskData.generateMessageToSend('typing', "c++");
+      expectedString = "Your partner sent you this cool speed coding challenge in c++ to get your mind and fingers ready for the day!\n"
+      assert.equal(msg.substring(0, 110), expectedString);
+    });
+
+    it('Testing quote message', () => {
+      var quoteInfo = ["MLK", "A riot is the language of the unheard."]
+      msg = generateTaskData.generateMessageToSend('quote', quoteInfo);
+      expectedString= "Your partner sent you a motivational quote to help you start your day right! MLK says: A riot is the language of the unheard."
+      assert.equal(msg, expectedString);
+
+      quoteInfo = ["Unknown", "Water and words, easy to pour, impossible to recover."]
+      msg = generateTaskData.generateMessageToSend('quote', quoteInfo);
+      expectedString= "Your partner sent you a motivational quote to help you start your day right! Water and words, easy to pour, impossible to recover."
+      assert.equal(msg, expectedString);
+    });
+
+    it('Testing article message', () => {
+      msg = generateTaskData.generateMessageToSend('article', "theverge.com");
+      expectedString= "Your partner sent you a tech article to read! Here is the link: theverge.com"
+      assert.equal(msg, expectedString);
+    });
+
+  });
+
+
+  
 
   //tests random generation features
   describe('Testing Random Generation', () => {
