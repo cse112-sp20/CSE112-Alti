@@ -176,7 +176,7 @@ async function boardExistingChannel(app, token, team_id, channelId) {
 }
 
 async function safeSetSchedule(workspaceId, userId) {
-    var t = firestoreFuncs.getWarmupTime(workspaceId, userId, "Monday");
+    var t = await firestoreFuncs.getWarmupTime(workspaceId, userId, "Monday");
     if (t !== undefined) {
         return;
     }
@@ -272,11 +272,12 @@ app.event('member_joined_channel', async ({ body, context }) => {
                 promises.push(firestoreFuncs.setWarmupTime(teamId, userId, "9:00 AM", day));
                 promises.push(firestoreFuncs.setCooldownTime(teamId, userId, "5:00 PM", day));
             }
+            Promise.all(promises).catch((error) => {
+                console.log(error);
+            });
         }
 
-        Promise.all(promises).catch((error) => {
-            console.log(error);
-        });
+        
     }
 });
 
