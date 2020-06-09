@@ -1236,7 +1236,7 @@ exports.getQuotesObj = function() { return [
     "author": "Buddha"
   },
   {
-    "text": "A thing long expectedStringtakes the form of the unexpectedStringwhen at last it comes.",
+    "text": "A thing long expected takes the form of the unexpected when at last it comes.",
     "author": "Mark Twain"
   },
   {

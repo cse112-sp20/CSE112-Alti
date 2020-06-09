@@ -51,6 +51,7 @@ exports.generatePuzzle =function generatePuzzle(typeOfPuzzle) {
     // Hardcoded difficulty, can be changed but also need to
     // hardcode the upper limit for each game in that case
     const difficulty = "1";
+
     // Hardcode the start of the url
     var url = `https://brainbashers.com/show${typeOfPuzzle}.asp?`;
 
@@ -78,6 +79,7 @@ exports.generatePuzzle =function generatePuzzle(typeOfPuzzle) {
             //For consideration:
             //var difficulty = Math.floor(Math.random() * 3) + 1 
             //difficulty = difficulty.toString();
+
             url += generateHitoriParameters(difficulty);
             break;
         default:
@@ -235,6 +237,7 @@ exports.generateMessageToSend = function generateMessageToSend(exerciseType, arg
   var msg = "";  	//temporary msg to store
   switch(exerciseType) {
     case "puzzle":
+
       url = exports.generatePuzzle(arg);
       message = "Your partner sent you this " + arg +
                 " puzzle to help you get those brain juices flowing!\nComplete it here: " + url;
@@ -252,6 +255,7 @@ exports.generateMessageToSend = function generateMessageToSend(exerciseType, arg
 		  msg = arg;
 		  message = "Your partner sent you a non-tech article to read! Here is the link: " + arg;
 	    break;
+
     case "typing":
       url = exports.generateCodingChallenge(arg);
       message = "Your partner sent you this cool speed coding challenge in " + arg +
@@ -268,7 +272,7 @@ exports.generateMessageToSend = function generateMessageToSend(exerciseType, arg
         message = `Your partner sent you a motivational quote to help you start your day right! ${author} says: ${quote}`;
       }
       break;
-	  
+	 
 	  case "article":
 		  url = arg;
 		  message = "Your partner sent you a tech article to read! Here is the link: " + arg;
