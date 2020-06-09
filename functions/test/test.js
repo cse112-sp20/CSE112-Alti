@@ -70,28 +70,54 @@ describe('Unit Testing', () => {
       url = generateTaskData.generateCodingChallenge('python',1);
       assert.equal(url.substring(0, 37),'http://www.speedcoder.net/lessons/py/');
       //checking if difficulty in correct range
-      //assert((url.substring(37, 38) == '9' && url.substring(37,38) >='7') || (url.substring(37,38) === 14));
+      assert((url.substring(37, 38) <= '6') || (url.substring(37,38) === '14') || (url.substring(37,38) === '12') ||(url.substring(37,38) === '13'));
       
     });
 
     it('Testing javascript', () => {
       url = generateTaskData.generateCodingChallenge('javascript',1);
       assert.equal(url.substring(0, 37),'http://www.speedcoder.net/lessons/js/');
+      assert((url.substring(37, 38) ==='2') || (url.substring(37,38) === '3'));
+
+      //different time test so it picks a differnt set of exercises
+      url = generateTaskData.generateCodingChallenge('javascript',3);
+      assert.equal(url.substring(0, 37),'http://www.speedcoder.net/lessons/js/');
+      assert((url.substring(37, 38) ==='4') || (url.substring(37,38) === '5'));
+
     });
 
     it('Testing java', () => {
       url = generateTaskData.generateCodingChallenge('java',2);
       assert.equal(url.substring(0, 38),'http://www.speedcoder.net/lessons/java');
+      assert((url.substring(38, 39) ==='7') || (url.substring(38, 39) <= '5'));
+
+      //different time test so it picks a differnt set of exercises
+      url = generateTaskData.generateCodingChallenge('java',5);
+      assert.equal(url.substring(0, 38),'http://www.speedcoder.net/lessons/java');
+      assert((url.substring(38, 39) <= '10' && url.substring(38,39) >='8') || (url.substring(38,39) === '6'));
+  
     });
 
     it('Testing c', () => {
       url = generateTaskData.generateCodingChallenge('c',3);
       assert.equal(url.substring(0, 35),'http://www.speedcoder.net/lessons/c');
+      assert((url.substring(35, 36) ==='4') || (url.substring(35, 36) === '5'));
+
+      url = generateTaskData.generateCodingChallenge('c',1);
+      assert.equal(url.substring(0, 35),'http://www.speedcoder.net/lessons/c');
+      assert((url.substring(35, 36) <= '3'));
+
     });
 
     it('Testing c++', () => {
       url = generateTaskData.generateCodingChallenge('c++',5);
       assert.equal(url.substring(0, 37),'http://www.speedcoder.net/lessons/cpp');
+      assert((url.substring(37, 38) ==='3') || (url.substring(37, 38) === '4'));
+
+      url = generateTaskData.generateCodingChallenge('c++',2);
+      assert.equal(url.substring(0, 37),'http://www.speedcoder.net/lessons/cpp');
+      assert((url.substring(37, 38) <= '3'));
+
     });
 
   });
