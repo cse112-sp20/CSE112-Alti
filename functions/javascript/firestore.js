@@ -8,7 +8,7 @@ const firestoreFuncs = require('./firestore');
 // console.log(typeof(process.env.FUNCTIONS_EMULATOR));
 if(process.env.FUNCTIONS_EMULATOR === "true"){
     
-    var serviceAccount = require('./serviceAccountKey.json');
+    var serviceAccount = require('../serviceAccountKey.json');
     
     admin.initializeApp({
         credential: admin.credential.cert(serviceAccount),
@@ -331,9 +331,9 @@ exports.getExercisePrompt = async function getExercisePrompt(workspaceID, userID
         partner's userID, or undefined if error or cannot find the user passed in
 */
 exports.getPartner = function getPartner(workspaceID, channelID, userID) {
-    console.log(workspaceID);
-    console.log(channelID);
-    console.log(userID);
+    // console.log(workspaceID);
+    // console.log(channelID);
+    // console.log(userID);
     let userRef = db.collection("workspaces").doc(workspaceID).collection("activeChannels")
                     .doc(channelID).collection('pairedUsers').doc(userID);
     
@@ -667,4 +667,35 @@ exports.getRankings = async function getRankings(workspaceID) {
         });
         return rankings;
     });
+};
+
+/*
+    setNewPairingChannelID(workspaceID, newChannel)
+    Given a workspace, stores the ID for the new pairing channel,
+    in the newChannel field in Firestore.
+    Inputs:
+        workspaceID - the workspace of the new pairing channel
+        newChannel - the new pairing channel's ID
+*/
+exports.setNewPairingChannelID = async function setNewPairingChannelID(workspaceID, newChannel) {
+    let data = {
+        newChannel: newChannel
+    };
+    let setDoc = db.collection('workspaces')
+                .doc(workspaceID)
+                .set(data, {merge: true});
+};
+
+/*
+    getNewPairingChannelID(workspaceID)
+    Given a workspace, retrieves the ID for the new pairing channel,
+    in the newChannel field in Firestore.
+    Inputs:
+        workspaceID - the workspace of the new pairing channel
+    Returns:
+        The ID of the new pairing channel
+*/
+exports.getNewPairingChannelID = async function getNewPairingChannelID(workspaceID) {
+    const snapshot = await db.collection('workspaces').doc(workspaceID).get();
+    return snapshot.data().newChannel;
 };

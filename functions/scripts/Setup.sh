@@ -1,7 +1,13 @@
 #!/bin/bash
 
+if [[ `pwd` == *"scripts"* ]]; then
+    cd ..
+fi
+
 RunTimeConfig=".runtimeconfig.json"
 ServiceAccountKey="serviceAccountKey.json"
+
+npm install
 
 if test -f "$RunTimeConfig"; then
     echo "$RunTimeConfig exist"
@@ -11,7 +17,7 @@ else
         sed -i '' -E "1 s/[^{]*//" .runtimeconfig.json
     fi
     if [[ "$OSTYPE" == "linux-gnu"* ]]; then
-        sed -i '' -E "1 s/[^{]*//" .runtimeconfig.json
+        sed -i "1s/.*/{/" .runtimeconfig.json
     fi
     echo "$RunTimeConfig created"
 fi
@@ -23,27 +29,7 @@ else
         sed -i '' -E "1 s/[^{]*//" serviceAccountKey.json
     fi
     if [[ "$OSTYPE" == "linux-gnu"* ]]; then
-        sed -i '' -E "1 s/[^{]*//" .runtimeconfig.json
+        sed -i "1s/.*/{/" serviceAccountKey.json
     fi
     echo "$ServiceAccountKey created"
 fi
-
-if [[ $OSTYPE == "msys" ]]; then
-    CurrPath=`pwd`
-    ServiceAccountKeyPath="$CurrPath\\$ServiceAccountKey"
-    export GOOGLE_APPLICATION_CREDENTIALS="$ServiceAccountKeyPath"
-fi
-
-if [[ $OSTYPE == "darwin"* ]]; then
-    CurrPath=`pwd`
-    ServiceAccountKeyPath="$CurrPath/$ServiceAccountKey"
-    export GOOGLE_APPLICATION_CREDENTIALS="$ServiceAccountKeyPath"
-fi
-
-if [[ "$OSTYPE" == "linux-gnu"* ]]; then
-    CurrPath=`pwd`
-    ServiceAccountKeyPath="$CurrPath/$ServiceAccountKey"
-    export GOOGLE_APPLICATION_CREDENTIALS="$ServiceAccountKeyPath"
-fi
-
-nyc --reporter=lcov --reporter=text --reporter=text-summary mocha

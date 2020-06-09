@@ -2,17 +2,17 @@
 const assert = require('assert');
 const should = require('chai').should();
 const expect = require('chai').expect;
-const index = require('../index');
+const index = require('../javascript/index');
 const testUtil = require('./testUtil');
 const app = index.getBolt();
 
-var generateTaskData = require ('../generateTaskData');
-const quotes = require('../quotes');
-const retros = require('../retros');
+var generateTaskData = require ('../javascript/generateTaskData');
+const quotes = require('../javascript/quotes');
+const retros = require('../javascript/retros');
 const motivationalQuotes = quotes.getQuotesObj();
 const retroQuestions = retros.getRetrosObj();
 
-let firestoreFuncs = require('../firestore');
+let firestoreFuncs = require('../javascript/firestore');
 
 const functions = require('firebase-functions');
 const config = functions.config();
@@ -27,7 +27,7 @@ describe('Integration Testing', () => {
    
     let schedule;
     before(async () => {
-      schedule = require('../schedule');
+      schedule = require('../javascript/schedule');
     });
 
     it('schedule for 2 min after', async function() {
@@ -128,7 +128,7 @@ describe('Integration Testing', () => {
     let pairUp;
     
     before(() => {
-      pairUp = require('../pairUp');
+      pairUp = require('../javascript/pairUp');
     });
 
     describe('Test the pairup function as a whole', () => {
@@ -154,6 +154,7 @@ describe('Integration Testing', () => {
         let test = await Promise.all(await pairUp.pairUp(undefined, token));
         var pairs = await firestoreFuncs.getPairedUsers(workspaceId);
         /* eslint-disable no-await-in-loop */
+        assert(pairs.length !== 0);
         for(var i = 0; i < pairs.length; i++)
         {
           var pair = pairs[i];
@@ -223,8 +224,8 @@ describe('Integration Testing', () => {
     let workspaceId;
     let userId;
     before(async () => {
-      appHome = require('../appHome'); 
-      onBoard = require('../onBoard');
+      appHome = require('../javascript/appHome'); 
+      onBoard = require('../javascript/onBoard');
       workspaceId = "TestWorkspace";
       userId = "user1";
       await firestoreFuncs.setOwner(workspaceId, userId);
@@ -270,5 +271,55 @@ describe('Integration Testing', () => {
         assert.equal(res[i], i+1);
       }
     });
+  });
+
+  describe('onBoard Test', () => {
+    let onBoard;
+    let util;
+    let team_id = 'T0137P851BJ';
+    
+    before(async function() {
+      this.timeout(5000); // 5sec
+      onBoard = require('../javascript/onBoard');
+      util = require('../javascript/util')
+      
+    });
+
+    it('Test CreateOnBoardChannel', async function() {
+      this.timeout(30000); //30 sec
+      let channelName = "testonboard"
+      await onBoard.onBoard(app, token, team_id, channelName);
+      let channelId = await util.getChannelIdByName(app, token, channelName);
+
+      let channel_info = await app.client.conversations.info({
+        token:token,
+        channel: channelId
+      }).catch((error) => {
+              console.log(error);
+      });
+      
+      assert(channel_info.ok);
+      assert.equal(channel_info.channel.name, channelName);
+
+      let member_info = await app.client.conversations.members({
+        token:token,
+        channel:channelId
+      });
+      assert(member_info.ok);
+      assert.equal(member_info.members.length, 15); //include bot
+    });
+
+    it('Test boardExistingChannel', async function() {
+      this.timeout(30000);
+      let workspaceId = "T0137P851BJ";
+      let channelId = "C012B6BTVDL";
+      await onBoard.onBoardExisting(app, token, team_id, channelId);
+      let activeChannel = await firestoreFuncs.getPairingChannel(workspaceId);
+      assert.equal(activeChannel, channelId);
+    });
+
+    after(async function(){
+     
+    })
   });
 });

@@ -138,11 +138,8 @@ async function handlePairingResponse(response, app, token, workspaceInfo, pairin
     if(!response.ok){
         return (response.error);
     }
-    app.client.chat.postMessage({
-        token: token,
-        channel: response.channel.id,
-        text: "You ppl just got paired!"
-    });
+
+
 
     let users = await app.client.conversations.members({
         token: token,
@@ -161,6 +158,20 @@ async function handlePairingResponse(response, app, token, workspaceInfo, pairin
         }
     }
     /* eslint-enable no-await-in-loop */
+
+    let pairMessage = "";
+    if (pairedUsers.length < 3) {
+        pairMessage = "👋 Hi <@" + pairedUsers[0] + "> , <@" + pairedUsers[1] + ">! I paired you up for this week 😄\n\nUse this DM thread to help each other smoothly transition in and out of your work routines by choosing your partner's warmup and cooldown activities when I prompt you to. Don't leave your partner hanging without a warmup or cooldown! 🙌";
+    }
+    else {
+        pairMessage = "👋 Hi <@" + pairedUsers[0] + "> , <@" + pairedUsers[1] + "> , <@" + pairedUsers[2] + ">! I paired you up for this week 😄\n\nUse this DM thread to help each other smoothly transition in and out of your work routines by choosing your partner's warmup and cooldown activities when I prompt you to. Don't leave your partner hanging without a warmup or cooldown! 🙌";
+    }
+
+    app.client.chat.postMessage({
+        token: token,
+        channel: response.channel.id,
+        text: pairMessage
+    });
 
     // If the number of people in the channel is even, pair them normally.
     // If not, pair a random group of 3 people in a circle where user0 -> user1 -> user2 -> user0.

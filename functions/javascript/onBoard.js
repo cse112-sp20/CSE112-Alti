@@ -29,9 +29,31 @@ app.action('pairing_channel_selected', async({body, ack, say, context}) => {
     });
     var team_id = body.team.id;
     // TODO make the update run after the db is updated in boardExistingChannel call
-    await boardExistingChannel(app, context.botToken, team_id, body.actions[0].selected_channel);
-    //console.log("After boardExisting -> Before update app home");
-    appHome.updateAppHome(body.user.id, body.team.id, context);
+    var newChannel = body.actions[0].selected_channel;
+
+    // Get the current pairing channel
+    var currentPairingChannel = await firestoreFuncs.getPairingChannel(team_id);
+
+    // If the current pairing channel is undefined, then set it normally.
+    if (currentPairingChannel === undefined)
+    {
+        await boardExistingChannel(app, context.botToken, team_id, newChannel);
+    } 
+    // If the current pairing channel is not the same as the new channel,
+    // call the PubSub function to set the new pairing channel on Sunday.
+    else if (currentPairingChannel !== newChannel) 
+    {
+        // There will always be a previous channel from this point forward
+        // Set newChannel field in Firestore to new channel's ID
+        await firestoreFuncs.setNewPairingChannelID(team_id, newChannel);
+    }
+    // Else, if the current and new pairing channels are the same, 
+    // set new pairing channel to 0 in Firestore.
+    else 
+    {
+        await firestoreFuncs.setNewPairingChannelID(team_id, 0);
+    }
+    appHome.updateAppHome(body.user.id, team_id, context);
 });
 
 
@@ -77,7 +99,7 @@ async function createOnBoardingChannel(app, token, team_id, channelName) {
             });
 
             // invite people
-            app.client.conversations.invite({
+            await app.client.conversations.invite({
                 token: token, 
                 channel: conversationObj.channel.id,
                 users: userString
@@ -127,15 +149,15 @@ async function boardExistingChannel(app, token, team_id, channelId) {
         var promises = [];
         var userList = await findUsersChannel(app, token, channelId);
 
+        let welcomeText = "Hi everyone! 😄 My name is Alti and I just got added to this channel to make sure everyone in here gets paired up every week!\n\nIf you don't want to be paired up next week, you can simply leave this channel."
         // send welcome message
-        app.client.chat.postMessage({
+        await app.client.chat.postMessage({
             token: token,
             channel: channelId,
-            text: `Hey I've just been added to this channel! Everyone here will participate in quick 
-                    and fun warm up and cool down activities :)
-                    `
+            text: welcomeText
             
         });
+
         await firestoreFuncs.storeNewPairingChannel(team_id, channelId);
         for (var userId of userList) {
             safeSetSchedule(team_id, userId);
@@ -204,9 +226,7 @@ async function findUsersChannel(app, token, channelId) {
     }).catch((error) => {
         console.log(error);
     });
-
     return users;
-
 }
 
 
@@ -291,3 +311,5 @@ app.event('member_left_channel', async ({ body, context }) => {
 
 exports.onBoard = createOnBoardingChannel;
 exports.onBoardExisting = boardExistingChannel;
+exports.onBoardFindUsersWorkspace = findUsersWorkSpace;
+exports.onBoardFindUsersChannel = findUsersChannel;
