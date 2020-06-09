@@ -35,14 +35,14 @@ exports.scheduleChangePairingChannel = functions.pubsub
 }
 
 /*
-changePairingChannelHelper(workspaceID, apiPair)
+    changePairingChannelHelper(workspaceID, apiPair)
 
-Changes the pairing channel in a given workspace
-(if it was requested to be changed mid-week).
-
-Inputs:
-    workspaceID - the workspace ID
-    apiPair - API pair for the workspace
+    Changes the pairing channel in a given workspace
+    (if it was requested to be changed mid-week).
+    
+    Inputs:
+        workspaceID - the workspace ID
+        apiPair - API pair for the workspace
 */
 async function changePairingChannelHelper(workspaceID, apiPair) {
     if (apiPair !== null) {
@@ -73,4 +73,4 @@ async function changePairingChannelHelper(workspaceID, apiPair) {
     }
     promise.catch(err => console.error(err));
     await promise;
-});
+}); 

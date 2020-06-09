@@ -594,7 +594,7 @@ async function loadHomeTabUI(app, workspaceID, userId, context) {
 						},
 						"text": {
 							"type": "plain_text",
-							"text": "❗️*NOTE*❗️: The pairing channel will be changed on Sunday. Switching your pairing channel will remove all data previously associated with that channel. Also, users that were in the previous pairing channel will not be transferred over to the new one; they will have to manually join the channel."
+							"text": "❗️*NOTE*❗️: The pairing channel will be changed on Sunday. Switching your pairing channel will remove all data previously associated with that channel. Also, users that were in the previous pairing channel will not be transferred over to the new one."
 						},
 						"confirm": {
 							"type": "plain_text",
