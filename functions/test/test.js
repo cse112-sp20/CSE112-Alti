@@ -49,7 +49,6 @@ describe('Unit Testing', () => {
 
   describe('generateCodingChallenge', () => {
     var url;
-
     it('Testing english', () => {
       //generateCodingChallenge();
       url = generateTaskData.generateCodingChallenge('english');
@@ -94,7 +93,7 @@ describe('Unit Testing', () => {
       //different time test so it picks a differnt set of exercises
       url = generateTaskData.generateCodingChallenge('java',5);
       assert.equal(url.substring(0, 38),'http://www.speedcoder.net/lessons/java');
-      assert((url.substring(39, 40) <= '10' && url.substring(39, 40) >='8') || (url.substring(39, 40) === '6'));
+      assert((url.substring(39, 40) <=10 && url.substring(39, 40) >='8') || (url.substring(39, 40) === '6'));
   
     });
 
