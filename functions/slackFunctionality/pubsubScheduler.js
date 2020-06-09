@@ -2,7 +2,7 @@ const index = require('./index');
 const pairUp = require('./pairUp');
 const schedule = require('./schedule');
 const functions = require('firebase-functions');
-const firestoreFuncs = require('./firestore');
+const firestoreFuncs = require('../util/firestore');
 const warmupMessage = require('./warmupMessage');
 const app = index.getBolt();
 

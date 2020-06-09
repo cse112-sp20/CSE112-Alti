@@ -2,17 +2,17 @@
 const assert = require('assert');
 const should = require('chai').should();
 const expect = require('chai').expect;
-const index = require('../javascript/index');
+const index = require('../slackFunctionality/index');
 const testUtil = require('./testUtil');
 const app = index.getBolt();
 
-var generateTaskData = require ('../javascript/generateTaskData');
-const quotes = require('../javascript/quotes');
-const retros = require('../javascript/retros');
+var generateTaskData = require ('../slackFunctionality/generateTaskData');
+const quotes = require('../util/quotes');
+const retros = require('../util/retros');
 const motivationalQuotes = quotes.getQuotesObj();
 const retroQuestions = retros.getRetrosObj();
 
-let firestoreFuncs = require('../javascript/firestore');
+let firestoreFuncs = require('../util/firestore');
 
 const functions = require('firebase-functions');
 const config = functions.config();
@@ -24,7 +24,7 @@ describe('Unit Testing', () => {
       // helps to find the channel ids
       let util;
       before(async () => {
-        util = require('../javascript/util');
+        util = require('../util/util');
       });
       
       it('Test with channel general', async function() {
@@ -124,8 +124,8 @@ describe('Unit Testing', () => {
     
     before(async function() {
       this.timeout(5000); // 5sec
-      onBoard = require('../javascript/onBoard');
-      util = require('../javascript/util')
+      onBoard = require('../slackFunctionality/onBoard');
+      util = require('../util/util')
     });
 
     it('Test getUsersWorkspace', async function() {

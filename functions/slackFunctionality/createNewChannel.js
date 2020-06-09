@@ -1,6 +1,6 @@
 const index = require('./index');
 const app = index.getBolt();
-const firestoreFuncs = require('./firestore');
+const firestoreFuncs = require('../util/firestore');
 const appHome = require('./appHome');
 
 var days = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"];
