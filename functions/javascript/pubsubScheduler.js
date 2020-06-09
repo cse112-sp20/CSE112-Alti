@@ -11,11 +11,13 @@ var days = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "S
 var threads;
 var test = 0;
 /* Scheduling Idea:
-/ Pair everyone up on Sundays but only create and send the thread on earliest partner's workday start
-/ on Monday. 
+/ Pair everyone up on Sundays as well as hardcode quote and retro for Monday and store them. 
 / For Mondays, always send a quote in the intro DM as warmup and retro question as cooldown.
 / On other weekdays, send each person their warmup in the morning, cooldown in the evening, and
 / prompt for their warmup and cooldown selection for their partner in the evening too.
+/ Send reminders at user's warmup and cooldown time. 
+/ Send four buttons: one to get warmup, one to get cooldown, one to send warmup for tmr,
+/ and one to send cooldown for tmr
 / (Morning = start of workday, Evening = end of workday)
 */
 
