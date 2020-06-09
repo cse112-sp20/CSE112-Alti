@@ -45,6 +45,7 @@ exports.scheduleResetWeeklyPoints = leaderboard.scheduleResetWeeklyPoints;
 exports.scheduleResetMonthlyPoints = leaderboard.scheduleResetMonthlyPoints;
 exports.scheduleChangePairingChannel = changePairingChannel.scheduleChangePairingChannel;
 
+
 //Test Ruixian 
 exports.test1 = pubsubScheduler.test1;
 //
