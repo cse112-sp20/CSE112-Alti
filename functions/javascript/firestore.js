@@ -663,3 +663,34 @@ exports.getRankings = async function getRankings(workspaceID) {
         return rankings;
     });
 };
+
+/*
+    setNewPairingChannelID(workspaceID, newChannel)
+    Given a workspace, stores the ID for the new pairing channel,
+    in the newChannel field in Firestore.
+    Inputs:
+        workspaceID - the workspace of the new pairing channel
+        newChannel - the new pairing channel's ID
+*/
+exports.setNewPairingChannelID = async function setNewPairingChannelID(workspaceID, newChannel) {
+    let data = {
+        newChannel: newChannel
+    };
+    let setDoc = db.collection('workspaces')
+                .doc(workspaceID)
+                .set(data, {merge: true});
+};
+
+/*
+    getNewPairingChannelID(workspaceID)
+    Given a workspace, retrieves the ID for the new pairing channel,
+    in the newChannel field in Firestore.
+    Inputs:
+        workspaceID - the workspace of the new pairing channel
+    Returns:
+        The ID of the new pairing channel
+*/
+exports.getNewPairingChannelID = async function getNewPairingChannelID(workspaceID) {
+    const snapshot = await db.collection('workspaces').doc(workspaceID).get();
+    return snapshot.data().newChannel;
+};
