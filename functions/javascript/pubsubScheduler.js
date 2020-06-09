@@ -253,7 +253,7 @@ async function scheduleDailyWorkspace(workspaceId) {
   }
   else {
     // TESTING PURPOSES
-    day = "Friday";
+    day = "Tuesday";
   }
 
   //console.log("Day: " + day);
