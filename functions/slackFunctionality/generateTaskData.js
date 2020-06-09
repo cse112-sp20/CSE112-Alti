@@ -1,7 +1,7 @@
 const index = require('./index');
 const app = index.getBolt();
-const quotes = require('./quotes');
-const retros = require('./retros');
+const quotes = require('../util/quotes');
+const retros = require('../util/retros');
 const motivationalQuotes = quotes.getQuotesObj();
 const retroQuestions = retros.getRetrosObj();
 

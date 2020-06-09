@@ -910,6 +910,27 @@ var modal =
   "private_metadata": "Shhhhhhhh"
 };
 
+var cant_select_12am = {
+  "type": "modal",
+  "callback_id": 'cant_select_12am',
+  "title": {
+    "type": "plain_text",
+    "text": "Sorry!"
+  },
+  "blocks": [
+    {
+      "type": "section",
+      "text": {
+        "type": "mrkdwn",
+        "text": "Sorry you can't select 12:00AM as a warmup or cooldown time :frowning:"
+      },
+    }
+  ],
+  "close": {
+    "type": "plain_text",
+    "text": "Cancel"
+  }
+};
 
 exports.times = times;
 exports.ampm = ampm;
@@ -920,4 +941,5 @@ exports.wednesday_custom_block = this.wednesday_custom_block;
 exports.thursday_custom_block = this.thursday_custom_block;
 exports.friday_custom_block = this.friday_custom_block;
 exports.modal = modal;
+exports.cant_select_12am = cant_select_12am;
 

@@ -2,7 +2,7 @@
 */
 
 const appHome = require('./appHome');
-const firestoreFuncs = require('./firestore');
+const firestoreFuncs = require('../util/firestore');
 const index = require('./index');
 const app = index.getBolt();
 
@@ -160,10 +160,7 @@ async function boardExistingChannel(app, token, team_id, channelId) {
 
         await firestoreFuncs.storeNewPairingChannel(team_id, channelId);
         for (var userId of userList) {
-            for (var day of days) {
-                promises.push(firestoreFuncs.setWarmupTime(team_id, userId, "9:00 AM", day));
-                promises.push(firestoreFuncs.setCooldownTime(team_id, userId, "5:00 PM", day));
-            }
+            safeSetSchedule(team_id, userId);
             
             // reset everyone's weekly and monthly points
             promises.push(firestoreFuncs.resetWeeklyPoints(team_id,userId));
@@ -176,7 +173,24 @@ async function boardExistingChannel(app, token, team_id, channelId) {
     catch (error) {
         console.log(error);
     }
+}
 
+async function safeSetSchedule(workspaceId, userId) {
+    var t = await firestoreFuncs.getWarmupTime(workspaceId, userId, "Monday");
+    if (t !== undefined) {
+        return;
+    }
+    else {
+        var promises = [];
+        for (var day of days) {
+            promises.push(firestoreFuncs.setWarmupTime(team_id, userId, "9:00 AM", day));
+            promises.push(firestoreFuncs.setCooldownTime(team_id, userId, "5:00 PM", day));
+        }
+        Promise.all(promises).catch((error) => {
+            console.log(error);
+        });
+    }
+    
 }
 
 // Find the users within a workspace and return it as a dict of userId: userName
@@ -258,11 +272,12 @@ app.event('member_joined_channel', async ({ body, context }) => {
                 promises.push(firestoreFuncs.setWarmupTime(teamId, userId, "9:00 AM", day));
                 promises.push(firestoreFuncs.setCooldownTime(teamId, userId, "5:00 PM", day));
             }
+            Promise.all(promises).catch((error) => {
+                console.log(error);
+            });
         }
 
-        Promise.all(promises).catch((error) => {
-            console.log(error);
-        });
+        
     }
 });
 

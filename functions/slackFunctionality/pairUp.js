@@ -1,17 +1,9 @@
 
-//require('@google-cloud/trace-agent').start({});
-// require('@google-cloud/profiler').start({
-// 	serviceContext: {
-// 	  service: 'pair_up',
-// 	  version: '1.0.0',
-// 	},
-// 	logLeveL: 3,
-// });
 const shuffle = require('shuffle-array');
-const firestoreFuncs = require('./firestore');
+const firestoreFuncs = require('../util/firestore');
 const index = require('./index');
 const app = index.getBolt();
-const util = require('./util');
+const util = require('../util/util');
 
 // Triggers the pairing up of all people in a given channel. Cleans all the previous pairing information
 // under the active pairing channel before starting to pair. If the number of people in the active channel

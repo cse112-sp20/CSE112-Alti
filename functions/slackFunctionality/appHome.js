@@ -1,8 +1,8 @@
 const index = require('./index');
 const app = index.getBolt();
 
-const appHomeObjects = require('./appHomeObjects');
-const firestoreFuncs = require('./firestore');
+const appHomeObjects = require('../util/appHomeObjects');
+const firestoreFuncs = require('../util/firestore');
 const leaderboard = require('./leaderboard');
 
 var days = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"];
@@ -153,7 +153,7 @@ async function loadHomeTabUI(app, workspaceID, userId, context) {
 	  ownerText = `*Alti admin*: <@${  ownerId  }> – The admin can change the pairing channel, and can also choose a different admin.`;
   }
   if (channelId === undefined) {
-	  channelText = `You have not picked a pairing channel yet 😟. If you're the Atli admin, choose or create one below to get started!`;
+	  channelText = `You have not picked a pairing channel yet 😟. If you're the Alti admin, choose or create one below to get started!`;
 	  partnerText = `There's no pairing channel selected, so no pairings have been made 😢. The Alti admin needs to select a pairing channel to get started, and then make sure to join it!`;
   }
   else {
