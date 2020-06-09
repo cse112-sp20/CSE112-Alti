@@ -34,10 +34,10 @@ exports.scheduledPairUp = functions.pubsub
   // console.log(allWorkspaces);
 	for( i=0; i<allWorkspaces.length; i++){
     let workspace = allWorkspaces[i];
-    //if(workspace === "T0137P851BJ") {
-
+    if(workspace === "T012US11G4X") {
+    
    
-		  // if ( workspace !== "T011H6FAPV4" ){
+		  //if ( workspace !== "T011H6FAPV4" ){
       // console.log("AT: " + workspace);
       promise = promise.then(res => {
         return firestoreFuncs.getAPIPair(workspace);
@@ -45,43 +45,47 @@ exports.scheduledPairUp = functions.pubsub
         return firestoreFuncs.getAPIPair(workspace);
       });
       //getl is ist of users
-      let memberList = [];
-      let pairedUsers = await firestoreFuncs.getPairedUsers(workspace);
-      pairedUsers.forEach( (obj) => {
-        memberList = memberList.concat(obj.users); 
-      });
+
       promise = promise.then(res => {
         return handleWorkspacePairup(workspace, res).then(res => {
           //schedule all of the individual users random for monday 
-          memberList.forEach((userId)=> {
-            //store warmup and cooldown
-
-            var warmuptext = generateTaskData.generateQuote();
-            quote = generateTaskData.generateQuote();
-            quote = quote.split("-")[1] + "-" + quote.split("-")[2];
-            var index = Math.floor(Math.random() * retroQuestions.length);
-            warmupTask = `Your partner sent you a motivational quote to help you start your day right!\n${quote}`;
-            cooldownTask = "Your partner sent you this retro: '" + retroQuestions[index].retro + "' to complete";
-            
-            //warmup warmup/cd propogation
-            console.log("workspace:" + workspace + "| uid: " + userId + "| warmupText:" + warmuptext);
-
-            //store warmup
-            firestoreFuncs.storeTypeOfExercise(workspace, userId, true, warmuptext);
-            //store cooldown 
-            firestoreFuncs.storeTypeOfExercise(workspace, userId, false, cooldownTask)
+          let memberList = [];
+          console.log(workspace)
+          return firestoreFuncs.getPairedUsers(workspace).then((res) => {
+            let pairedUsers = res;
+            pairedUsers.forEach((obj) => {
+              memberList = memberList.concat(obj.users); 
+            });
+  
+            memberList.forEach((userId)=> {
+              //store warmup and cooldown
+  
+              var warmuptext = generateTaskData.generateQuote();
+              quote = generateTaskData.generateQuote();
+              quote = quote.split("-")[1] + "-" + quote.split("-")[2];
+              var index = Math.floor(Math.random() * retroQuestions.length);
+              warmupTask = `Your partner sent you a motivational quote to help you start your day right!\n${quote}`;
+              cooldownTask = "Your partner sent you this retro: '" + retroQuestions[index].retro + "' to complete";
+              
+              //warmup warmup/cd propogation
+              console.log("workspace:" + workspace + "| uid: " + userId + "| warmupText:" + warmuptext);
+  
+              //store warmup
+              firestoreFuncs.storeTypeOfExercise(workspace, userId, true, warmuptext);
+              //store cooldown 
+              firestoreFuncs.storeTypeOfExercise(workspace, userId, false, cooldownTask)
+            });
+              return Promise.resolve(); 
+            },rej => {
+              return Promise.reject(new Error("Workspace "+workspace+" random tasks have not been assigned for users"));
+            });
           });
-            return Promise.resolve(); 
-          },rej => {
-            return Promise.reject(new Error("Workspace "+workspace+" has not been paired"));
-          });
-
       });
-  //}
+  }
 }
   promise.catch(err => console.error(err));
   await promise;
-  
+  console.log("Done assigning random tasks for users and pairing up");
 });
 
 
