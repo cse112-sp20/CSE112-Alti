@@ -19,3 +19,5 @@ To combat this problem, Alti brings your team a unique solution that helps you e
 
 # Developer Guide
 Find all developer documentation here: [Alti Documentation](https://www.notion.so/Alti-Documentation-cafbc1ccc0a24833bc277c906625948f)
+
+To start contributing, start here: [New Developer Onboarding](https://www.notion.so/New-Developer-Onboarding-39e5d50ca55b475190ca853566c48089)
