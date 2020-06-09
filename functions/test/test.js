@@ -65,9 +65,7 @@ describe('Unit Testing', () => {
     it('Testing python', () => {
       url = generateTaskData.generateCodingChallenge('python',5);
       assert.equal(url.substring(0, 37),'http://www.speedcoder.net/lessons/py/');
-      //checking if difficulty in correct range
-      assert((url.substring(37, 38) <= '9' && url.substring(37,38) >='7') || (url.substring(37,38) === 14));
-      
+      assert((url.substring(37, 38) == '9' && url.substring(37,38) >='7') || (url.substring(37,38) === '14'));
       url = generateTaskData.generateCodingChallenge('python',1);
       assert.equal(url.substring(0, 37),'http://www.speedcoder.net/lessons/py/');
       //checking if difficulty in correct range
