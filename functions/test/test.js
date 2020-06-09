@@ -64,12 +64,12 @@ describe('Unit Testing', () => {
     it('Testing python', () => {
       url = generateTaskData.generateCodingChallenge('python',5);
       assert.equal(url.substring(0, 37),'http://www.speedcoder.net/lessons/py/');
-      assert((url.substring(37, 38) <= '9' && url.substring(37,38) >='7') || (url.substring(37,38) === '14'));
+      assert((url.substring(37, 38) <= '9' && url.substring(37,38) >='7') || (url.substring(37,39) === '14'));
       
       url = generateTaskData.generateCodingChallenge('python',1);
       assert.equal(url.substring(0, 37),'http://www.speedcoder.net/lessons/py/');
       //checking if difficulty in correct range
-      assert((url.substring(37, 38) <= '6') || (url.substring(37,38) === '14') || (url.substring(37,38) === '12') ||(url.substring(37,38) === '13'));
+      assert((url.substring(37, 38) <= '6') || (url.substring(37,39) === '14') || (url.substring(37,39) === '12') ||(url.substring(37,39) === '13'));
       
     });
 
@@ -93,7 +93,7 @@ describe('Unit Testing', () => {
       //different time test so it picks a differnt set of exercises
       url = generateTaskData.generateCodingChallenge('java',5);
       assert.equal(url.substring(0, 38),'http://www.speedcoder.net/lessons/java');
-      assert((url.substring(39, 40) <=10 && url.substring(39, 40) >='8') || (url.substring(39, 40) === '6'));
+      assert((url.substring(39, 41) === '10') || (url.substring(39, 40) === '6') ||(url.substring(39, 40) === '8') || (url.substring(39, 40) === '9'));
   
     });
 
