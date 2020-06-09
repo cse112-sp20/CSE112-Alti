@@ -287,7 +287,7 @@ async function scheduleDailyWorkspace(workspaceId) {
       if(!memberList.includes(member)){
         memberList.push(member);
       }
-    })
+    });
   });
   // console.log("memberList: ");
   // console.log(memberList);
