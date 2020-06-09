@@ -102,7 +102,7 @@ app.command('/setupwarmup', async ({ command, ack, say, context}) => {
     // Acknowledge command request
     ack();
 	//send Warmup prompts to the channel that this command was called from
-    warmupMessage.sendSelectChoice(command.channel_id,app, context.botToken);
+    warmupMessage.sendWarmupButton(command.channel_id,app, context.botToken);
 });
 
 // Handle '/getwarmup' command invocations
@@ -110,9 +110,16 @@ app.command('/getwarmup', async ({ command, ack, say, context }) => {
     // Acknowledge command request
     ack();
 
-    warmupMessage.sendExercisePrompt(command.team_id, command.user_id, command.channel_id, true, context);
+    warmupMessage.sendGetWarmupButton(command.channel_id, app, context.botToken);
 });
 
+// Handle '/getcooldown' command invocations
+app.command('/getcooldown', async ({ command, ack, say, context }) => {
+    // Acknowledge command request
+    ack();
+
+    warmupMessage.sendGetCooldownButton(command.channel_id, app, context.botToken);
+});
 
 /*
 generic_button Action Listener
@@ -155,7 +162,7 @@ app.command('/setupcooldown', async ({ command, ack, say, context }) => {
     // Acknowledge command request
     ack();
 	//send Warmup prompts to the channel that this command was called from
-    warmupMessage.sendSelectCooldownChoice(command.channel_id,app, context.botToken);
+    warmupMessage.sendCooldownButton(command.channel_id,app, context.botToken);
 });
 
 app.action('cooldown_video_select', async ({ ack, body, context }) => {
@@ -193,14 +200,7 @@ app.action('warmup_puzzle_select', async ({ ack, body, context }) => {
 app.action('warmup_quote_select', async ({ ack, body, context }) => {
    warmupMessage.warmupQuoteSelect(ack,body,context);
  });
- 
- app.action('warmup_quote_select', async ({ ack, body, context }) => {
-   warmupMessage.warmupQuoteSelect(ack,body,context);
- });
-
-
-
- 
+  
  app.view('generic_close', async ({ ack, body, context }) => {
     ack({
 	  //clear the modal off the users screen
