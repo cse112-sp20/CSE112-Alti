@@ -1,6 +1,6 @@
 const index = require('./index');
 const functions = require('firebase-functions');
-const firestoreFuncs = require('./firestore');
+const firestoreFuncs = require('../util/firestore');
 const onBoard = require('./onBoard');
 const app = index.getBolt();
 

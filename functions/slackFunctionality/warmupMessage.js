@@ -1,15 +1,7 @@
-//require('@google-cloud/trace-agent').start({});
-// require('@google-cloud/profiler').start({
-// 	serviceContext: {
-// 	  service: 'warmup_messages',
-// 	  version: '1.0.0',
-// 	},
-// 	logLeveL: 3,
-// });
 const index = require('./index');
-const quotes = require('./quotes');
+const quotes = require('../util/quotes');
 const app = index.getBolt();
-const firestoreFuncs = require('./firestore');
+const firestoreFuncs = require('../util/firestore');
 const motivationalQuotes = quotes.getQuotesObj();
 const generateData = require('./generateTaskData');
 sendSelectWarmupChoice = async function(ack,body,context){
