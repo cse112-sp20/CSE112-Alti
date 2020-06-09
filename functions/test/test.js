@@ -49,6 +49,7 @@ describe('Unit Testing', () => {
 
   describe('generateCodingChallenge', () => {
     var url;
+
     it('Testing english', () => {
       //generateCodingChallenge();
       url = generateTaskData.generateCodingChallenge('english');
@@ -65,8 +66,7 @@ describe('Unit Testing', () => {
       url = generateTaskData.generateCodingChallenge('python',5);
       assert.equal(url.substring(0, 37),'http://www.speedcoder.net/lessons/py/');
       //checking if difficulty in correct range
-      assert((url.substring(37, 38) <= 9 &&url.substring(37,38) >=7) || (url.substring(37,38) === 14));
-
+      assert.equal(url.substring(37, 38), 5);
     });
 
     it('Testing javascript', () => {
