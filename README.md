@@ -17,7 +17,9 @@ When you’re working from home, the lines become blurred between what your brai
 
 To combat this problem, Alti brings your team a unique solution that helps you efficiently "warm up" and "cool down" in and out of your work routine to ensure productivity during work hours, and regret-free relaxation with your family during your downtime.
 
-# Developer Guide
+# Documentation
 Find all developer documentation here: [Alti Documentation](https://www.notion.so/Alti-Documentation-cafbc1ccc0a24833bc277c906625948f)
 
 To start contributing, start here: [New Developer Onboarding](https://www.notion.so/New-Developer-Onboarding-39e5d50ca55b475190ca853566c48089)
+
+Are you a team looking into using Alti? Here's how to get started: [Alti User Guide](https://www.notion.so/New-Alti-User-Guide-1e79c57cdb8246ac8efb839a536d53d9)
