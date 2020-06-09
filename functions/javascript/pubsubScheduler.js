@@ -253,7 +253,7 @@ async function scheduleDailyWorkspace(workspaceId) {
   }
   else {
     // TESTING PURPOSES
-    day = "Tuesday";
+    day = "Friday";
   }
 
   //console.log("Day: " + day);
@@ -375,7 +375,7 @@ async function scheduleDailyUser(workspaceId, userId, token, day, threads) {
   }
   else {
   // TESTING PURPOSES
-    schedule.scheduleMsg(19, 49, warmupReminderMessage, conversation.channel.id, token);
+    schedule.scheduleMsg(22, 49, warmupReminderMessage, conversation.channel.id, token);
   }
 
   split = cooldownTime.split(" ");
@@ -396,7 +396,7 @@ async function scheduleDailyUser(workspaceId, userId, token, day, threads) {
   }
   else {
   // TESTING PURPOSES
-   await schedule.scheduleMsg(19, 49, cooldownReminderMessage, conversation.channel.id, token);
+   await schedule.scheduleMsg(22, 49, cooldownReminderMessage, conversation.channel.id, token);
   }
   
 
@@ -424,14 +424,14 @@ async function scheduleDailyUser(workspaceId, userId, token, day, threads) {
     }
     else {
       // TESTING PURPOSES
-      await schedule.scheduleMsg(19, 49, warmupButtonText, dmThreadID, token, warmupMessage.getStartDayBlocks())
+      await schedule.scheduleMsg(22, 49, warmupButtonText, dmThreadID, token, warmupMessage.getStartDayBlocks())
       .catch((error) => {
         console.error(error);
       });     
     }
   }
 
-  if (day !== 'Friday' && userId === threads[dmThreadID].cooldownUser) {
+  if (userId === threads[dmThreadID].cooldownUser) {
     console.log("Prompting is run for user " + `<@${  userId  }>` + " in thread " + dmThreadID);
     split = cooldownTime.split(" ");
     hour = cooldownTime.split(" ")[0].split(":")[0];
@@ -446,7 +446,7 @@ async function scheduleDailyUser(workspaceId, userId, token, day, threads) {
     }
     const exerciseSelectNotificationText = "Here is your cooldown for the day. I will remind this to you at the end of your workday!";
     if (test === 0) {
-      await schedule.scheduleMsg(hour, min, exerciseSelectNotificationText, dmThreadID, token, warmupMessage.getEndDayBlocks())
+      await schedule.scheduleMsg(hour, min, exerciseSelectNotificationText, dmThreadID, token, warmupMessage.getEndDayBlocks(day))
               .catch((err) => {
                 console.error(err);
               });
@@ -454,7 +454,7 @@ async function scheduleDailyUser(workspaceId, userId, token, day, threads) {
     else {
       // TESTING PURPOSES
       
-      await schedule.scheduleMsg(19, 49, exerciseSelectNotificationText, dmThreadID, token, warmupMessage.getEndDayBlocks())
+      await schedule.scheduleMsg(22, 49, exerciseSelectNotificationText, dmThreadID, token, warmupMessage.getEndDayBlocks(day))
               .catch((err) => {
                 console.error(err);
               });

@@ -1160,10 +1160,15 @@ exports.getStartDayBlocks = function(){
 	return [generateGetWarmupJSON()];
 }
 
-exports. getEndDayBlocks = function(){
-	let blocks = []
-	blocks.push(generateGetCooldownJSON());
-	blocks = blocks.concat(generateSetExercisesJSON());
+exports. getEndDayBlocks = function(day){
+	let blocks = [];
+	if (day === "Friday") {
+		blocks.push(generateGetCooldownJSON());
+	}
+	else {
+		blocks.push(generateGetCooldownJSON());
+		blocks = blocks.concat(generateSetExercisesJSON());
+	}
 	return blocks;
 }
 
