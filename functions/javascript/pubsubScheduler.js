@@ -34,7 +34,7 @@ exports.scheduledPairUp = functions.pubsub
   // console.log(allWorkspaces);
 	for( i=0; i<allWorkspaces.length; i++){
     let workspace = allWorkspaces[i];
-    if(workspace === "T012US11G4X") {
+    //if(workspace === "T012US11G4X") {
     
    
 		  //if ( workspace !== "T011H6FAPV4" ){
@@ -50,7 +50,7 @@ exports.scheduledPairUp = functions.pubsub
         return handleWorkspacePairup(workspace, res).then(res => {
           //schedule all of the individual users random for monday 
           let memberList = [];
-          console.log(workspace)
+          
           return firestoreFuncs.getPairedUsers(workspace).then((res) => {
             let pairedUsers = res;
             pairedUsers.forEach((obj) => {
@@ -68,7 +68,7 @@ exports.scheduledPairUp = functions.pubsub
               cooldownTask = "Your partner sent you this retro: '" + retroQuestions[index].retro + "' to complete";
               
               //warmup warmup/cd propogation
-              console.log("workspace:" + workspace + "| uid: " + userId + "| warmupText:" + warmuptext);
+              //console.log("workspace:" + workspace + "| uid: " + userId + "| warmupText:" + warmuptext);
   
               //store warmup
               firestoreFuncs.storeTypeOfExercise(workspace, userId, true, warmuptext);
@@ -81,11 +81,11 @@ exports.scheduledPairUp = functions.pubsub
             });
           });
       });
-  }
+  //}
 }
   promise.catch(err => console.error(err));
   await promise;
-  console.log("Done assigning random tasks for users and pairing up");
+  //console.log("Done assigning random tasks for users and pairing up");
 });
 
 
