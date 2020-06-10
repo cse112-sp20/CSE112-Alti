@@ -14,7 +14,7 @@ var testHour = 19;
 var testMin = 5;
 var testShiftHour = 19;
 var testShiftMin = 20;
-/* Scheduling Idea:
+/* Scheduling Idea: 
 / Pair everyone up on Sundays as well as hardcode quote and retro for Monday and store them. 
 / For Mondays, always send a quote in the intro DM as warmup and retro question as cooldown.
 / On other weekdays, send each person their warmup in the morning, cooldown in the evening, and
@@ -444,7 +444,6 @@ async function scheduleDailyUser(workspaceId, userId, token, day, threads) {
   }
 
   if (userId === threads[dmThreadID].cooldownUser) {
-    console.log("Prompting is run for user " + `<@${  userId  }>` + " in thread " + dmThreadID);
     split = cooldownTime.split(" ");
     hour = cooldownTime.split(" ")[0].split(":")[0];
     min = cooldownTime.split(" ")[0].split(":")[1];
@@ -462,6 +461,7 @@ async function scheduleDailyUser(workspaceId, userId, token, day, threads) {
     const exerciseSelectNotificationText = "Here is your cooldown for the day. I will remind this to you at the end of your workday!";
     if (test === 0) {
       [shiftedEndHour, shiftedEndMin] = calculateShiftedSendTime(hour, min);
+      console.log("CD/Prompting run for user " + `<@${  userId  }>` + " in thread " + dmThreadID + " at time " + shiftedEndHour + ":" + shiftedEndMin);
       await schedule.scheduleMsg(shiftedEndHour, shiftedEndMin, exerciseSelectNotificationText, dmThreadID, token, warmupMessage.getEndDayBlocks(day))
               .catch((err) => {
                 console.error(err);
@@ -471,8 +471,8 @@ async function scheduleDailyUser(workspaceId, userId, token, day, threads) {
       // TESTING PURPOSES
       
     [shiftedEndHour, shiftedEndMin] = calculateShiftedSendTime(testShiftHour, testShiftMin);
-    console.log("Shifted End Time: " + shiftedEndHour +":"+shiftedEndMin);
-      await schedule.scheduleMsg(shiftedEndHour, shiftedEndMin, "This is a test\n" + exerciseSelectNotificationText, dmThreadID, token, warmupMessage.getEndDayBlocks(day))
+    console.log("CD/Prompting run for user " + `<@${  userId  }>` + " in thread " + dmThreadID + " at time " + shiftedEndHour + ":" + shiftedEndMin);
+    await schedule.scheduleMsg(shiftedEndHour, shiftedEndMin, "This is a test\n" + exerciseSelectNotificationText, dmThreadID, token, warmupMessage.getEndDayBlocks(day))
               .catch((err) => {
                 console.error(err);
               });
