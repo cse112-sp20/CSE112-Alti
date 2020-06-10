@@ -497,6 +497,7 @@ function calculateShiftedSendTime(hour, min){
   let minsToShiftBack = 15;
   let shiftedHour;
   let shiftedMin;
+  // ascertain it's in number form
   hour = Number(hour);
   min = Number(min);
   if(min >= minsToShiftBack){
