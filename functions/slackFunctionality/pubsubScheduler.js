@@ -380,7 +380,7 @@ async function scheduleDailyUser(workspaceId, userId, token, day, threads) {
   }
   else {
   // TESTING PURPOSES
-    schedule.scheduleMsg(testHour, testMin, warmupReminderMessage, conversation.channel.id, token);
+    schedule.scheduleMsg(18, 0, "This is a test\n" + warmupReminderMessage, conversation.channel.id, token);
   }
 
   split = cooldownTime.split(" ");
@@ -395,13 +395,13 @@ async function scheduleDailyUser(workspaceId, userId, token, day, threads) {
   }
   if (test === 0) {
     console.log("Schedule cooldown reminder for " + hour + ":" + min + " for userId " + `<@${  userId  }>`);
-    await schedule.scheduleMsg(hour, min, cooldownReminderMessage, conversation.channel.id, token).catch((error) => {
+    await schedule.scheduleMsg(testHour, testMin, cooldownReminderMessage, conversation.channel.id, token).catch((error) => {
       console.log(error);
     });
   }
   else {
   // TESTING PURPOSES
-   await schedule.scheduleMsg(testHour, testMin, cooldownReminderMessage, conversation.channel.id, token);
+   await schedule.scheduleMsg(testHour, testMin, "This is a test\n" + cooldownReminderMessage, conversation.channel.id, token);
   }
   
 
@@ -432,8 +432,8 @@ async function scheduleDailyUser(workspaceId, userId, token, day, threads) {
     }
     else {
       // TESTING PURPOSES
-      [shiftedStartHour, shiftedStartMin] = calculateShiftedSendTime(18, 15);
-      await schedule.scheduleMsg(shiftedStartHour, shiftedStartMin, warmupButtonText, dmThreadID, token, warmupMessage.getStartDayBlocks())
+      [shiftedStartHour, shiftedStartMin] = calculateShiftedSendTime(testShiftMin, testShiftMin);
+      await schedule.scheduleMsg(shiftedStartHour, shiftedStartMin, "This is a test\n" + warmupButtonText, dmThreadID, token, warmupMessage.getStartDayBlocks())
       .catch((error) => {
         console.error(error);
       });     
@@ -458,7 +458,7 @@ async function scheduleDailyUser(workspaceId, userId, token, day, threads) {
 
     const exerciseSelectNotificationText = "Here is your cooldown for the day. I will remind this to you at the end of your workday!";
     if (test === 0) {
-      [shiftedEndHour, shiftedEndMin] = calculateShiftedSendTime(testShiftHour, testShiftMin);
+      [shiftedEndHour, shiftedEndMin] = calculateShiftedSendTime(hour, min);
       await schedule.scheduleMsg(shiftedEndHour, shiftedEndMin, exerciseSelectNotificationText, dmThreadID, token, warmupMessage.getEndDayBlocks(day))
               .catch((err) => {
                 console.error(err);
@@ -469,7 +469,7 @@ async function scheduleDailyUser(workspaceId, userId, token, day, threads) {
       
     [shiftedEndHour, shiftedEndMin] = calculateShiftedSendTime(testShiftHour, testMin);
     console.log("Shifted End Time: " + shiftedEndHour +":"+shiftedEndMin)
-      await schedule.scheduleMsg(shiftedEndHour, shiftedEndMin, exerciseSelectNotificationText, dmThreadID, token, warmupMessage.getEndDayBlocks(day))
+      await schedule.scheduleMsg(shiftedEndHour, shiftedEndMin, "This is a test\n" + exerciseSelectNotificationText, dmThreadID, token, warmupMessage.getEndDayBlocks(day))
               .catch((err) => {
                 console.error(err);
               });
