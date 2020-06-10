@@ -10,10 +10,10 @@ var days = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "S
 // class variable to track dmThreads where prompts have already been sent
 var threads;
 var test = 1;
-var testHour = 18;
-var testMin = 57;
+var testHour = 19;
+var testMin = 05;
 var testShiftHour = 19;
-var testShiftMin = 12;
+var testShiftMin = 20;
 /* Scheduling Idea:
 / Pair everyone up on Sundays as well as hardcode quote and retro for Monday and store them. 
 / For Mondays, always send a quote in the intro DM as warmup and retro question as cooldown.
