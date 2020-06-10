@@ -11,7 +11,7 @@ var days = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "S
 var threads;
 var test = 1;
 var testHour = 19;
-var testMin = 05;
+var testMin = 5;
 var testShiftHour = 19;
 var testShiftMin = 20;
 /* Scheduling Idea:
