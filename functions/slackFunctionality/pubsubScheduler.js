@@ -10,6 +10,10 @@ var days = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "S
 // class variable to track dmThreads where prompts have already been sent
 var threads;
 var test = 1;
+var testHour = 18;
+var testMin = 15;
+var testShiftHour = 18;
+var testShiftMin = 30;
 /* Scheduling Idea:
 / Pair everyone up on Sundays as well as hardcode quote and retro for Monday and store them. 
 / For Mondays, always send a quote in the intro DM as warmup and retro question as cooldown.
@@ -376,7 +380,7 @@ async function scheduleDailyUser(workspaceId, userId, token, day, threads) {
   }
   else {
   // TESTING PURPOSES
-    schedule.scheduleMsg(18, 0, warmupReminderMessage, conversation.channel.id, token);
+    schedule.scheduleMsg(testHour, testMin, warmupReminderMessage, conversation.channel.id, token);
   }
 
   split = cooldownTime.split(" ");
@@ -397,7 +401,7 @@ async function scheduleDailyUser(workspaceId, userId, token, day, threads) {
   }
   else {
   // TESTING PURPOSES
-   await schedule.scheduleMsg(18, 0, cooldownReminderMessage, conversation.channel.id, token);
+   await schedule.scheduleMsg(testHour, testMin, cooldownReminderMessage, conversation.channel.id, token);
   }
   
 
@@ -454,7 +458,7 @@ async function scheduleDailyUser(workspaceId, userId, token, day, threads) {
 
     const exerciseSelectNotificationText = "Here is your cooldown for the day. I will remind this to you at the end of your workday!";
     if (test === 0) {
-      [shiftedEndHour, shiftedEndMin] = calculateShiftedSendTime(hour, min);
+      [shiftedEndHour, shiftedEndMin] = calculateShiftedSendTime(testShiftHour, testShiftMin);
       await schedule.scheduleMsg(shiftedEndHour, shiftedEndMin, exerciseSelectNotificationText, dmThreadID, token, warmupMessage.getEndDayBlocks(day))
               .catch((err) => {
                 console.error(err);
@@ -463,7 +467,7 @@ async function scheduleDailyUser(workspaceId, userId, token, day, threads) {
     else {
       // TESTING PURPOSES
       
-    [shiftedEndHour, shiftedEndMin] = calculateShiftedSendTime(18, 15);
+    [shiftedEndHour, shiftedEndMin] = calculateShiftedSendTime(testShiftHour, testMin);
     console.log("Shifted End Time: " + shiftedEndHour +":"+shiftedEndMin)
       await schedule.scheduleMsg(shiftedEndHour, shiftedEndMin, exerciseSelectNotificationText, dmThreadID, token, warmupMessage.getEndDayBlocks(day))
               .catch((err) => {
