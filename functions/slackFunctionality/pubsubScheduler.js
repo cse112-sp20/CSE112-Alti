@@ -2,7 +2,7 @@ const index = require('./index');
 const pairUp = require('./pairUp');
 const schedule = require('./schedule');
 const functions = require('firebase-functions');
-const firestoreFuncs = require('./firestore');
+const firestoreFuncs = require('../util/firestore');
 const warmupMessage = require('./warmupMessage');
 const app = index.getBolt();
 
@@ -376,7 +376,7 @@ async function scheduleDailyUser(workspaceId, userId, token, day, threads) {
   }
   else {
   // TESTING PURPOSES
-    schedule.scheduleMsg(17, 33, warmupReminderMessage, conversation.channel.id, token);
+    schedule.scheduleMsg(18, 00, warmupReminderMessage, conversation.channel.id, token);
   }
 
   split = cooldownTime.split(" ");
@@ -397,7 +397,7 @@ async function scheduleDailyUser(workspaceId, userId, token, day, threads) {
   }
   else {
   // TESTING PURPOSES
-   await schedule.scheduleMsg(17, 33, cooldownReminderMessage, conversation.channel.id, token);
+   await schedule.scheduleMsg(18, 00, cooldownReminderMessage, conversation.channel.id, token);
   }
   
 
@@ -415,17 +415,21 @@ async function scheduleDailyUser(workspaceId, userId, token, day, threads) {
       hour = "0";
     }
 
+    let shiftedStartHour;
+    let shiftedStartMin;
     const warmupButtonText = "Hi! Click here for your warmup! I will remind you when it's time :smile:";
     if (test === 0) { 
-      console.log("Schedule warmup button for " + hour + ":" + min + " for userId " + `<@${  userId  }>`);
-      await schedule.scheduleMsg(hour, min, warmupButtonText, dmThreadID, token, warmupMessage.getStartDayBlocks())
+      [shiftedStartHour, shiftedStartMin] = calculateShiftedSendTime(hour, min);
+      console.log("Schedule warmup button for " + shiftedStartHour + ":" + shiftedStartMin + " for userId " + `<@${  userId  }>`);
+      await schedule.scheduleMsg(shiftedStartHour, shiftedStartMin, warmupButtonText, dmThreadID, token, warmupMessage.getStartDayBlocks())
       .catch((error) => {
         console.error(error);
       }); 
     }
     else {
       // TESTING PURPOSES
-      await schedule.scheduleMsg(17, 33, warmupButtonText, dmThreadID, token, warmupMessage.getStartDayBlocks())
+      [shiftedStartHour, shiftedStartMin] = calculateShiftedSendTime(18, 15);
+      await schedule.scheduleMsg(shiftedStartHour, shiftedStartMin, warmupButtonText, dmThreadID, token, warmupMessage.getStartDayBlocks())
       .catch((error) => {
         console.error(error);
       });     
@@ -445,9 +449,13 @@ async function scheduleDailyUser(workspaceId, userId, token, day, threads) {
     else if (mid === "AM" && hour === "12") {
       hour = "0";
     }
+    let shiftedEndHour;
+    let shiftedEndMin;
+
     const exerciseSelectNotificationText = "Here is your cooldown for the day. I will remind this to you at the end of your workday!";
     if (test === 0) {
-      await schedule.scheduleMsg(hour, min, exerciseSelectNotificationText, dmThreadID, token, warmupMessage.getEndDayBlocks(day))
+      [shiftedEndHour, shiftedEndMin] = calculateShiftedSendTime(hour, min);
+      await schedule.scheduleMsg(shiftedEndHour, shiftedEndMin, exerciseSelectNotificationText, dmThreadID, token, warmupMessage.getEndDayBlocks(day))
               .catch((err) => {
                 console.error(err);
               });
@@ -455,7 +463,9 @@ async function scheduleDailyUser(workspaceId, userId, token, day, threads) {
     else {
       // TESTING PURPOSES
       
-      await schedule.scheduleMsg(17, 33, exerciseSelectNotificationText, dmThreadID, token, warmupMessage.getEndDayBlocks(day))
+    [shiftedEndHour, shiftedEndMin] = calculateShiftedSendTime(18, 15);
+    console.log("Shifted End Time: " + shiftedEndHour +":"+shiftedEndMin)
+      await schedule.scheduleMsg(shiftedEndHour, shiftedEndMin, exerciseSelectNotificationText, dmThreadID, token, warmupMessage.getEndDayBlocks(day))
               .catch((err) => {
                 console.error(err);
               });
@@ -468,3 +478,30 @@ async function scheduleDailyUser(workspaceId, userId, token, day, threads) {
   return null;
 }
 
+/*
+  Calculates the time for the prompts to be sent a certain
+  amount of time earlier from the earliest start/end time.
+  Parameters:
+    hour - hour of the earliest start/end time of the thread
+    min - min of the earliest start/end time of the thread
+*/
+function calculateShiftedSendTime(hour, min){
+  let minsToShiftBack = 15;
+  let shiftedHour;
+  let shiftedMin;
+  if(min >= minsToShiftBack){
+    shiftedMin = min - minsToShiftBack;
+    shiftedHour = hour;
+  }
+  else if (shiftedHour === "0") {
+    return [shiftedHour, shiftedMin];
+  }
+  else {
+    shiftedHour = hour - 1;
+    shiftedMin = min - minsToShiftBack + 60; 
+  }
+  if (shiftedHour < 0){
+    shiftedHour += 24;
+  }
+  return [shiftedHour, shiftedMin];
+}

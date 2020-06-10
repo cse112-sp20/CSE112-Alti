@@ -1,13 +1,4 @@
 
-//working
-//require('@google-cloud/trace-agent').start({});
-// require('@google-cloud/profiler').start({
-// 	serviceContext: {
-// 	  service: 'schedule',
-// 	  version: '1.0.0',
-// 	},
-// 	logLeveL: 3,
-// });
 const index = require('./index')
 const app = index.getBolt();
 

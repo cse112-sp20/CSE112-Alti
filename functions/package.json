@@ -1,7 +1,7 @@
 {
   "name": "functions",
   "description": "Cloud Functions for Firebase",
-  "main": "./javascript/index.js",
+  "main": "./slackFunctionality/index.js",
   "scripts": {
     "test": "bash ./scripts/RunTest.sh",
     "setup": "bash ./scripts/Setup.sh",

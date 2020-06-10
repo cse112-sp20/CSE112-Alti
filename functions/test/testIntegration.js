@@ -2,17 +2,17 @@
 const assert = require('assert');
 const should = require('chai').should();
 const expect = require('chai').expect;
-const index = require('../javascript/index');
+const index = require('../slackFunctionality/index');
 const testUtil = require('./testUtil');
 const app = index.getBolt();
 
-var generateTaskData = require ('../javascript/generateTaskData');
-const quotes = require('../javascript/quotes');
-const retros = require('../javascript/retros');
+var generateTaskData = require ('../slackFunctionality/generateTaskData');
+const quotes = require('../util/quotes');
+const retros = require('../util/retros');
 const motivationalQuotes = quotes.getQuotesObj();
 const retroQuestions = retros.getRetrosObj();
 
-let firestoreFuncs = require('../javascript/firestore');
+let firestoreFuncs = require('../util/firestore');
 
 const functions = require('firebase-functions');
 const config = functions.config();
@@ -27,7 +27,7 @@ describe('Integration Testing', () => {
    
     let schedule;
     before(async () => {
-      schedule = require('../javascript/schedule');
+      schedule = require('../slackFunctionality/schedule');
     });
 
     it('schedule for 2 min after', async function() {
@@ -128,7 +128,7 @@ describe('Integration Testing', () => {
     let pairUp;
     
     before(() => {
-      pairUp = require('../javascript/pairUp');
+      pairUp = require('../slackFunctionality/pairUp');
     });
 
     describe('Test the pairup function as a whole', () => {
@@ -224,8 +224,8 @@ describe('Integration Testing', () => {
     let workspaceId;
     let userId;
     before(async () => {
-      appHome = require('../javascript/appHome'); 
-      onBoard = require('../javascript/onBoard');
+      appHome = require('../slackFunctionality/appHome'); 
+      onBoard = require('../slackFunctionality/onBoard');
       workspaceId = "TestWorkspace";
       userId = "user1";
       await firestoreFuncs.setOwner(workspaceId, userId);
@@ -280,8 +280,8 @@ describe('Integration Testing', () => {
     
     before(async function() {
       this.timeout(5000); // 5sec
-      onBoard = require('../javascript/onBoard');
-      util = require('../javascript/util')
+      onBoard = require('../slackFunctionality/onBoard');
+      util = require('../util/util')
       
     });
 
