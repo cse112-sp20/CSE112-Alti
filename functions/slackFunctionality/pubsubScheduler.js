@@ -376,7 +376,7 @@ async function scheduleDailyUser(workspaceId, userId, token, day, threads) {
   }
   else {
   // TESTING PURPOSES
-    schedule.scheduleMsg(18, 00, warmupReminderMessage, conversation.channel.id, token);
+    schedule.scheduleMsg(18, 0, warmupReminderMessage, conversation.channel.id, token);
   }
 
   split = cooldownTime.split(" ");
@@ -397,7 +397,7 @@ async function scheduleDailyUser(workspaceId, userId, token, day, threads) {
   }
   else {
   // TESTING PURPOSES
-   await schedule.scheduleMsg(18, 00, cooldownReminderMessage, conversation.channel.id, token);
+   await schedule.scheduleMsg(18, 0, cooldownReminderMessage, conversation.channel.id, token);
   }
   
 
