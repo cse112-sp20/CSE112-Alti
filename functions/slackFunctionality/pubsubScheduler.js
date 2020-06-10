@@ -11,9 +11,9 @@ var days = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "S
 var threads;
 var test = 1;
 var testHour = 18;
-var testMin = 15;
-var testShiftHour = 18;
-var testShiftMin = 30;
+var testMin = 57;
+var testShiftHour = 19;
+var testShiftMin = 12;
 /* Scheduling Idea:
 / Pair everyone up on Sundays as well as hardcode quote and retro for Monday and store them. 
 / For Mondays, always send a quote in the intro DM as warmup and retro question as cooldown.
@@ -135,7 +135,7 @@ async function scheduleDailyHelper() {
   else {
   // TESTING PURPOSES
     // scheduleDailyWorkspace("T012US11G4X");
-    scheduleDailyWorkspace("T011H6FAPV4");
+     scheduleDailyWorkspace("T011H6FAPV4");
     //scheduleDailyWorkspace("T0132EDC3M4");
 
   }
@@ -380,7 +380,8 @@ async function scheduleDailyUser(workspaceId, userId, token, day, threads) {
   }
   else {
   // TESTING PURPOSES
-    schedule.scheduleMsg(18, 0, "This is a test\n" + warmupReminderMessage, conversation.channel.id, token);
+  console.log("Schedule warm up reminder for " + testHour + ":" + testMin + " for userId " + `<@${  userId  }>`);
+    schedule.scheduleMsg(testHour, testMin, "This is a test\n" + warmupReminderMessage, conversation.channel.id, token);
   }
 
   split = cooldownTime.split(" ");
@@ -395,12 +396,13 @@ async function scheduleDailyUser(workspaceId, userId, token, day, threads) {
   }
   if (test === 0) {
     console.log("Schedule cooldown reminder for " + hour + ":" + min + " for userId " + `<@${  userId  }>`);
-    await schedule.scheduleMsg(testHour, testMin, cooldownReminderMessage, conversation.channel.id, token).catch((error) => {
+    await schedule.scheduleMsg(hour, min, cooldownReminderMessage, conversation.channel.id, token).catch((error) => {
       console.log(error);
     });
   }
   else {
   // TESTING PURPOSES
+  console.log("Schedule cooldown reminder for " + testHour + ":" + testMin + " for userId " + `<@${  userId  }>`);
    await schedule.scheduleMsg(testHour, testMin, "This is a test\n" + cooldownReminderMessage, conversation.channel.id, token);
   }
   
@@ -419,7 +421,7 @@ async function scheduleDailyUser(workspaceId, userId, token, day, threads) {
       hour = "0";
     }
 
-    let shiftedStartHour;
+    let shiftedStartHour; 
     let shiftedStartMin;
     const warmupButtonText = "Hi! Click here for your warmup! I will remind you when it's time :smile:";
     if (test === 0) { 
@@ -432,7 +434,8 @@ async function scheduleDailyUser(workspaceId, userId, token, day, threads) {
     }
     else {
       // TESTING PURPOSES
-      [shiftedStartHour, shiftedStartMin] = calculateShiftedSendTime(testShiftMin, testShiftMin);
+      [shiftedStartHour, shiftedStartMin] = calculateShiftedSendTime(testShiftHour, testShiftMin);
+      console.log("Schedule warmup button for " + shiftedStartHour + ":" + shiftedStartMin + " for userId " + `<@${  userId  }>`);
       await schedule.scheduleMsg(shiftedStartHour, shiftedStartMin, "This is a test\n" + warmupButtonText, dmThreadID, token, warmupMessage.getStartDayBlocks())
       .catch((error) => {
         console.error(error);
@@ -467,8 +470,8 @@ async function scheduleDailyUser(workspaceId, userId, token, day, threads) {
     else {
       // TESTING PURPOSES
       
-    [shiftedEndHour, shiftedEndMin] = calculateShiftedSendTime(testShiftHour, testMin);
-    console.log("Shifted End Time: " + shiftedEndHour +":"+shiftedEndMin)
+    [shiftedEndHour, shiftedEndMin] = calculateShiftedSendTime(testShiftHour, testShiftMin);
+    console.log("Shifted End Time: " + shiftedEndHour +":"+shiftedEndMin);
       await schedule.scheduleMsg(shiftedEndHour, shiftedEndMin, "This is a test\n" + exerciseSelectNotificationText, dmThreadID, token, warmupMessage.getEndDayBlocks(day))
               .catch((err) => {
                 console.error(err);
@@ -497,7 +500,7 @@ function calculateShiftedSendTime(hour, min){
     shiftedMin = min - minsToShiftBack;
     shiftedHour = hour;
   }
-  else if (shiftedHour === "0") {
+  else if (shiftedHour === "0" || shiftedHour === 0) {
     return [shiftedHour, shiftedMin];
   }
   else {
