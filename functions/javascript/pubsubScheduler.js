@@ -9,7 +9,7 @@ const app = index.getBolt();
 var days = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
 // class variable to track dmThreads where prompts have already been sent
 var threads;
-var test = 0;
+var test = 1;
 /* Scheduling Idea:
 / Pair everyone up on Sundays as well as hardcode quote and retro for Monday and store them. 
 / For Mondays, always send a quote in the intro DM as warmup and retro question as cooldown.
@@ -130,8 +130,8 @@ async function scheduleDailyHelper() {
   }
   else {
   // TESTING PURPOSES
-     scheduleDailyWorkspace("T012US11G4X");
-    //scheduleDailyWorkspace("T011H6FAPV4");
+    // scheduleDailyWorkspace("T012US11G4X");
+    scheduleDailyWorkspace("T011H6FAPV4");
     //scheduleDailyWorkspace("T0132EDC3M4");
 
   }
@@ -294,13 +294,14 @@ async function scheduleDailyWorkspace(workspaceId) {
 
   // TODO make dict of threads of earliest user times
   await addToThreads(workspaceId, memberList, w_token, threads, day);
-  // console.log("Threads:");
-  // console.log(threads);
+  console.log("Threads:");
+  console.log(threads);
   for (var m of memberList) {
     scheduleDailyUser(workspaceId, m, w_token, day, threads);
   }
 
   /*
+  scheduleDailyUser(workspaceId, "U011HDLFMCN", w_token, day, threads);
   // TESTING PURPOSES
   var temp = await app.client.chat.scheduledMessages.list({
     token: w_token,
@@ -375,7 +376,7 @@ async function scheduleDailyUser(workspaceId, userId, token, day, threads) {
   }
   else {
   // TESTING PURPOSES
-    schedule.scheduleMsg(22, 49, warmupReminderMessage, conversation.channel.id, token);
+    schedule.scheduleMsg(17, 33, warmupReminderMessage, conversation.channel.id, token);
   }
 
   split = cooldownTime.split(" ");
@@ -396,7 +397,7 @@ async function scheduleDailyUser(workspaceId, userId, token, day, threads) {
   }
   else {
   // TESTING PURPOSES
-   await schedule.scheduleMsg(22, 49, cooldownReminderMessage, conversation.channel.id, token);
+   await schedule.scheduleMsg(17, 33, cooldownReminderMessage, conversation.channel.id, token);
   }
   
 
@@ -424,7 +425,7 @@ async function scheduleDailyUser(workspaceId, userId, token, day, threads) {
     }
     else {
       // TESTING PURPOSES
-      await schedule.scheduleMsg(22, 49, warmupButtonText, dmThreadID, token, warmupMessage.getStartDayBlocks())
+      await schedule.scheduleMsg(17, 33, warmupButtonText, dmThreadID, token, warmupMessage.getStartDayBlocks())
       .catch((error) => {
         console.error(error);
       });     
@@ -454,7 +455,7 @@ async function scheduleDailyUser(workspaceId, userId, token, day, threads) {
     else {
       // TESTING PURPOSES
       
-      await schedule.scheduleMsg(22, 49, exerciseSelectNotificationText, dmThreadID, token, warmupMessage.getEndDayBlocks(day))
+      await schedule.scheduleMsg(17, 33, exerciseSelectNotificationText, dmThreadID, token, warmupMessage.getEndDayBlocks(day))
               .catch((err) => {
                 console.error(err);
               });

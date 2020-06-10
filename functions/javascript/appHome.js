@@ -104,7 +104,8 @@ async function createScheduleDisplay(workspaceId, userId) {
 /* Checks if user is owner or not and loads up either owner home tab or non-owner home tab
 */
 async function loadHomeTabUI(app, workspaceID, userId, context) {
-
+// TODO Huge lag in updating schedule times display could partly be caused by too many awaits.
+ 	// Possibly use Promise.all or .then to decrease number 
 	var view;
 
 	var ownerId = await firestoreFuncs.getOwner(workspaceID).then((obj)=>{
