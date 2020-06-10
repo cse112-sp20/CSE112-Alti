@@ -9,7 +9,7 @@ const app = index.getBolt();
 var days = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
 // class variable to track dmThreads where prompts have already been sent
 var threads;
-var test = 1;
+var test = 0;
 var testHour = 19;
 var testMin = 5;
 var testShiftHour = 19;
