@@ -14,7 +14,7 @@ var testHour = 19;
 var testMin = 5;
 var testShiftHour = 19;
 var testShiftMin = 20;
-/* Scheduling Idea:
+/* Scheduling Idea: 
 / Pair everyone up on Sundays as well as hardcode quote and retro for Monday and store them. 
 / For Mondays, always send a quote in the intro DM as warmup and retro question as cooldown.
 / On other weekdays, send each person their warmup in the morning, cooldown in the evening, and
