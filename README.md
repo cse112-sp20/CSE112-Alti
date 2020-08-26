@@ -16,6 +16,9 @@ When you’re working from home, the lines become blurred between what your brai
 
 To combat this problem, Alti brings your team a unique solution that helps you efficiently "warm up" and "cool down" in and out of your work routine to ensure productivity during work hours, and regret-free relaxation with your family during your downtime.
 
+
+View our feature demo video here: [Demo Video](https://www.notion.so/Feature-Demo-Video-0a8adc350cf34b45a1eff6c7ab093de3)
+
 More details on Slack app page here: [Alti Slack App](https://slack.com/apps/A012W8N2L4B-alti)
 
 # Documentation
