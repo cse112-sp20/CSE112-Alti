@@ -18,6 +18,7 @@ To combat this problem, Alti brings your team a unique solution that helps you e
 
 
 View our feature demo video here: [Demo Video](https://www.notion.so/Feature-Demo-Video-0a8adc350cf34b45a1eff6c7ab093de3)
+
 More details on Slack app page here: [Alti Slack App](https://slack.com/apps/A012W8N2L4B-alti)
 
 # Documentation
